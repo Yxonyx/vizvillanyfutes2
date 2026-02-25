@@ -1,0 +1,36 @@
+{
+  "name": "vizvillanyfutes",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@stripe/react-stripe-js": "^5.6.0",
+    "@stripe/stripe-js": "^8.8.0",
+    "@supabase/supabase-js": "^2.97.0",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.400.0",
+    "mapbox-gl": "^3.18.1",
+    "next": "14.2.0",
+    "nodemailer": "^7.0.11",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-map-gl": "^8.1.0",
+    "resend": "^6.5.2",
+    "stripe": "^20.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/nodemailer": "^7.0.4",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5"
+  }
+}

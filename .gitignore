@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Next.js
+.next/
+out/
+build/
+
+# Production
+dist/
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+netlify.env
+netlify-env-vars.txt
+NETLIFY_ENV_VARS.md
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+*.log
+*.cache
+
+# Temp/debug files
+*.resolved
+build_debug*.txt
+error.html
+out.html
+hero-options.html
+animation-prototype.html
+scripts/apply_*.mjs
+update_rpc*.sql
+docs/*.pdf

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <!-- Main Pages -->
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.vizvillanyfutes.hu/opengraph-image</image:loc>
+      <image:title>VízVillanyFűtés - Vízszerelő, Villanyszerelő, Fűtésszerelő Budapest</image:title>
+    </image:image>
+  </url>
+  
+  <!-- Service Pages - High Priority -->
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/vizszerelo-budapest</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/villanyszerelo-budapest</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/dugulaselharitas-budapest</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/futeskorszerusites</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Booking & Pricing - Critical Conversion Pages -->
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/foglalas</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/visszahivas</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/arak</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Grant Calculator -->
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/palyazat-kalkulator</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- B2B & Partner Pages -->
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/general-kivitelezo-partner</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/csatlakozz-partnerkent</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Blog Index -->
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/blog</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Blog Posts -->
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/blog/1</loc>
+    <lastmod>2025-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/blog/2</loc>
+    <lastmod>2025-11-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/blog/3</loc>
+    <lastmod>2025-11-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/blog/4</loc>
+    <lastmod>2025-11-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/blog/5</loc>
+    <lastmod>2025-11-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/blog/6</loc>
+    <lastmod>2025-11-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/blog/7</loc>
+    <lastmod>2025-11-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/blog/8</loc>
+    <lastmod>2025-10-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Information Pages -->
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/rolunk</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/gyik</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/szolgaltatasi-teruletek</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/kapcsolat</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Legal Pages -->
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/aszf</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/adatkezeles</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/cookie</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.vizvillanyfutes.hu/impresszum</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>

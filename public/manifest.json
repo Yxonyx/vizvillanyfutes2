@@ -1,0 +1,26 @@
+{
+  "name": "VízVillanyFűtés",
+  "short_name": "VízVillanyFűtés",
+  "description": "Professzionális víz-, villany- és fűtésszerelés Budapesten és Pest megyében",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1F8DFF",
+  "icons": [
+    {
+      "src": "/icon",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icon-192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
