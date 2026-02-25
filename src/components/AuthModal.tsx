@@ -19,7 +19,7 @@ export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
         if (isContractor) setContractorLoading(true); else setLoading(true);
         setError(null);
 
-        const fakeId = `demo-${role}-${Date.now()}`;
+        const fakeId = crypto.randomUUID();
         const fakeEmail = isContractor
             ? 'demo.szakember@vizvillanyfutes.hu'
             : 'demo.ugyfel@vizvillanyfutes.hu';
