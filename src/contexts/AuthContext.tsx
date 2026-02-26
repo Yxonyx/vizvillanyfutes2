@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  // Listen for Supabase auth state changes (catches direct signIn from AuthModal demo)
+  // Listen for Supabase auth state changes (catches direct signIn from AuthModal)
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, sbSession) => {

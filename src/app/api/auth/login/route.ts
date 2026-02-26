@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     if (authError) {
       console.error('Auth login error:', authError);
-      
+
       // Handle specific auth errors
       if (authError.message.includes('Invalid login credentials')) {
         return NextResponse.json(
@@ -28,14 +28,14 @@ export async function POST(request: NextRequest) {
           { status: 401 }
         );
       }
-      
+
       if (authError.message.includes('Email not confirmed')) {
         return NextResponse.json(
           { success: false, error: 'Kérjük erősítse meg email címét' },
           { status: 401 }
         );
       }
-      
+
       return NextResponse.json(
         { success: false, error: authError.message },
         { status: 401 }
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       // User exists but no meta - might be a new user
     }
 
-    // Check if user is active
+    // Check if user is suspended
     if (userMeta?.status === 'suspended') {
       return NextResponse.json(
         { success: false, error: 'Fiók felfüggesztve. Kérjük vegye fel velünk a kapcsolatot.' },
@@ -69,9 +69,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Block login until admin approves the account
     if (userMeta?.status === 'pending_approval') {
       return NextResponse.json(
-        { success: false, error: 'Fiók jóváhagyásra vár. Kérjük várjon az admin jóváhagyására.' },
+        { success: false, error: 'Fiókja jóváhagyásra vár. Amint az admin jóváhagyja, szabadon bejelentkezhet.' },
         { status: 403 }
       );
     }
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
         .select('id, display_name, status')
         .eq('user_id', authData.user.id)
         .single();
-      
+
       contractorProfile = profile;
 
       // Check contractor approval status
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
           { status: 403 }
         );
       }
-      
+
       if (profile?.status === 'rejected') {
         return NextResponse.json(
           { success: false, error: 'Partner jelentkezése el lett utasítva.' },
