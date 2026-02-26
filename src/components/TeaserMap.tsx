@@ -84,7 +84,7 @@ export default function TeaserMap() {
 
         // Fetch initial leads
         const fetchLeads = async () => {
-            const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+            const { data, error } = await supabase.from('leads').select('*').eq('status', 'waiting').order('created_at', { ascending: false });
             if (!error && data) {
                 setLeads(data as Lead[]);
             }
