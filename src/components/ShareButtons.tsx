@@ -11,12 +11,12 @@ export default function ShareButtons({ url, title }: ShareButtonsProps) {
     const shareUrl = encodeURIComponent(url);
 
     return (
-        <div className="flex items-center gap-4 py-6 border-t border-b border-gray-100 my-8">
-            <div className="flex items-center gap-2 text-gray-600 font-medium">
+        <div className="flex flex-wrap items-center gap-4 py-6 border-t border-b border-gray-100 my-8">
+            <div className="flex items-center gap-2 text-gray-600 font-medium shrink-0">
                 <Share2 className="w-5 h-5" />
                 <span>Megosztás:</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
                 <button
                     onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, 'facebook-share', 'width=600,height=400')}
                     className="bg-[#1877F2] text-white p-2 rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity"

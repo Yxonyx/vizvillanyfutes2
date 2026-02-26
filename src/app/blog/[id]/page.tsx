@@ -313,51 +313,61 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <section className="bg-gradient-to-br from-vvm-blue-600 to-vvm-blue-800 text-white pt-28 lg:pt-32 pb-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href="/blog" className="inline-flex items-center gap-2 text-blue-200 hover:text-white mb-6">
-            <ArrowLeft className="w-5 h-5" />
-            <span>Vissza a bloghoz</span>
-          </Link>
+      <section className="bg-gradient-to-br from-vvm-blue-600 to-vvm-blue-800 text-white pt-24 pb-12 lg:pt-32 lg:pb-16 relative overflow-hidden">
+        {/* Subtle background decoration */}
+        <div className="absolute top-0 right-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-20">
+          <div className="absolute -top-20 -right-20 w-96 h-96 bg-blue-400 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 -left-20 w-80 h-80 bg-vvm-blue-400 rounded-full blur-3xl"></div>
+        </div>
 
-          <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium mb-4 ${categoryColors[post.category]}`}>
-            <CategoryIcon className="w-4 h-4" />
-            {post.categoryLabel}
-          </span>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="mb-6 lg:mb-8">
+            <Link href="/blog" className="inline-flex items-center gap-2 text-blue-200 hover:text-white transition-colors">
+              <ArrowLeft className="w-5 h-5" />
+              <span className="font-medium">Vissza a bloghoz</span>
+            </Link>
+          </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold font-heading mb-6">
+          <div className="mb-4 lg:mb-6">
+            <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs lg:text-sm font-bold tracking-wide uppercase shadow-sm border border-white/20 ${categoryColors[post.category]}`}>
+              <CategoryIcon className="w-4 h-4" />
+              {post.categoryLabel}
+            </span>
+          </div>
+
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold font-heading mb-6 leading-tight">
             {post.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-6 text-blue-200">
+          <div className="flex flex-wrap items-center gap-4 lg:gap-6 text-sm lg:text-base text-blue-100 font-medium">
             <div className="flex items-center gap-2">
-              <User className="w-4 h-4" />
+              <User className="w-4 h-4 opacity-70" />
               <span>{post.author}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4 opacity-70" />
               <span>{post.date}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span>{post.readTime} olvasás</span>
+            <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">
+              <Clock className="w-4 h-4 text-vvm-yellow-400" />
+              <span className="text-white">{post.readTime} olvasás</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-12">
+      <section className="py-10 lg:py-12 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Main Content */}
-            <div className="lg:col-span-2">
-              <article className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
-                <div className="prose prose-lg max-w-none">
+            <div className="lg:col-span-2 min-w-0">
+              <article className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 sm:p-8 lg:p-12 mb-8 overflow-hidden">
+                <div className="prose prose-base sm:prose-lg max-w-none prose-headings:font-heading prose-headings:text-slate-800 prose-p:text-slate-600 prose-a:text-vvm-blue-600 hover:prose-a:text-vvm-blue-800 prose-strong:text-slate-800 prose-ul:text-slate-600 break-words">
                   {post.content.map((paragraph, index) => {
                     if (paragraph.startsWith('## ')) {
                       return (
-                        <h2 key={index} className="text-2xl font-bold text-gray-900 mt-8 mb-4">
+                        <h2 key={index} className="text-xl sm:text-2xl font-bold text-slate-800 mt-8 mb-4 lg:mt-10 lg:mb-5">
                           {paragraph.replace('## ', '')}
                         </h2>
                       );
@@ -368,7 +378,7 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
                       const parts = text.split(/(\*\*.*?\*\*)/g);
                       return parts.map((part, i) => {
                         if (part.startsWith('**') && part.endsWith('**')) {
-                          return <strong key={i} className="font-semibold text-gray-900">{part.slice(2, -2)}</strong>;
+                          return <strong key={i} className="font-semibold text-slate-800">{part.slice(2, -2)}</strong>;
                         }
                         return part;
                       });
@@ -376,47 +386,50 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
 
                     if (paragraph.startsWith('- ')) {
                       return (
-                        <ul key={index} className="list-disc list-inside text-gray-600 space-y-1 mb-2">
+                        <ul key={index} className="list-disc list-inside text-slate-600 space-y-2 mb-3 pl-2">
                           <li>{renderInlineFormatting(paragraph.replace('- ', ''))}</li>
                         </ul>
                       );
                     }
                     return (
-                      <p key={index} className="text-gray-600 mb-4 leading-relaxed">
+                      <p key={index} className="text-slate-600 mb-5 leading-relaxed">
                         {renderInlineFormatting(paragraph)}
                       </p>
                     );
                   })}
                 </div>
 
-                {/* Share */}
-                <ShareButtons
-                  url={`https://www.vizvillanyfutes.hu/blog/${params.id}`}
-                  title={post.title}
-                />
+                <div className="mt-10 pt-8 border-t border-slate-100">
+                  {/* Share */}
+                  <ShareButtons
+                    url={`https://www.vizvillanyfutes.hu/blog/${params.id}`}
+                    title={post.title}
+                  />
+                </div>
               </article>
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 space-y-6 lg:space-y-8">
               {/* CTA */}
-              <div className="bg-gradient-to-br from-vvm-blue-600 to-vvm-blue-800 rounded-2xl p-6 text-white mb-8 shadow-lg">
-                <h3 className="font-bold text-xl mb-3">Sürgős segítség kell?</h3>
-                <p className="text-blue-100 text-sm mb-6">
+              <div className="bg-gradient-to-br from-vvm-blue-600 to-vvm-blue-800 rounded-3xl p-6 lg:p-8 text-white shadow-xl relative overflow-hidden">
+                <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                <h3 className="font-bold text-xl lg:text-2xl mb-3 relative z-10 font-heading">Sürgős segítség kell?</h3>
+                <p className="text-blue-100 text-sm lg:text-base mb-6 relative z-10 leading-relaxed">
                   Add fel a munkát percek alatt, és válogass a közeledben lévő, ellenőrzött szakemberek ajánlatai közül!
                 </p>
-                <Link href="/login?role=customer" className="btn-primary w-full py-3 text-center flex items-center justify-center gap-2 mb-3">
-                  <User className="w-5 h-5" />
-                  Szakembert keresek
+                <Link href="/login?role=customer" className="bg-white text-vvm-blue-700 hover:bg-slate-50 w-full py-3.5 rounded-xl font-bold text-center flex items-center justify-center gap-2 mb-3 shadow-lg transition-colors relative z-10">
+                  <User className="w-5 h-5 flex-shrink-0" />
+                  <span className="truncate">Szakembert keresek</span>
                 </Link>
-                <Link href="/csatlakozz-partnerkent" className="w-full py-3 text-center flex items-center justify-center gap-2 text-sm text-blue-200 hover:text-white transition-colors">
+                <Link href="/csatlakozz-partnerkent" className="block w-full py-2 text-center text-sm text-blue-200 hover:text-white transition-colors relative z-10 font-medium">
                   Szakember vagyok, csatlakozom
                 </Link>
               </div>
 
               {/* Related Posts */}
-              <div className="bg-white rounded-2xl shadow-lg p-6">
-                <h3 className="font-bold text-gray-900 mb-4">Kapcsolódó cikkek</h3>
+              <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 lg:p-8">
+                <h3 className="font-bold text-slate-800 text-lg mb-5 font-heading">Kapcsolódó cikkek</h3>
                 <div className="space-y-4">
                   {relatedPosts.map((relPost) => (
                     <Link
@@ -424,9 +437,11 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
                       href={`/blog/${relPost.id}`}
                       className="block group"
                     >
-                      <div className="flex items-start gap-3">
-                        <ChevronRight className="w-5 h-5 text-vvm-blue-600 flex-shrink-0 mt-0.5 group-hover:translate-x-1 transition-transform" />
-                        <span className="text-gray-700 group-hover:text-vvm-blue-600 transition-colors">
+                      <div className="flex items-start gap-3 p-3 -mx-3 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div className="mt-0.5 w-6 h-6 rounded-full bg-vvm-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-vvm-blue-100 transition-colors">
+                          <ChevronRight className="w-4 h-4 text-vvm-blue-600" />
+                        </div>
+                        <span className="text-slate-700 font-medium group-hover:text-vvm-blue-700 transition-colors text-sm lg:text-base leading-snug">
                           {relPost.title}
                         </span>
                       </div>
