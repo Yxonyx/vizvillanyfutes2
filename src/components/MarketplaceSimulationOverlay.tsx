@@ -44,7 +44,7 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
     const sidebarRef = useRef<HTMLDivElement>(null);
 
     const EXPANDED_HEIGHT = typeof window !== 'undefined' ? window.innerHeight * 0.6 : 480;
-    const COLLAPSED_HEIGHT = 48; // h-12
+    const COLLAPSED_HEIGHT = 72; // Increased from 48 to make it easier to grab
 
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
         touchStartY.current = e.touches[0].clientY;
@@ -267,46 +267,45 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                 `}
                 style={getSidebarStyle()}
             >
-                {/* Drag handle — touch to drag, tap to toggle */}
+                {/* Drag handle and Profile Widget combined — touch to drag anywhere here */}
                 <div
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="lg:hidden w-full flex flex-col items-center pt-2 pb-1 cursor-grab active:cursor-grabbing select-none touch-none"
+                    className="p-5 pb-4 border-b border-slate-100 bg-slate-50 cursor-grab active:cursor-grabbing select-none lg:cursor-default lg:pointer-events-none"
                 >
-                    <div className={`w-10 h-1.5 rounded-full transition-colors ${isDragging ? 'bg-vvm-blue-400' : 'bg-slate-300'}`} />
-                    {!isMobileMenuOpen && !isDragging && (
-                        <span className="text-xs text-slate-500 font-medium mt-1">
-                            {viewMode === 'contractor' ? 'Szakember Portál' : 'Ügyfél Portál'} ▲
-                        </span>
-                    )}
-                </div>
+                    <div className="lg:hidden w-full flex flex-col items-center mb-4 touch-none">
+                        <div className={`w-12 h-1.5 rounded-full transition-colors ${isDragging ? 'bg-vvm-blue-400' : 'bg-slate-300'}`} />
+                        {!isMobileMenuOpen && !isDragging && (
+                            <span className="text-xs text-slate-500 font-medium mt-2">
+                                {viewMode === 'contractor' ? 'Szakember Portál' : 'Ügyfél Portál'} ▲
+                            </span>
+                        )}
+                    </div>
 
-                {/* Profile Widget */}
-                <div className="p-5 border-b border-slate-100 bg-slate-50">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-full bg-slate-200 border-2 border-white shadow-sm flex items-center justify-center">
+                    <div className="flex items-center gap-3 lg:pointer-events-auto">
+                        <div className="w-12 h-12 rounded-full bg-slate-200 border-2 border-white shadow-sm flex items-center justify-center flex-shrink-0">
                             <User className="w-6 h-6 text-slate-500" />
                         </div>
-                        <div>
-                            <div className="font-bold text-slate-800 leading-tight">
+                        <div className="flex-1 min-w-0">
+                            <div className="font-bold text-slate-800 leading-tight truncate">
                                 {viewMode === 'contractor' ? 'Minta Szakember' : 'Ügyfél Fiók'}
                             </div>
                             <div className={`flex items-center gap-1 text-[11px] font-bold ${viewMode === 'contractor' ? 'text-emerald-600' : 'text-blue-600'} uppercase tracking-widest mt-0.5`}>
                                 <Shield className="w-3 h-3" /> {viewMode === 'contractor' ? 'Partner' : 'Aktív'}
                             </div>
                         </div>
-                    </div>
-
-                    {viewMode === 'contractor' && (
-                        <div className="bg-slate-800 text-white rounded-xl p-3 shadow-inner">
-                            <div className="text-xs text-slate-400 font-medium mb-1">Egyenleged</div>
-                            <div className="text-xl font-black font-mono">
-                                {creditBalance !== null ? `${creditBalance.toLocaleString('hu-HU')} Ft` : '...'}
+                        {/* Only show balance on desktop or when expanded on mobile to save space when collapsed */}
+                        {viewMode === 'contractor' && (isMobileMenuOpen || typeof window !== 'undefined' && window.innerWidth >= 1024) && (
+                            <div className="bg-slate-800 text-white rounded-xl p-2 px-3 shadow-inner ml-auto text-right flex-shrink-0">
+                                <div className="text-[10px] text-slate-400 font-medium mb-0.5">Egyenleg</div>
+                                <div className="text-sm font-black font-mono">
+                                    {creditBalance !== null ? `${creditBalance.toLocaleString('hu-HU')} Ft` : '...'}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
                 {/* Navigation Links */}
