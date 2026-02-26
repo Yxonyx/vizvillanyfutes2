@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
+import { createAdminClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Sign in with Supabase Auth
+    // Sign in with Supabase Auth (safe on client)
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -49,8 +50,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user's role and status from user_meta
-    const { data: userMeta, error: metaError } = await supabase
+    // Get user's role and status from user_meta using the admin client to bypass RLS on the server
+    const adminClient = createAdminClient();
+
+    const { data: userMeta, error: metaError } = await adminClient
       .from('user_meta')
       .select('role, status')
       .eq('user_id', authData.user.id)
@@ -80,7 +83,7 @@ export async function POST(request: NextRequest) {
     // Get contractor profile if user is a contractor
     let contractorProfile = null;
     if (userMeta?.role === 'contractor') {
-      const { data: profile } = await supabase
+      const { data: profile } = await adminClient
         .from('contractor_profiles')
         .select('id, display_name, status')
         .eq('user_id', authData.user.id)
