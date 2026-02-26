@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, Lock, LogIn, AlertCircle, Eye, EyeOff, User, Wrench, CheckCircle } from 'lucide-react';
+import { Mail, Lock, LogIn, AlertCircle, Eye, EyeOff, User, Wrench, UserPlus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -24,7 +24,10 @@ function LoginPageContent() {
 
   const [loginMode, setLoginMode] = useState<'contractor' | 'customer'>(roleParam === 'customer' ? 'customer' : 'contractor');
   const [customerEmail, setCustomerEmail] = useState('');
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [customerPassword, setCustomerPassword] = useState('');
+  const [showCustomerPassword, setShowCustomerPassword] = useState(false);
+  const [isCustomerRegister, setIsCustomerRegister] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
 
@@ -64,20 +67,48 @@ function LoginPageContent() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: customerEmail,
-        options: {
-          emailRedirectTo: `${window.location.origin}/ugyfel/dashboard`,
-        },
-      });
+      if (isCustomerRegister) {
+        // Register new customer
+        if (customerPassword.length < 6) {
+          setError('A jelszónak legalább 6 karakter hosszúnak kell lennie.');
+          setIsSubmitting(false);
+          return;
+        }
+        const { data: authData, error: signUpError } = await supabase.auth.signUp({
+          email: customerEmail,
+          password: customerPassword,
+          options: {
+            data: { role: 'customer' },
+          },
+        });
+        if (signUpError) throw signUpError;
+        if (!authData.user) throw new Error('Nem sikerült létrehozni a fiókot.');
 
-      if (error) {
-        throw error;
+        // Create user_meta for customer
+        const { error: metaError } = await supabase.from('user_meta').insert({
+          user_id: authData.user.id,
+          role: 'customer',
+          status: 'active',
+        });
+        if (metaError && !metaError.message.includes('duplicate')) {
+          console.warn('user_meta insert warning:', metaError);
+        }
+
+        setRegisterSuccess(true);
+      } else {
+        // Login existing customer
+        const result = await login(customerEmail, customerPassword);
+        if (!result.success) {
+          setError(result.error || 'Bejelentkezés sikertelen.');
+        }
       }
-
-      setMagicLinkSent(true);
     } catch (err: any) {
-      setError(err.message || 'Hiba történt a link küldésekor');
+      if (err.message?.includes('already registered')) {
+        setError('Ez az email cím már regisztrálva van. Jelentkezzen be.');
+        setIsCustomerRegister(false);
+      } else {
+        setError(err.message || 'Hiba történt.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -160,10 +191,12 @@ function LoginPageContent() {
             </div>
           )}
 
-          {loginMode === 'customer' && !magicLinkSent && (
+          {loginMode === 'customer' && !registerSuccess && (
             <div className="bg-vvm-blue-50 rounded-xl p-4 mb-6">
               <p className="text-sm text-vvm-blue-800 text-center">
-                👋 Üdvözöljük! Adja meg az email címét, és egy biztonságos (jelszó nélküli) belépő linket küldünk, amivel elérheti a bejelentéseit.
+                {isCustomerRegister
+                  ? '👋 Hozzon létre egy fiókot, hogy könnyedén nyomon követhesse bejelentéseit!'
+                  : '👋 Üdvözöljük! Jelentkezzen be az email címével és jelszavával.'}
               </p>
             </div>
           )}
@@ -248,20 +281,21 @@ function LoginPageContent() {
               </button>
             </form>
           ) : (
-            magicLinkSent ? (
+            registerSuccess ? (
               <div className="text-center py-6">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
+                  <UserPlus className="w-8 h-8 text-green-600" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Ellenőrizze az email fiókját!</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Sikeres regisztráció!</h3>
                 <p className="text-gray-600 mb-6">
-                  Elküldtük a belépési linket a(z) <strong>{customerEmail}</strong> címre.
+                  A fiók létrejött. Most már bejelentkezhet.
                 </p>
                 <button
-                  onClick={() => setMagicLinkSent(false)}
-                  className="btn-outline w-full justify-center"
+                  onClick={() => { setRegisterSuccess(false); setIsCustomerRegister(false); }}
+                  className="btn-primary w-full justify-center"
                 >
-                  Másik email címet próbálok
+                  <LogIn className="w-5 h-5" />
+                  Bejelentkezés
                 </button>
               </div>
             ) : (
@@ -284,23 +318,58 @@ function LoginPageContent() {
                   </div>
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Jelszó
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type={showCustomerPassword ? 'text' : 'password'}
+                      required
+                      autoComplete={isCustomerRegister ? 'new-password' : 'current-password'}
+                      className="input-field pl-10 pr-10"
+                      placeholder={isCustomerRegister ? 'Legalább 6 karakter' : '••••••••'}
+                      value={customerPassword}
+                      onChange={(e) => setCustomerPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowCustomerPassword(!showCustomerPassword)}
+                    >
+                      {showCustomerPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
                 <button
                   type="submit"
-                  disabled={isSubmitting || !customerEmail}
+                  disabled={isSubmitting || !customerEmail || !customerPassword}
                   className="btn-primary w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Link küldése...</span>
+                      <span>{isCustomerRegister ? 'Regisztráció...' : 'Bejelentkezés...'}</span>
                     </>
                   ) : (
                     <>
-                      <Mail className="w-5 h-5" />
-                      <span>Belépési link kérése</span>
+                      {isCustomerRegister ? <UserPlus className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
+                      <span>{isCustomerRegister ? 'Regisztráció' : 'Bejelentkezés'}</span>
                     </>
                   )}
                 </button>
+
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => { setIsCustomerRegister(!isCustomerRegister); setError(null); }}
+                    className="text-vvm-blue-600 hover:underline text-sm font-medium"
+                  >
+                    {isCustomerRegister ? 'Már van fiókom — Bejelentkezés' : 'Nincs még fiókom — Regisztráció'}
+                  </button>
+                </div>
               </form>
             )
           )}
