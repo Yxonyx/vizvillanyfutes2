@@ -45,9 +45,9 @@ export default function Footer() {
       {/* Trust Badges */}
       <div className="border-b border-slate-800 relative">
         {/* Subtle top highlight logic if needed */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8 lg:pt-6 lg:pb-10">
-          <div className="text-center mb-6">
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-2 font-heading tracking-wide">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-12 lg:pt-16 lg:pb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-3 font-heading tracking-wide">
               Minden, amire a zavartalan otthonhoz szükséged van
             </h2>
             <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
