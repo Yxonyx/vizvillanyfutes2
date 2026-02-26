@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
-  Award, CheckCircle, ArrowRight, Phone, Calendar, 
-  Shield, HelpCircle, 
+import {
+  Award, CheckCircle, ArrowRight, Phone, Calendar,
+  Shield, HelpCircle,
   Clock, Building, Home,
   Flame, Leaf, FileCheck, AlertCircle, XCircle
 } from 'lucide-react';
@@ -87,22 +87,22 @@ export default function PalyazatKalkulatorPage() {
 
   const handleCalculate = async () => {
     setIsSubmitting(true);
-    
+
     // Simple eligibility logic
     let score = 0;
-    
+
     if (formData.buildingYear === 'before_1970' || formData.buildingYear === '1970_1990') {
       score += 2;
     } else if (formData.buildingYear === '1990_2006') {
       score += 1;
     }
-    
+
     if (formData.heatingType === 'gas_old' || formData.heatingType === 'electric') {
       score += 2;
     } else if (formData.heatingType === 'mixed') {
       score += 1;
     }
-    
+
     if (formData.renovationType === 'heating' || formData.renovationType === 'heatpump' || formData.renovationType === 'combined') {
       score += 2;
     } else {
@@ -135,10 +135,10 @@ export default function PalyazatKalkulatorPage() {
             buildingYear: buildingYearLabels[formData.buildingYear] || formData.buildingYear,
             currentHeating: heatingTypeLabels[formData.heatingType] || formData.heatingType,
             plannedWork: renovationTypeLabels[formData.renovationType] || formData.renovationType,
-            calculatorResult: resultType === 'likely' 
-              ? 'Valószínűleg jogosult' 
-              : resultType === 'conditional' 
-                ? 'Feltételekkel jogosult lehet' 
+            calculatorResult: resultType === 'likely'
+              ? 'Valószínűleg jogosult'
+              : resultType === 'conditional'
+                ? 'Feltételekkel jogosult lehet'
                 : 'Kevéssé valószínű a jogosultság',
           },
         }),
@@ -146,7 +146,7 @@ export default function PalyazatKalkulatorPage() {
     } catch {
       // Continue even if email fails
     }
-    
+
     setResult(resultType);
     setStep(3);
     setIsSubmitting(false);
@@ -164,14 +164,14 @@ export default function PalyazatKalkulatorPage() {
             <Award className="w-4 h-4" />
             <span>Otthonfelújítási Program 2025</span>
           </div>
-          
+
           <h1 className="text-4xl md:text-5xl font-bold font-heading mb-6">
             Pályázati Jogosultság <br />
             <span className="text-emerald-200">Kalkulátor</span>
           </h1>
-          
+
           <p className="text-xl text-emerald-100 max-w-2xl mx-auto">
-            Tudja meg 1 perc alatt, hogy jogosult-e akár 6 millió Ft támogatásra 
+            Tudja meg 1 perc alatt, hogy jogosult-e akár 6 millió Ft támogatásra
             víz–villany–fűtés korszerűsítésre!
           </p>
         </div>
@@ -189,7 +189,7 @@ export default function PalyazatKalkulatorPage() {
               </span>
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-emerald-500 transition-all duration-500"
                 style={{ width: `${(step / 3) * 100}%` }}
               ></div>
@@ -215,11 +215,10 @@ export default function PalyazatKalkulatorPage() {
                       <button
                         key={option.value}
                         onClick={() => setFormData(prev => ({ ...prev, buildingYear: option.value }))}
-                        className={`p-4 rounded-xl border-2 text-left transition-all ${
-                          formData.buildingYear === option.value
+                        className={`p-4 rounded-xl border-2 text-left transition-all ${formData.buildingYear === option.value
                             ? 'border-emerald-500 bg-emerald-50'
                             : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                          }`}
                       >
                         <span className="font-medium text-gray-800">{option.label}</span>
                       </button>
@@ -237,11 +236,10 @@ export default function PalyazatKalkulatorPage() {
                       <button
                         key={option.value}
                         onClick={() => setFormData(prev => ({ ...prev, propertyType: option.value }))}
-                        className={`p-4 rounded-xl border-2 text-left transition-all ${
-                          formData.propertyType === option.value
+                        className={`p-4 rounded-xl border-2 text-left transition-all ${formData.propertyType === option.value
                             ? 'border-emerald-500 bg-emerald-50'
                             : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                          }`}
                       >
                         <span className="font-medium text-gray-800">{option.label}</span>
                       </button>
@@ -259,11 +257,10 @@ export default function PalyazatKalkulatorPage() {
                       <button
                         key={option.value}
                         onClick={() => setFormData(prev => ({ ...prev, heatingType: option.value }))}
-                        className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
-                          formData.heatingType === option.value
+                        className={`w-full p-4 rounded-xl border-2 text-left transition-all ${formData.heatingType === option.value
                             ? 'border-emerald-500 bg-emerald-50'
                             : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                          }`}
                       >
                         <span className="font-medium text-gray-800">{option.label}</span>
                       </button>
@@ -281,11 +278,10 @@ export default function PalyazatKalkulatorPage() {
                       <button
                         key={option.value}
                         onClick={() => setFormData(prev => ({ ...prev, renovationType: option.value }))}
-                        className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-center gap-4 ${
-                          formData.renovationType === option.value
+                        className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-center gap-4 ${formData.renovationType === option.value
                             ? 'border-emerald-500 bg-emerald-50'
                             : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                          }`}
                       >
                         <option.icon className={`w-6 h-6 ${formData.renovationType === option.value ? 'text-emerald-600' : 'text-gray-400'}`} />
                         <span className="font-medium text-gray-800">{option.label}</span>
@@ -311,7 +307,7 @@ export default function PalyazatKalkulatorPage() {
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">Elérhetőségek</h2>
                   <p className="text-gray-600">
-                    Adja meg elérhetőségeit, hogy elküldhessük a részletes eredményt és 
+                    Adja meg elérhetőségeit, hogy elküldhessük a részletes eredményt és
                     szakértőink felvehessék Önnel a kapcsolatot.
                   </p>
                 </div>
@@ -329,7 +325,7 @@ export default function PalyazatKalkulatorPage() {
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Telefonszám *
@@ -342,7 +338,7 @@ export default function PalyazatKalkulatorPage() {
                       onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email cím *
@@ -400,13 +396,12 @@ export default function PalyazatKalkulatorPage() {
             {step === 3 && (
               <div className="space-y-8 animate-fade-in">
                 {/* Result Banner */}
-                <div className={`p-6 rounded-2xl ${
-                  result === 'likely' 
+                <div className={`p-6 rounded-2xl ${result === 'likely'
                     ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white'
                     : result === 'conditional'
                       ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-white'
                       : 'bg-gradient-to-br from-gray-500 to-gray-600 text-white'
-                }`}>
+                  }`}>
                   <div className="flex items-center gap-4 mb-4">
                     {result === 'likely' && <CheckCircle className="w-12 h-12" />}
                     {result === 'conditional' && <AlertCircle className="w-12 h-12" />}
@@ -424,7 +419,7 @@ export default function PalyazatKalkulatorPage() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white/20 rounded-xl p-4">
                       <div className="text-3xl font-bold">Max. 6M Ft</div>
@@ -440,7 +435,7 @@ export default function PalyazatKalkulatorPage() {
                 {/* Next Steps */}
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4">Következő lépések</h3>
-                  
+
                   <div className="space-y-4">
                     <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
                       <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -453,7 +448,7 @@ export default function PalyazatKalkulatorPage() {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
                       <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
                         <Calendar className="w-5 h-5 text-emerald-600" />
@@ -465,7 +460,7 @@ export default function PalyazatKalkulatorPage() {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
                       <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
                         <FileCheck className="w-5 h-5 text-emerald-600" />
@@ -489,7 +484,7 @@ export default function PalyazatKalkulatorPage() {
                     Szakértőink hamarosan felhívják a megadott számon: <strong>{formData.phone}</strong>
                   </p>
                   <div className="flex gap-4">
-                    <Link href="/foglalas" className="btn-primary flex-1">
+                    <Link href="/login?role=customer" className="btn-primary flex-1">
                       <Calendar className="w-5 h-5" />
                       <span>Helyszíni felmérés kérése</span>
                     </Link>

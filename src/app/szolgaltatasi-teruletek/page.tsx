@@ -166,7 +166,7 @@ export default function SzolgaltatasiTeruletekPage() {
               <Phone className="w-5 h-5" />
               <span>+36 30 269 6406</span>
             </a>
-            <Link href="/foglalas" className="btn-outline py-4 px-8">
+            <Link href="/login?role=customer" className="btn-outline py-4 px-8">
               <Calendar className="w-5 h-5" />
               <span>Időpontfoglalás</span>
             </Link>

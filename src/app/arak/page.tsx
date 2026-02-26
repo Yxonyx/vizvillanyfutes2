@@ -135,8 +135,8 @@ export default function ArakPage() {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-medium transition-all whitespace-nowrap flex-shrink-0 ${activeCategory === cat.id
-                    ? `${cat.color} text-white shadow-lg`
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? `${cat.color} text-white shadow-lg`
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
               >
                 <cat.icon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -175,8 +175,8 @@ export default function ArakPage() {
                       )}
                     </div>
                     <div className={`font-bold text-lg ${currentCategory.id === 'viz' ? 'text-sky-600' :
-                        currentCategory.id === 'villany' ? 'text-amber-600' :
-                          'text-orange-600'
+                      currentCategory.id === 'villany' ? 'text-amber-600' :
+                        'text-orange-600'
                       }`}>
                       {item.price}
                     </div>
@@ -211,7 +211,7 @@ export default function ArakPage() {
               Kérjen személyre szabott árajánlatot!
             </h3>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/foglalas" className="btn-primary py-4 px-8">
+              <Link href="/login?role=customer" className="btn-primary py-4 px-8">
                 <Calendar className="w-5 h-5" />
                 <span>Időpontfoglalás</span>
               </Link>

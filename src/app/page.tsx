@@ -229,7 +229,7 @@ export default function HomePage() {
                   )
                 ) : (
                   <>
-                    <Link href="/foglalas" className="bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(250,204,21,0.3)]">
+                    <Link href="/login?role=customer" className="bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(250,204,21,0.3)]">
                       <User className="w-6 h-6" />
                       <span>Ügyfél vagyok</span>
                     </Link>
@@ -411,20 +411,20 @@ export default function HomePage() {
                 ))}
               </ul>
 
-              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
                 <Link
                   href="/csatlakozz-partnerkent#szakember_regisztracio"
-                  className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-vvm-yellow-400 to-vvm-yellow-500 hover:from-vvm-yellow-300 to-vvm-yellow-400 text-gray-900 font-black text-base py-3.5 px-8 rounded-xl gap-2.5 transition-all transform hover:scale-[1.03] shadow-[0_0_30px_rgba(250,204,21,0.3)]"
+                  className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-vvm-yellow-400 to-vvm-yellow-500 hover:from-vvm-yellow-300 to-vvm-yellow-400 text-gray-900 font-black text-sm sm:text-base py-3.5 px-3 sm:px-8 rounded-xl gap-2 transition-all transform hover:scale-[1.03] shadow-[0_0_30px_rgba(250,204,21,0.3)]"
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Regisztrálok szakemberként</span>
                 </Link>
                 <Link
                   href="/csatlakozz-partnerkent"
-                  className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold py-3.5 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold flex-1 py-3.5 px-4 sm:px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base"
                 >
                   <span>Tudj meg többet</span>
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Link>
               </div>
             </div>
@@ -679,7 +679,7 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0 mt-10">
-            <Link href="/foglalas" className="bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold px-10 py-5 rounded-2xl text-lg flex items-center justify-center gap-3 transition-transform hover:scale-105 shadow-[0_0_30px_rgba(250,204,21,0.3)]">
+            <Link href="/login?role=customer" className="bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold px-10 py-5 rounded-2xl text-lg flex items-center justify-center gap-3 transition-transform hover:scale-105 shadow-[0_0_30px_rgba(250,204,21,0.3)]">
               <User className="w-6 h-6" />
               <span>Ügyfél vagyok</span>
             </Link>

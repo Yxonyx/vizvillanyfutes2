@@ -119,7 +119,7 @@ export default function FuteskorszerusitesPage() {
                   <Award className="w-5 h-5" />
                   <span>Pályázat kalkulátor</span>
                 </Link>
-                <Link href="/foglalas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
+                <Link href="/login?role=customer" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
                   <Calendar className="w-5 h-5" />
                   <span>Helyszíni felmérés</span>
                 </Link>
@@ -188,7 +188,7 @@ export default function FuteskorszerusitesPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{service.name}</h3>
                 <p className="text-gray-600 mb-4">{service.description}</p>
                 <Link
-                  href={`/foglalas?service=${service.id}`}
+                  href={`/login?role=customer`}
                   className="inline-flex items-center gap-2 text-orange-600 font-semibold hover:text-orange-700"
                 >
                   <span>Érdeklődés</span>

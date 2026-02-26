@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Droplets, Zap, Flame, CheckCircle, ArrowRight,
   Users, DollarSign, Headphones, Clock, Shield,
@@ -522,17 +523,28 @@ export default function PartnerOnboardingPage() {
       </section>
 
       {/* Application Form */}
-      <section id="szakember_regisztracio" className="py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-emerald-100 rounded-full px-4 py-2 text-sm text-emerald-700 mb-4">
-              <Lock className="w-4 h-4" />
+      <section id="szakember_regisztracio" className="py-10 sm:py-16 relative">
+        {/* Blurred background image */}
+        <div className="fixed inset-0 -z-10 bg-slate-900 leading-none">
+          <Image
+            src="/login_bg.webp"
+            alt="Háttér"
+            fill
+            className="object-cover blur-[8px] opacity-60"
+            quality={80}
+          />
+        </div>
+
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-8 sm:mb-12">
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white mb-3 sm:mb-4">
+              <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>Fiók létrehozása</span>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 font-heading mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white font-heading mb-2 sm:mb-4 shadow-sm">
               Szakember regisztráció
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-base sm:text-lg text-gray-200 drop-shadow-sm">
               Hozd létre a fiókodat, és kezdj el munkákat kapni! A regisztráció után munkatársunk jóváhagyja a jelentkezésedet.
             </p>
           </div>
@@ -568,7 +580,7 @@ export default function PartnerOnboardingPage() {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="bg-gray-50 rounded-2xl p-8 space-y-6">
+            <form onSubmit={handleSubmit} className="bg-gray-50 rounded-2xl p-5 sm:p-8 space-y-4 sm:space-y-6">
               {/* Error message */}
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">

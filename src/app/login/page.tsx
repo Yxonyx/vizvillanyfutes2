@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail, Lock, LogIn, AlertCircle, Eye, EyeOff, User, Wrench, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
@@ -17,13 +18,16 @@ function LoginPageContent() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginMode, setLoginMode] = useState<'contractor' | 'customer'>('contractor');
+  const redirect = searchParams.get('redirect');
+  const expired = searchParams.get('expired');
+  const roleParam = searchParams.get('role');
+
+  const [loginMode, setLoginMode] = useState<'contractor' | 'customer'>(roleParam === 'customer' ? 'customer' : 'contractor');
   const [customerEmail, setCustomerEmail] = useState('');
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const redirect = searchParams.get('redirect');
-  const expired = searchParams.get('expired');
+
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -99,43 +103,51 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 lg:pt-28 pb-12">
-      <div className="max-w-md mx-auto px-4">
-        <Breadcrumbs className="mb-6" />
+    <div className="min-h-screen relative pt-16 sm:pt-24 lg:pt-28 pb-6 sm:pb-12 flex flex-col justify-center">
+      {/* Blurred background image */}
+      <div className="fixed inset-0 -z-10 bg-slate-900 leading-none">
+        <Image
+          src="/login_bg.webp"
+          alt="Háttér"
+          fill
+          className="object-cover blur-[8px] opacity-50"
+          quality={80}
+          priority
+        />
+      </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <LogIn className="w-8 h-8 text-emerald-600" />
+      <div className="max-w-md md:max-w-lg lg:max-w-xl mx-auto px-4 relative z-10 w-full">
+        <Breadcrumbs className="mb-4 sm:mb-6" />
+
+        <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-8">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <LogIn className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 font-heading">Bejelentkezés</h1>
-            <p className="text-gray-600 mt-2">Válassza ki a fiókja típusát</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 font-heading">Bejelentkezés</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Válassza ki a fiókja típusát</p>
           </div>
 
-          <div className="flex bg-gray-50 border border-gray-100 p-1.5 rounded-2xl mb-8">
+          <div className="flex bg-gray-50/80 border border-gray-200 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl mb-6 sm:mb-8 w-full">
             <button
               onClick={() => setLoginMode('contractor')}
-              className={`flex-1 flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-xl text-sm font-medium transition-all ${loginMode === 'contractor'
-                ? 'bg-white text-vvm-blue-700 shadow-sm border border-gray-100'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'
+              className={`flex-1 flex items-center justify-center gap-2 py-2 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl text-sm sm:text-[15px] transition-all font-semibold ${loginMode === 'contractor'
+                ? 'bg-white text-vvm-blue-700 shadow-sm border border-gray-200'
+                : 'text-gray-500 hover:text-vvm-blue-600 hover:bg-gray-100/80 border border-transparent'
                 }`}
             >
-              <div className="flex items-center gap-2">
-                <Wrench className="w-4 h-4" />
-                <span className="font-semibold">Szakember</span>
-              </div>
+              <Wrench className="w-4 h-4" />
+              <span>Szakember</span>
             </button>
             <button
               onClick={() => setLoginMode('customer')}
-              className={`flex-1 flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-xl text-sm font-medium transition-all ${loginMode === 'customer'
-                ? 'bg-white text-vvm-blue-700 shadow-sm border border-gray-100'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'
+              className={`flex-1 flex items-center justify-center gap-2 py-2 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl text-sm sm:text-[15px] transition-all font-semibold ${loginMode === 'customer'
+                ? 'bg-white text-vvm-blue-700 shadow-sm border border-gray-200'
+                : 'text-gray-500 hover:text-vvm-blue-600 hover:bg-gray-100/80 border border-transparent'
                 }`}
             >
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                <span className="font-semibold text-center leading-tight">Szolgáltatást Tervező<br />Ügyfél</span>
-              </div>
+              <User className="w-4 h-4" />
+              <span>Ügyfél</span>
             </button>
           </div>
 
@@ -293,14 +305,16 @@ function LoginPageContent() {
             )
           )}
 
-          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-            <p className="text-gray-600 text-sm">
-              Még nincs fiókod?{' '}
-              <Link href="/csatlakozz-partnerkent" className="text-vvm-blue-600 hover:underline font-medium">
-                Jelentkezz partnerként
-              </Link>
-            </p>
-          </div>
+          {loginMode === 'contractor' && (
+            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+              <p className="text-gray-600 text-sm">
+                Még nincs fiókod?{' '}
+                <Link href="/csatlakozz-partnerkent" className="text-vvm-blue-600 hover:underline font-medium">
+                  Jelentkezz partnerként
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="mt-6 text-center">

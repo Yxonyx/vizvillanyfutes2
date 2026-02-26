@@ -209,7 +209,7 @@ export default function CustomerDashboard() {
                         <h1 className="text-3xl font-bold text-gray-900 font-heading">Ügyfél Portál</h1>
                         <p className="text-gray-600 mt-2">Kezelje bejelentéseit és kövesse nyomon a szakembereket.</p>
                     </div>
-                    <Link href="/foglalas" className="btn-primary w-full md:w-auto justify-center">
+                    <Link href="/login?role=customer" className="btn-primary w-full md:w-auto justify-center">
                         Új probléma bejelentése
                     </Link>
                 </div>
@@ -228,7 +228,7 @@ export default function CustomerDashboard() {
                         <p className="text-gray-600 mb-6 max-w-md mx-auto">
                             Ha problémája akadna otthonában, itt tudja majd nyomon követni a kiérkező szakembert.
                         </p>
-                        <Link href="/foglalas" className="btn-primary inline-flex">
+                        <Link href="/login?role=customer" className="btn-primary inline-flex">
                             Probléma bejelentése
                         </Link>
                     </div>

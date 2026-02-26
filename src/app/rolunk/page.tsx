@@ -88,7 +88,7 @@ export default function RolunkPage() {
                 fűtésszerelőkkel. A szakemberek versenyeznek a munkádért.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="/foglalas" className="btn-primary py-4 px-8">
+                <Link href="/login?role=customer" className="btn-primary py-4 px-8">
                   <User className="w-5 h-5" />
                   <span>Szakembert keresek</span>
                 </Link>
@@ -327,7 +327,7 @@ export default function RolunkPage() {
             Akár ügyfél vagy, akár szakember, nálunk mindenki jól jár.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/foglalas" className="btn-primary py-4 px-10 text-lg">
+            <Link href="/login?role=customer" className="btn-primary py-4 px-10 text-lg">
               <User className="w-6 h-6" />
               <span>Ingyenes ajánlatkérés</span>
             </Link>

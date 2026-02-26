@@ -405,7 +405,7 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
                 <p className="text-blue-100 text-sm mb-6">
                   Add fel a munkát percek alatt, és válogass a közeledben lévő, ellenőrzött szakemberek ajánlatai közül!
                 </p>
-                <Link href="/foglalas" className="btn-primary w-full py-3 text-center flex items-center justify-center gap-2 mb-3">
+                <Link href="/login?role=customer" className="btn-primary w-full py-3 text-center flex items-center justify-center gap-2 mb-3">
                   <User className="w-5 h-5" />
                   Szakembert keresek
                 </Link>

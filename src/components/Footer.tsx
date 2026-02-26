@@ -15,7 +15,7 @@ const footerLinks = {
     { name: 'Villanyszerelés Budapest', href: '/villanyszerelo-budapest' },
     { name: 'Duguláselhárítás', href: '/dugulaselharitas-budapest' },
     { name: 'Fűtéskorszerűsítés', href: '/futeskorszerusites' },
-    { name: 'SOS Hibaelhárítás', href: '/foglalas?sos=true' },
+    { name: 'SOS Hibaelhárítás', href: '/login?role=customer' },
   ],
   informacio: [
     { name: 'Áraink', href: '/arak' },
@@ -43,8 +43,18 @@ export default function Footer() {
   return (
     <footer className="bg-gradient-to-b from-slate-900 to-slate-950 text-white pb-20 lg:pb-0">
       {/* Trust Badges */}
-      <div className="border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-8">
+      <div className="border-b border-slate-800 relative">
+        {/* Subtle top highlight logic if needed */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8 lg:pt-6 lg:pb-10">
+          <div className="text-center mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-2 font-heading tracking-wide">
+              Minden, amire a zavartalan otthonhoz szükséged van
+            </h2>
+            <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
+              Szakmai felkészültségünk és ügyfélközpontú hozzáállásunk garantálja a magas minőséget és a tartós eredményeket.
+            </p>
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-6">
             {[
               { icon: <ThumbsUp className="w-7 h-7 md:w-5 md:h-5 text-green-400" />, bg: 'bg-green-500/20', title: 'Ingyenes ajánlatkérés', desc: 'Rejtett költségek nélkül' },

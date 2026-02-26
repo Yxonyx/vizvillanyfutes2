@@ -135,7 +135,7 @@ export default function VillanyszerelPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/foglalas" className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 shadow-lg">
+                <Link href="/login?role=customer" className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 shadow-lg">
                   <Calendar className="w-5 h-5" />
                   <span>Időpontfoglalás</span>
                 </Link>
@@ -239,7 +239,7 @@ export default function VillanyszerelPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{service.name}</h3>
                 <p className="text-gray-600 mb-4">{service.description}</p>
                 <Link
-                  href={`/foglalas?service=${service.id}`}
+                  href={`/login?role=customer`}
                   className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700"
                 >
                   <span>Időpont kérése</span>
@@ -285,7 +285,7 @@ export default function VillanyszerelPage() {
                 </div>
               </div>
 
-              <Link href="/foglalas?service=fi-rele" className="btn-primary inline-flex">
+              <Link href="/login?role=customer" className="btn-primary inline-flex">
                 <span>Fi-relé beépítés kérése</span>
                 <ArrowRight className="w-5 h-5" />
               </Link>
@@ -357,7 +357,7 @@ export default function VillanyszerelPage() {
           </div>
 
           <div className="text-center mt-8">
-            <Link href="/foglalas" className="btn-primary inline-flex py-4 px-8">
+            <Link href="/login?role=customer" className="btn-primary inline-flex py-4 px-8">
               <Calendar className="w-5 h-5" />
               <span>Kérjen árajánlatot</span>
             </Link>
@@ -415,7 +415,7 @@ export default function VillanyszerelPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/foglalas" className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg shadow-lg">
+            <Link href="/login?role=customer" className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg shadow-lg">
               <Calendar className="w-6 h-6" />
               <span>Online foglalás</span>
             </Link>

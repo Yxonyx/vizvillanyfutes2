@@ -241,7 +241,7 @@ export default function GyikPage() {
             Vegye fel velünk a kapcsolatot, vagy próbálja ki a platformot – az ajánlatkérés ingyenes!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/foglalas" className="btn-primary py-4 px-8">
+            <Link href="/login?role=customer" className="btn-primary py-4 px-8">
               <User className="w-5 h-5" />
               <span>Ingyenes ajánlatkérés</span>
             </Link>

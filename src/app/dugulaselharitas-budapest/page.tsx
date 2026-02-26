@@ -123,7 +123,7 @@ export default function DugulaselharitasPage() {
                   <Phone className="w-6 h-6" />
                   <span>+36 30 269 6406</span>
                 </a>
-                <Link href="/foglalas?service=dugulas&sos=true" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
+                <Link href="/login?role=customer&service=dugulas&sos=true" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
                   <Calendar className="w-5 h-5" />
                   <span>Online foglalás</span>
                 </Link>
@@ -315,7 +315,7 @@ export default function DugulaselharitasPage() {
               <Phone className="w-6 h-6" />
               <span>SOS Hívás: +36 30 269 6406</span>
             </a>
-            <Link href="/foglalas?service=dugulas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20">
+            <Link href="/login?role=customer&service=dugulas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20">
               <Calendar className="w-6 h-6" />
               <span>Online foglalás</span>
             </Link>
