@@ -18,9 +18,9 @@ export default function ConditionalFooter() {
     }, []);
 
     // Hide footer only on mobile + homepage + authenticated (app mode)
-    if (pathname === '/' && isMobile && isAuthenticated && !isLoading) {
-        return null;
-    }
+    // if (pathname === '/' && isMobile && isAuthenticated && !isLoading) {
+    //     return null;
+    // }
 
     return <Footer />;
 }
