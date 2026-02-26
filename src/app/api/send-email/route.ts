@@ -528,7 +528,7 @@ export async function POST(request: NextRequest) {
 
     // Send email via Resend
     const { error } = await resend.emails.send({
-      from: 'VízVillanyFűtés <onboarding@resend.dev>',
+      from: 'VízVillanyFűtés <info@vizvillanyfutes.hu>',
       to: recipientEmail,
       replyTo: data.email as string || undefined,
       subject,
