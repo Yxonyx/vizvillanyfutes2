@@ -43,7 +43,7 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
     const touchStartTime = useRef(0);
     const sidebarRef = useRef<HTMLDivElement>(null);
 
-    const EXPANDED_HEIGHT = typeof window !== 'undefined' ? window.innerHeight * 0.5 : 400;
+    const EXPANDED_HEIGHT = typeof window !== 'undefined' ? window.innerHeight * 0.6 : 480;
     const COLLAPSED_HEIGHT = 48; // h-12
 
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -574,8 +574,8 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                                 <button
                                     onClick={onClose}
                                     className={`p-2 sm:px-4 sm:py-2 rounded-xl backdrop-blur-md transition-all shadow-lg flex items-center gap-2 font-bold text-sm ${isAuthenticated
-                                            ? 'text-slate-700 hover:text-slate-900 bg-white/80 hover:bg-white border border-slate-200'
-                                            : 'text-white/90 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20'
+                                        ? 'text-slate-700 hover:text-slate-900 bg-white/80 hover:bg-white border border-slate-200'
+                                        : 'text-white/90 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20'
                                         }`}
                                 >
                                     <ArrowLeft className="w-5 h-5" />
