@@ -44,7 +44,7 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
     const sidebarRef = useRef<HTMLDivElement>(null);
 
     const EXPANDED_HEIGHT = typeof window !== 'undefined' ? window.innerHeight * 0.6 : 480;
-    const COLLAPSED_HEIGHT = 72; // Increased from 48 to make it easier to grab
+    const COLLAPSED_HEIGHT = 100; // Increased to 100 to prevent iPhone home indicator interference
 
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
         touchStartY.current = e.touches[0].clientY;
@@ -68,16 +68,16 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
         setIsDragging(false);
         const elapsed = Date.now() - touchStartTime.current;
         const velocity = Math.abs(dragOffset) / elapsed; // px/ms
-        const threshold = EXPANDED_HEIGHT * 0.25;
+        const threshold = EXPANDED_HEIGHT * 0.15;
 
         if (isMobileMenuOpen) {
             // If dragged down enough or fast flick → collapse
-            if (dragOffset > threshold || (velocity > 0.5 && dragOffset > 30)) {
+            if (dragOffset > threshold || (velocity > 0.3 && dragOffset > 20)) {
                 setIsMobileMenuOpen(false);
             }
         } else {
             // If dragged up enough or fast flick → expand
-            if (Math.abs(dragOffset) > threshold || (velocity > 0.5 && Math.abs(dragOffset) > 30)) {
+            if (Math.abs(dragOffset) > threshold || (velocity > 0.3 && Math.abs(dragOffset) > 20)) {
                 setIsMobileMenuOpen(true);
             }
         }
@@ -273,7 +273,7 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="p-5 pb-4 border-b border-slate-100 bg-slate-50 cursor-grab active:cursor-grabbing select-none lg:cursor-default lg:pointer-events-none"
+                    className="p-5 pb-4 border-b border-slate-100 bg-slate-50 cursor-grab active:cursor-grabbing select-none touch-none lg:cursor-default lg:pointer-events-none"
                 >
                     <div className="lg:hidden w-full flex flex-col items-center mb-4 touch-none">
                         <div className={`w-12 h-1.5 rounded-full transition-colors ${isDragging ? 'bg-vvm-blue-400' : 'bg-slate-300'}`} />
@@ -429,48 +429,96 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                         </>
                     ) : (
                         <div className="p-2 space-y-4 fade-in">
-                            <h3 className="text-lg font-black text-slate-800 mb-2">Fiók Adataim</h3>
+                            <h3 className="text-lg font-black text-slate-800 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+                                <Settings className="w-5 h-5 text-vvm-blue-600" />
+                                Fiók Adataim
+                            </h3>
 
                             {/* User info card */}
-                            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Email cím</label>
-                                    <div className="text-slate-800 font-medium">{user?.email || 'Nincs email megadva'}</div>
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Szerepkör</label>
-                                    <div className="text-slate-800 font-medium">
-                                        {viewMode === 'contractor' ? '🔧 Szakember' : '👤 Ügyfél'}
+                            <div className="bg-slate-800 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden mb-4">
+                                {/* Decorative elements */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                                <div className="absolute bottom-0 left-0 w-24 h-24 bg-vvm-blue-500/20 rounded-full blur-xl -ml-10 -mb-10 pointer-events-none"></div>
+
+                                <div className="flex items-center gap-4 relative z-10">
+                                    <div className="w-14 h-14 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center flex-shrink-0 shadow-inner">
+                                        <User className="w-7 h-7 text-slate-300" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="font-bold text-base truncate mb-1">
+                                            {user?.email || 'Nincs email megadva'}
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-xs text-slate-300 font-medium bg-slate-700/50 w-fit px-2.5 py-1 rounded-md border border-slate-600/50">
+                                            {viewMode === 'contractor' ? (
+                                                <><Shield className="w-3.5 h-3.5 text-emerald-400" /> Szakember Partner</>
+                                            ) : (
+                                                <><User className="w-3.5 h-3.5 text-blue-400" /> Regisztrált Ügyfél</>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-5">
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Jelszó módosítása</label>
-                                    <button className="text-sm font-bold text-vvm-blue-600 hover:text-vvm-blue-800 transition-colors">
-                                        Jelszócsere e-mail küldése
+                                    <label className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+                                        <Mail className="w-3.5 h-3.5" /> Email cím
+                                    </label>
+                                    <div className="text-slate-800 font-medium text-15px">{user?.email || 'Nincs email'}</div>
+                                </div>
+
+                                <div className="pt-4 border-t border-slate-100">
+                                    <label className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+                                        <Briefcase className="w-3.5 h-3.5" /> Szerepkör
+                                    </label>
+                                    <div className="text-slate-800 font-medium text-15px">
+                                        {viewMode === 'contractor' ? 'Regisztrált Szakember' : 'Regisztrált Ügyfél'}
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 border-t border-slate-100">
+                                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Jelszó módosítása</label>
+                                    <button className="text-sm font-bold text-vvm-blue-600 hover:text-vvm-blue-800 transition-colors flex items-center gap-1">
+                                        Jelszócsere e-mail küldése <ArrowRight className="w-3.5 h-3.5" />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Contractor-specific: Credit & Stats */}
                             {viewMode === 'contractor' && (
-                                <div className="space-y-3">
-                                    <div className="bg-gradient-to-r from-slate-800 to-slate-700 text-white rounded-2xl p-4 shadow-lg">
-                                        <div className="text-xs text-slate-300 font-medium mb-1">Kredit egyenleg</div>
-                                        <div className="text-2xl font-black font-mono">
-                                            {creditBalance !== null ? `${creditBalance.toLocaleString('hu-HU')} Ft` : '...'}
+                                <div className="space-y-4">
+                                    <div className="bg-slate-800 text-white rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+
+                                        <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2 relative z-10">
+                                            <Wallet className="w-3.5 h-3.5" /> Kredit egyenleg
                                         </div>
-                                        <a href="/contractor/topup" className="mt-2 inline-block text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
-                                            + Kredit feltöltés →
-                                        </a>
+                                        <div className="flex items-end gap-3 mb-1">
+                                            <div className="text-3xl font-black font-mono tracking-tight relative z-10">
+                                                {creditBalance !== null ? creditBalance.toLocaleString('hu-HU') : '...'}
+                                            </div>
+                                            <div className="text-xl font-bold text-slate-300 pb-0.5">Ft</div>
+                                        </div>
+
+                                        <button className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors shadow-lg shadow-emerald-500/20 relative z-10 w-fit">
+                                            + Kredit feltöltés
+                                        </button>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="bg-white p-3 rounded-xl border border-slate-200 text-center">
-                                            <div className="text-2xl font-black text-slate-800">{mockLeads.length}</div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-white p-4 rounded-2xl border border-slate-200 text-center flex flex-col items-center justify-center gap-2 shadow-sm">
+                                            <div className="w-10 h-10 rounded-full bg-blue-50 text-vvm-blue-600 flex items-center justify-center">
+                                                <Briefcase className="w-5 h-5" />
+                                            </div>
+                                            <div className="text-2xl font-black text-slate-800 leading-none">{mockLeads.length}</div>
                                             <div className="text-xs text-slate-500 font-medium">Elérhető munka</div>
                                         </div>
-                                        <div className="bg-white p-3 rounded-xl border border-slate-200 text-center">
-                                            <div className="text-2xl font-black text-emerald-600">{myInterests.filter(i => i.status === 'accepted').length}</div>
-                                            <div className="text-xs text-slate-500 font-medium">Elfogadott</div>
+                                        <div className="bg-white p-4 rounded-2xl border border-slate-200 text-center flex flex-col items-center justify-center gap-2 shadow-sm">
+                                            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                                <Check className="w-5 h-5" />
+                                            </div>
+                                            <div className="text-2xl font-black text-emerald-600 leading-none">{myInterests.filter(i => i.status === 'accepted').length}</div>
+                                            <div className="text-xs text-slate-500 font-medium">Megnyert munka</div>
                                         </div>
                                     </div>
                                     {/* Accepted leads — negotiation list */}

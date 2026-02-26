@@ -56,60 +56,57 @@ export default function FiokPage() {
                 </div>
             </div>
 
-            {/* Fixed floating back button for mobile */}
-            <Link href="/" className="lg:hidden fixed bottom-24 left-4 z-40 w-12 h-12 bg-white shadow-lg border border-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors">
-                <ArrowLeft className="w-5 h-5" />
-            </Link>
+
 
             <div className="max-w-2xl mx-auto px-4 pt-6 pb-8 space-y-6">
 
                 {/* Profile Card */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className={`px-6 py-5 ${isContractor ? 'bg-gradient-to-r from-slate-800 to-slate-700' : 'bg-gradient-to-r from-vvm-blue-600 to-vvm-blue-700'}`}>
-                        <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
-                                <User className="w-7 h-7 text-white" />
+                <div className="bg-slate-800 text-white p-5 sm:p-6 rounded-2xl shadow-lg relative overflow-hidden mb-4 border border-slate-700">
+                    {/* Decorative elements */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-vvm-blue-500/20 rounded-full blur-xl -ml-10 -mb-10 pointer-events-none"></div>
+
+                    <div className="flex items-center gap-4 relative z-10">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center flex-shrink-0 shadow-inner">
+                            <User className="w-7 h-7 sm:w-8 sm:h-8 text-slate-300" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="font-bold text-base sm:text-lg truncate mb-1">
+                                {user.email}
                             </div>
-                            <div>
-                                <div className="text-white font-bold text-lg">{user.email}</div>
-                                <div className="flex items-center gap-1.5 mt-0.5">
-                                    <Shield className="w-3.5 h-3.5 text-white/70" />
-                                    <span className="text-white/80 text-sm font-medium">
-                                        {isContractor ? 'Szakember' : role === 'admin' ? 'Admin' : role === 'dispatcher' ? 'Diszpécser' : 'Ügyfél'}
-                                    </span>
-                                </div>
+                            <div className="flex items-center gap-1.5 text-xs text-slate-300 font-medium bg-slate-700/50 w-fit px-2.5 py-1 rounded-md border border-slate-600/50">
+                                {isContractor ? (
+                                    <><Shield className="w-3.5 h-3.5 text-emerald-400" /> Szakember Partner</>
+                                ) : (
+                                    <><User className="w-3.5 h-3.5 text-blue-400" /> Regisztrált Ügyfél</>
+                                )}
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="p-6 space-y-5">
-                        {/* Email */}
-                        <div>
-                            <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                                <Mail className="w-3.5 h-3.5" /> Email cím
-                            </label>
-                            <div className="text-slate-800 font-medium">{user.email}</div>
-                        </div>
+                <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                    <div>
+                        <label className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+                            <Mail className="w-3.5 h-3.5" /> Email cím
+                        </label>
+                        <div className="text-slate-800 font-medium text-[15px]">{user.email}</div>
+                    </div>
 
-                        {/* Role */}
-                        <div>
-                            <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                                <Shield className="w-3.5 h-3.5" /> Szerepkör
-                            </label>
-                            <div className="text-slate-800 font-medium">
-                                {isContractor ? '🔧 Regisztrált Szakember' : '👤 Ügyfél'}
-                            </div>
+                    <div className="pt-4 border-t border-slate-100">
+                        <label className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+                            <Shield className="w-3.5 h-3.5" /> Szerepkör
+                        </label>
+                        <div className="text-slate-800 font-medium text-[15px]">
+                            {isContractor ? 'Regisztrált Szakember' : 'Regisztrált Ügyfél'}
                         </div>
+                    </div>
 
-                        {/* Password */}
-                        <div>
-                            <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                                Jelszó módosítása
-                            </label>
-                            <button className="text-sm font-bold text-vvm-blue-600 hover:text-vvm-blue-800 transition-colors">
-                                Jelszócsere e-mail küldése →
-                            </button>
-                        </div>
+                    <div className="pt-4 border-t border-slate-100">
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Jelszó módosítása</label>
+                        <button className="text-sm font-bold text-vvm-blue-600 hover:text-vvm-blue-800 transition-colors flex items-center gap-1">
+                            Jelszócsere e-mail küldése <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
+                        </button>
                     </div>
                 </div>
 
