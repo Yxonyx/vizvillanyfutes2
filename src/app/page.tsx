@@ -8,7 +8,7 @@ import {
   Search, ChevronRight, ArrowRight, Phone, Calendar,
   Droplets, Zap, Flame, AlertTriangle, Shield, FileCheck,
   Receipt, Star, Clock, MapPin, CheckCircle, Users, User,
-  Building, Wrench, ThumbsUp, Award
+  Building, Wrench, ThumbsUp, Award, Briefcase, Send
 } from 'lucide-react';
 
 // Problem suggestions for the search
@@ -174,18 +174,21 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-[1fr_1.15fr] gap-8 lg:gap-12 items-center">
 
             {/* LEFT - Landing Text */}
-            <div className="text-white space-y-5 z-20">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm border border-white/20 shadow-lg">
+            <div className="text-white space-y-5 z-20 relative text-center lg:text-left items-center lg:items-start flex flex-col">
+              {/* Subtle radial glow on mobile */}
+              <div className="absolute -top-20 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:-top-10 lg:-left-10 w-[300px] h-[300px] bg-vvm-blue-400/20 rounded-full blur-[100px] -z-10 lg:hidden"></div>
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm border border-white/20 shadow-lg mb-4">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <span className="font-medium text-emerald-100">Rendelj szakit, mint egy taxit!</span>
+                <span className="font-medium text-white font-bold tracking-wide">Rendelj szakit, mint egy taxit!</span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-[4rem] font-bold font-heading leading-[1.1] tracking-tight">
-                Találd meg a tökéletes<br />
-                <span className="text-vvm-yellow-400">szakembert</span> percek alatt!
+              <h1 className="text-[2.25rem] md:text-5xl lg:text-[4rem] font-bold font-heading leading-[1.1] tracking-tight text-center lg:text-left">
+                Találd meg a<br />
+                <span className="whitespace-nowrap">tökéletes <span className="text-vvm-yellow-400">szakembert</span></span><br />
+                percek alatt!
               </h1>
 
-              <p className="text-lg md:text-xl text-blue-100 max-w-lg leading-relaxed font-light">
+              <p className="text-xl md:text-xl text-blue-50 max-w-lg leading-relaxed font-light mx-auto lg:mx-0">
                 A VízVillanyFűtés az új generációs platform, ami azonnal összeköt téged a közeledben lévő, ellenőrzött víz-, villany- és fűtésszerelőkkel.
               </p>
 
@@ -239,44 +242,38 @@ export default function HomePage() {
               </div>
 
               {/* Trust indicators & Rating */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-6 pt-6 border-t border-white/10">
+              <div className="pt-6 border-t border-white/10 space-y-4">
 
-                {/* Google Rating Badge */}
-                <div className="flex flex-col pr-6 border-r border-white/10 hidden sm:flex">
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <span className="text-3xl font-bold text-white leading-none">4.9</span>
-                    <svg className="w-6 h-6 text-vvm-yellow-400 fill-current" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
+                {/* Google Rating Badge - visible on all screens */}
+                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/15 w-fit mx-auto lg:mx-0 lg:bg-transparent lg:backdrop-blur-none lg:rounded-none lg:px-0 lg:py-0 lg:border-0">
+                  <div className="flex items-center gap-1">
+                    <span className="text-2xl sm:text-3xl font-bold text-white leading-none">4.9</span>
+                    <div className="flex gap-0.5 ml-1">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} className="w-4 h-4 sm:w-5 sm:h-5 text-vvm-yellow-400 fill-current" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
                   </div>
-                  <span className="text-blue-200 text-sm font-medium">Google értékelés</span>
-                </div>
-
-                {/* Features */}
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2 text-blue-100">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span className="text-sm font-medium">100% Ellenőrzött mesterek</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-blue-100">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span className="text-sm font-medium">Gyorsabb a hagyományos keresésnél</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-blue-100">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span className="text-sm font-medium">Számlaképes munkavégzés</span>
+                  <div className="border-l border-white/20 pl-3 lg:border-l-0 lg:pl-0 lg:ml-1">
+                    <span className="text-blue-100 text-sm font-medium">Google értékelés</span>
                   </div>
                 </div>
 
-                {/* Mobile Google Rating (shown only on small screens) */}
-                <div className="flex items-center gap-3 sm:hidden pt-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-2xl font-bold text-white leading-none">4.9</span>
-                    <svg className="w-5 h-5 text-vvm-yellow-400 fill-current" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  </div>
-                  <span className="text-blue-200 text-sm font-medium">Google értékelés</span>
+                {/* Features as compact 2x2 grid */}
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 lg:flex lg:gap-6">
+                  {[
+                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Ellenőrzött mesterek' },
+                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Gyorsabb kereső' },
+                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Számlaképes munka' },
+                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: '24/7 Elérhető' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-1.5 text-sm text-blue-100 font-medium">
+                      {item.icon}
+                      <span>{item.text}</span>
+                    </div>
+                  ))}
                 </div>
 
               </div>
@@ -288,11 +285,11 @@ export default function HomePage() {
             </div>
 
           </div>
-        </div>
-      </section>
+        </div >
+      </section >
 
       {/* Trust Bar */}
-      <section className="bg-white border-b border-gray-100">
+      < section className="bg-white border-b border-gray-100" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             <div className="trust-badge">
@@ -316,7 +313,7 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-blue-50 via-indigo-50/60 to-blue-50 overflow-hidden">
+      <section className="py-16 md:py-24 bg-gradient-to-b from-blue-100 via-blue-50 to-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <HowItWorksAnimation />
           <p className="text-center text-xs sm:text-sm text-slate-400 font-medium tracking-wider mt-12 px-4">
@@ -367,115 +364,121 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Contractor Registration Incentive Section */}
-      <section className="py-12 md:py-16 relative overflow-hidden bg-vvm-blue-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Left Content - The Pitch */}
-            <div className="space-y-5">
-              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1.5 text-sm text-blue-100 shadow-sm backdrop-blur-sm">
-                <Zap className="w-3.5 h-3.5 text-vvm-yellow-400" />
-                <span className="font-semibold tracking-wide uppercase text-[11px]">Limitált ajánlat új csatlakozóknak</span>
+      {/* Contractor Registration Hero (Moved from registration page) */}
+      <section className="relative bg-gradient-to-br from-vvm-blue-800 via-vvm-blue-700 to-vvm-blue-900 text-white overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0di00aC0ydjRoLTR2Mmg0djRoMnYtNGg0di0yaC00em0wLTMwVjBoLTJ2NGgtNHYyaDR2NGgyVjZoNFY0aC00ek02IDM0di00SDR2NEgwdjJoNHY0aDJ2LTRoNHYtMkg2ek02IDRWMEg0djRIMHYyaDR2NGgyVjZoNFY0SDZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30 pointer-events-none"></div>
+
+        {/* Mobile background figure — visible only below lg */}
+        <div className="absolute inset-0 lg:hidden pointer-events-none" aria-hidden="true">
+          <img
+            src="/hero_stats_large.webp"
+            alt=""
+            className="absolute right-[-15%] top-0 h-[70%] w-auto object-contain object-top opacity-[0.4]"
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 md:py-24">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left - Text content */}
+            <div className="relative z-20">
+              <div className="inline-flex items-center gap-2 bg-emerald-500/20 rounded-full px-4 py-2 text-sm text-emerald-300 mb-6 border border-emerald-500/30">
+                <Briefcase className="w-4 h-4" />
+                <span className="font-semibold tracking-wide uppercase text-[11px]">Szakember Regisztráció</span>
               </div>
 
-              <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] font-bold font-heading leading-[1.1] tracking-tight text-white">
-                Szakember vagy? Dolgozz ott, ahol akarsz, akkor, amikor akarsz.
+              <h2 className="text-4xl md:text-5xl lg:text-[3.25rem] font-bold font-heading mb-6 leading-[1.1] tracking-tight text-white">
+                Legyél te is a <span className="text-vvm-yellow-400">szakemberünk!</span>
               </h2>
 
-              <p className="text-base md:text-lg text-blue-100 leading-relaxed font-light">
-                Csak kiválasztod a térképen a számodra szimpatikus munkát, a neked megfelelő helyen – és már indulhatsz is. Próbáld ki rendszerünket: regisztrálj most, és <strong className="text-vvm-yellow-400 font-semibold">10 000 Ft induló kreditet kapsz ajándékba</strong>, amiből azonnal elkezdhetsz munkákat vállalni.
+              <p className="text-lg md:text-xl text-blue-100 mb-8 font-light leading-relaxed max-w-lg">
+                <strong className="text-white font-semibold">Mi hozzuk az ügyfelet</strong>, te pedig elvégzed a munkát. Maradj <strong className="text-white font-semibold">szabadúszó</strong>, mi csak a <strong className="text-white font-semibold">marketinget és a kapcsolatépítést</strong> biztosítjuk számodra.
               </p>
 
-              <div className="bg-white/10 border border-white/20 rounded-xl p-4 relative overflow-hidden group hover:border-vvm-yellow-400 transition-colors">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-vvm-yellow-400/20 rounded-full blur-2xl -mr-8 -mt-8 group-hover:bg-vvm-yellow-400/30 transition-all"></div>
-
-                <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2.5">
-                  <div className="bg-vvm-yellow-400 text-gray-900 p-1.5 rounded-lg">
-                    <Award className="w-5 h-5" />
-                  </div>
-                  Induló Ajándék: <span className="text-vvm-yellow-400">10 000 Ft</span> Kredit
-                </h3>
-
-                <ul className="space-y-2 font-medium text-blue-50 text-sm">
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                    <span>Regisztrálj most, és jóváírunk <strong>10 000 Ft</strong> értéket a fiókodban.</span>
+              <ul className="space-y-4 mb-8 border border-white/10 rounded-2xl p-5 bg-vvm-blue-800/80 backdrop-blur-md lg:border-0 lg:p-0 lg:rounded-none lg:bg-transparent lg:backdrop-blur-none">
+                {[
+                  { icon: <MapPin className="w-4 h-4" />, color: 'bg-sky-500', text: 'Folyamatos ügyfélkapcsolatok Budapest és Pest megyében' },
+                  { icon: <Award className="w-4 h-4" />, color: 'bg-emerald-500', text: '10.000 Ft kezdő kredit az induláshoz' },
+                  { icon: <Receipt className="w-4 h-4" />, color: 'bg-amber-500', text: 'Nincs százalékos jutalék — te egyezel meg az ügyféllel' },
+                  { icon: <Briefcase className="w-4 h-4" />, color: 'bg-indigo-500', text: 'Egy ügyfél közvetítése kb. egy kávé ára (~2.000 Ft)' },
+                  { icon: <Clock className="w-4 h-4" />, color: 'bg-orange-500', text: 'Rugalmas időbeosztás — maradsz a saját főnököd' },
+                ].map((item, index) => (
+                  <li key={index} className="flex items-center gap-3 text-blue-50 font-medium">
+                    <span className={`${item.color} w-8 h-8 rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-lg`}>
+                      {item.icon}
+                    </span>
+                    <span>{item.text}</span>
                   </li>
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                    <span>Ebből a keretből <strong>azonnal elkezdhetsz munkákat vállalni</strong> a térképről.</span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                    <span>Kockázatmentes próbalehetőség – próbáld ki a rendszert ingyen!</span>
-                  </li>
-                </ul>
-              </div>
+                ))}
+              </ul>
 
-              <div className="pt-2">
-                <Link href="/login" className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-vvm-yellow-400 to-vvm-yellow-500 hover:from-vvm-yellow-300 hover:to-vvm-yellow-400 text-gray-900 font-black text-base py-3.5 px-8 rounded-xl gap-2.5 transition-all transform hover:scale-[1.03] shadow-[0_0_30px_rgba(250,204,21,0.3)]">
-                  <Wrench className="w-5 h-5" />
-                  <span>Szakember Regisztráció / Belépés</span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <Link
+                  href="/csatlakozz-partnerkent#szakember_regisztracio"
+                  className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-vvm-yellow-400 to-vvm-yellow-500 hover:from-vvm-yellow-300 to-vvm-yellow-400 text-gray-900 font-black text-base py-3.5 px-8 rounded-xl gap-2.5 transition-all transform hover:scale-[1.03] shadow-[0_0_30px_rgba(250,204,21,0.3)]"
+                >
+                  <Send className="w-5 h-5" />
+                  <span>Regisztrálok szakemberként</span>
                 </Link>
-                <p className="text-xs text-blue-200/70 text-center sm:text-left mt-2">Rugalmas beosztás • Kiszámítható bevétel • Garantált ügyfélkör</p>
+                <Link
+                  href="/csatlakozz-partnerkent"
+                  className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold py-3.5 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2"
+                >
+                  <span>Tudj meg többet</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
               </div>
             </div>
 
-            {/* Right Content - Visuals / Social Proof */}
-            <div className="relative mt-6 lg:mt-0 lg:ml-6">
+            {/* Right - Desktop figure (hidden on mobile, shown on lg+) */}
+            <div className="relative hidden lg:flex items-center justify-center">
               <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 blur-2xl rounded-[3rem] -z-10"></div>
+              <img
+                src="/hero_stats_large.webp"
+                alt="Szakemberünk munka közben"
+                className="w-full max-w-lg rounded-2xl shadow-2xl drop-shadow-xl object-contain"
+              />
 
-              <div className="grid gap-4 relative">
-                {/* Card 1 */}
-                <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-4 rounded-xl shadow-2xl transform hover:-translate-y-1 transition-transform duration-300">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400">
-                      <MapPin className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="font-bold text-white">Térképes Munkaválasztás</div>
-                      <div className="text-sm text-slate-400">Lásd azonnal mi van a közeledben</div>
-                    </div>
-                  </div>
-                  <p className="text-sm text-slate-300 leading-relaxed">
-                    Nem a diszpécser osztja a munkát. Felnyitod az appot, látod a térképen az elérhető feladatokat a közeledben, és lecsapsz arra, amelyik szimpatikus.
-                  </p>
+              {/* Floating Badge: Free registration */}
+              <div className="absolute top-4 -left-8 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 animate-float z-20">
+                <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-emerald-600" />
                 </div>
-
-                {/* Card 2 */}
-                <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-4 rounded-xl shadow-2xl transform hover:-translate-y-1 transition-transform duration-300 lg:-ml-8 lg:mr-8 border-l-4 border-l-vvm-yellow-500">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-vvm-yellow-500/20 rounded-full flex items-center justify-center text-vvm-yellow-400">
-                      <Receipt className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="font-bold text-white">Nincs jutalék, csak Fix Díj</div>
-                      <div className="text-sm text-slate-400">Tartsd meg, amit megkeresel</div>
-                    </div>
-                  </div>
-                  <p className="text-sm text-slate-300 leading-relaxed">
-                    Nem vonunk le %-os jutalékot a munkadíjadból. Csak egy fix (munkától függő) "Lead Díjat" fizetsz a feladat megnyitásáért a kreditegyenlegedből.
-                  </p>
+                <div>
+                  <div className="text-sm font-bold text-gray-800">Ingyenes</div>
+                  <div className="text-[10px] text-gray-500 font-medium">Regisztráció</div>
                 </div>
+              </div>
 
-                {/* Testimonial Snippet */}
-                <div className="relative mt-3 group">
-                  <div className="absolute -left-2.5 -top-2.5 w-7 h-7 bg-indigo-500 rounded-full flex items-center justify-center text-white shadow-lg border-2 border-slate-900 z-10">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                      <path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.57-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z" />
-                    </svg>
-                  </div>
-                  <div className="bg-white/5 border border-white/10 p-4 rounded-xl pt-5 italic text-sm text-indigo-100/90 leading-relaxed backdrop-blur-sm relative">
-                    Mióta itt vállalok munkát, ott és akkor dolgozom, amikor akarok. A 10 ezer forintos bónuszból 3 kisebb munkát is el tudtam vinni első nap!
-                    <div className="mt-4 flex items-center gap-3 not-italic">
-                      <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">TJ</div>
-                      <div className="text-xs">
-                        <span className="block font-semibold text-white">Tóth József</span>
-                        <span className="text-indigo-300">Vízszerelő, XIV. ker.</span>
-                      </div>
-                    </div>
-                  </div>
+              {/* Floating Badge: Starting credit */}
+              <div className="absolute bottom-8 -left-12 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 0.5s infinite' }}>
+                <div className="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <Award className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-gray-800">10.000 Ft</div>
+                  <div className="text-[10px] text-gray-500 font-medium">Induló kredit</div>
+                </div>
+              </div>
+
+              {/* Floating Badge: No commission */}
+              <div className="absolute top-12 -right-6 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 1s infinite' }}>
+                <div className="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center">
+                  <Receipt className="w-5 h-5 text-red-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-gray-800">0% jutalék</div>
+                  <div className="text-[10px] text-gray-500 font-medium">Nincs százalék</div>
+                </div>
+              </div>
+
+              {/* Floating Badge: You set the price */}
+              <div className="absolute bottom-16 -right-4 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 1.5s infinite' }}>
+                <div className="w-9 h-9 bg-sky-100 rounded-lg flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 text-sky-600" />
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-gray-800">Te szabod</div>
+                  <div className="text-[10px] text-gray-500 font-medium">az árat az ügyféllel</div>
                 </div>
               </div>
             </div>
@@ -613,7 +616,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-8 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory md:snap-none scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-8 overflow-x-auto py-8 px-4 -mx-4 md:p-8 md:-m-8 snap-x snap-mandatory md:snap-none scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {testimonials.map((testimonial, index) => (
               <div key={index} className="bg-white rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 w-[85vw] xs:w-[75vw] md:w-auto snap-start">
                 <div className="flex items-center gap-1 mb-3">
@@ -689,15 +692,15 @@ export default function HomePage() {
           <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-blue-200">
             <div className="flex items-center gap-2">
               <ThumbsUp className="w-4 h-4" />
-              <span>Ingyenes árajánlat</span>
+              <span>Ingyenes ajánlatkérés</span>
             </div>
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              <span>1 év garancia</span>
+              <Users className="w-4 h-4" />
+              <span>Versengő szakemberek</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span>SOS 2 órán belül</span>
+              <Star className="w-4 h-4" />
+              <span>Értékelt szakemberek</span>
             </div>
           </div>
         </div>

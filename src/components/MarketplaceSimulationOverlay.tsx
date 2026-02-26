@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Map, { Marker, NavigationControl, MapRef } from 'react-map-gl/mapbox';
-import { X, User, ChevronRight, Briefcase, Wallet, Settings, Menu, Shield, MapPin, Clock, ArrowRight, AlertTriangle, Plus, Check, XCircle, Phone, Mail, UserCheck } from 'lucide-react';
+import { X, User, ChevronRight, Briefcase, Wallet, Settings, Menu, Shield, MapPin, Clock, ArrowRight, ArrowLeft, AlertTriangle, Plus, Check, XCircle, Phone, Mail, UserCheck } from 'lucide-react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
@@ -35,6 +35,67 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [addLocation, setAddLocation] = useState<{ lat: number, lng: number }>({ lat: 47.4979, lng: 19.0402 });
     const mapRef = useRef<MapRef>(null);
+
+    // Touch drag state for sidebar
+    const [dragOffset, setDragOffset] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const touchStartY = useRef(0);
+    const touchStartTime = useRef(0);
+    const sidebarRef = useRef<HTMLDivElement>(null);
+
+    const EXPANDED_HEIGHT = typeof window !== 'undefined' ? window.innerHeight * 0.5 : 400;
+    const COLLAPSED_HEIGHT = 48; // h-12
+
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        touchStartY.current = e.touches[0].clientY;
+        touchStartTime.current = Date.now();
+        setIsDragging(true);
+    }, []);
+
+    const handleTouchMove = useCallback((e: React.TouchEvent) => {
+        if (!isDragging) return;
+        const currentY = e.touches[0].clientY;
+        const delta = currentY - touchStartY.current;
+        // Only allow dragging down when open, up when closed
+        if (isMobileMenuOpen) {
+            setDragOffset(Math.max(0, delta)); // drag down only
+        } else {
+            setDragOffset(Math.min(0, delta)); // drag up only
+        }
+    }, [isDragging, isMobileMenuOpen]);
+
+    const handleTouchEnd = useCallback(() => {
+        setIsDragging(false);
+        const elapsed = Date.now() - touchStartTime.current;
+        const velocity = Math.abs(dragOffset) / elapsed; // px/ms
+        const threshold = EXPANDED_HEIGHT * 0.25;
+
+        if (isMobileMenuOpen) {
+            // If dragged down enough or fast flick → collapse
+            if (dragOffset > threshold || (velocity > 0.5 && dragOffset > 30)) {
+                setIsMobileMenuOpen(false);
+            }
+        } else {
+            // If dragged up enough or fast flick → expand
+            if (Math.abs(dragOffset) > threshold || (velocity > 0.5 && Math.abs(dragOffset) > 30)) {
+                setIsMobileMenuOpen(true);
+            }
+        }
+        setDragOffset(0);
+    }, [dragOffset, isMobileMenuOpen, EXPANDED_HEIGHT]);
+
+    // Calculate sidebar style for smooth drag
+    const getSidebarStyle = (): React.CSSProperties => {
+        if (typeof window === 'undefined' || window.innerWidth >= 1024) return {};
+        const baseHeight = isMobileMenuOpen ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT;
+        const currentHeight = isDragging
+            ? Math.max(COLLAPSED_HEIGHT, Math.min(EXPANDED_HEIGHT, baseHeight - dragOffset))
+            : baseHeight;
+        return {
+            height: currentHeight,
+            transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
+        };
+    };
 
     // Lead interests state
     const [myInterests, setMyInterests] = useState<any[]>([]);
@@ -196,25 +257,31 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
         <div className={`fixed inset-0 z-[100] flex animate-in fade-in duration-300 ${isAuthenticated ? 'bg-slate-100' : 'bg-slate-900'}`}>
 
             {/* Sidebar / Menu — persistent bottom sheet on mobile, left panel on desktop */}
-            <div className={`
-                fixed lg:relative z-20 bg-white shadow-2xl flex flex-col transform transition-all duration-300 ease-in-out
-                inset-x-0 bottom-0 rounded-t-2xl
-                lg:inset-y-0 lg:left-0 lg:h-auto lg:w-80 lg:max-w-none lg:rounded-none
-                ${isMobileMenuOpen ? 'h-[50vh]' : 'h-12'}
-                lg:h-auto lg:translate-y-0
-            `}>
-                {/* Drag handle — tap to toggle */}
-                <button
+            <div
+                ref={sidebarRef}
+                className={`
+                    fixed lg:relative z-20 bg-white shadow-2xl flex flex-col
+                    inset-x-0 bottom-0 rounded-t-2xl
+                    lg:inset-y-0 lg:left-0 lg:h-auto lg:w-80 lg:max-w-none lg:rounded-none
+                    lg:h-auto lg:translate-y-0
+                `}
+                style={getSidebarStyle()}
+            >
+                {/* Drag handle — touch to drag, tap to toggle */}
+                <div
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="lg:hidden w-full flex flex-col items-center pt-2 pb-1 cursor-pointer"
+                    className="lg:hidden w-full flex flex-col items-center pt-2 pb-1 cursor-grab active:cursor-grabbing select-none touch-none"
                 >
-                    <div className="w-10 h-1.5 bg-slate-300 rounded-full" />
-                    {!isMobileMenuOpen && (
+                    <div className={`w-10 h-1.5 rounded-full transition-colors ${isDragging ? 'bg-vvm-blue-400' : 'bg-slate-300'}`} />
+                    {!isMobileMenuOpen && !isDragging && (
                         <span className="text-xs text-slate-500 font-medium mt-1">
                             {viewMode === 'contractor' ? 'Szakember Portál' : 'Ügyfél Portál'} ▲
                         </span>
                     )}
-                </button>
+                </div>
 
                 {/* Profile Widget */}
                 <div className="p-5 border-b border-slate-100 bg-slate-50">
@@ -502,14 +569,19 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                     <div className={`absolute inset-0 bg-gradient-to-b ${isAuthenticated ? 'from-white/60' : 'from-slate-900/80'} to-transparent`}></div>
                     <div className="relative h-full px-4 flex items-center justify-between pointer-events-auto">
                         <div className="flex items-center gap-3">
-                            {/* Profile icon → /fiok (mobile only) */}
-                            <a
-                                href="/fiok"
-                                className={`lg:hidden p-2 rounded-lg backdrop-blur-md transition-all shadow-lg ${isAuthenticated ? 'text-slate-600 hover:text-slate-800 bg-white/70 hover:bg-white/90' : 'text-white/80 hover:text-white bg-white/10 hover:bg-white/20'
-                                    }`}
-                            >
-                                <User className="w-6 h-6" />
-                            </a>
+                            {/* Back button — left side */}
+                            {onClose && (
+                                <button
+                                    onClick={onClose}
+                                    className={`p-2 sm:px-4 sm:py-2 rounded-xl backdrop-blur-md transition-all shadow-lg flex items-center gap-2 font-bold text-sm ${isAuthenticated
+                                            ? 'text-slate-700 hover:text-slate-900 bg-white/80 hover:bg-white border border-slate-200'
+                                            : 'text-white/90 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20'
+                                        }`}
+                                >
+                                    <ArrowLeft className="w-5 h-5" />
+                                    <span className="hidden sm:inline">Vissza</span>
+                                </button>
+                            )}
                             <div className={`backdrop-blur-md px-3 py-1.5 rounded-lg text-sm font-medium hidden sm:flex items-center gap-2 shadow-lg ${isAuthenticated
                                 ? 'bg-white/80 text-slate-700 border border-slate-200'
                                 : 'bg-slate-800/80 text-white border border-slate-700 animate-pulse'
@@ -520,16 +592,6 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                                     : (viewMode === 'contractor' ? 'Szimulált Szakember Applikáció' : 'Teljes Képernyős Térkép Nézet')}
                             </div>
                         </div>
-                        {onClose && (
-                            <button
-                                onClick={onClose}
-                                className="bg-white hover:bg-slate-50 text-slate-800 shadow-xl backdrop-blur-md border border-slate-200 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all transform hover:scale-105 pointer-events-auto"
-                            >
-                                <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
-                                <span className="hidden sm:inline">Vissza a főoldalra</span>
-                                <span className="sm:hidden">Vissza</span>
-                            </button>
-                        )}
                     </div>
                 </div>
 
@@ -616,10 +678,10 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
 
                                         {alreadyInterested(selectedLead.id) ? (
                                             <div className={`w-full py-3.5 px-6 rounded-xl text-base font-bold text-center ${getInterestStatus(selectedLead.id) === 'accepted'
-                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                    : getInterestStatus(selectedLead.id) === 'rejected'
-                                                        ? 'bg-red-50 text-red-600 border border-red-200'
-                                                        : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                : getInterestStatus(selectedLead.id) === 'rejected'
+                                                    ? 'bg-red-50 text-red-600 border border-red-200'
+                                                    : 'bg-amber-50 text-amber-700 border border-amber-200'
                                                 }`}>
                                                 {getInterestStatus(selectedLead.id) === 'accepted'
                                                     ? '✅ Elfogadva — hamarosan megkapod az elérhetőségeket!'
@@ -652,8 +714,8 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                                         <div className="space-y-2">
                                             {leadInterestDetails[selectedLead.id].map((interest: any) => (
                                                 <div key={interest.id} className={`p-3 rounded-xl border ${interest.status === 'accepted' ? 'bg-emerald-50 border-emerald-200'
-                                                        : interest.status === 'rejected' ? 'bg-red-50 border-red-200 opacity-50'
-                                                            : 'bg-white border-slate-200'
+                                                    : interest.status === 'rejected' ? 'bg-red-50 border-red-200 opacity-50'
+                                                        : 'bg-white border-slate-200'
                                                     }`}>
                                                     <div className="flex items-center justify-between">
                                                         <div className="flex items-center gap-2">

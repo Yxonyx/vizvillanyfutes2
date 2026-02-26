@@ -1,53 +1,68 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  Award, Shield, Clock, CheckCircle,
-  Droplets, Zap, Flame, Heart, Target, Calendar, Phone
+  Rocket, Shield, Zap, Users, Target, Lightbulb,
+  Droplets, Flame, CheckCircle, ArrowRight, Wrench, User, Star
 } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Rólunk - Megbízható Szakemberek 2015 óta | VízVillanyFűtés',
-  description: 'Ismerje meg a VízVillanyFűtés csapatát! Ellenőrzött szakemberek, garanciális munkavégzés Budapesten.',
+  title: 'Rólunk | VízVillanyFűtés',
+  description: 'Ismerd meg a VízVillanyFűtés platformot. Azonnal összekötünk a közeledben lévő, ellenőrzött szakemberekkel.',
 };
 
 const stats = [
-  { value: '500+', label: 'Elégedett ügyfél' },
-  { value: '150+', label: 'Aktív szakember' },
-  { value: '4.9', label: 'Google értékelés', suffix: '★' },
-  { value: '1 év', label: 'Garancia' },
+  { value: '100%', label: 'Ellenőrzött mesterek' },
+  { value: '0 Ft', label: 'Ügyfél díj' },
+  { value: 'Budapest', label: '+ Pest megye' },
+  { value: '2025', label: 'Indulás éve' },
 ];
 
 const values = [
   {
+    icon: Rocket,
+    title: 'Innováció',
+    description: 'A hagyományos „ismerős ismerőse" keresést felváltjuk egy modern, valós idejű, térképalapú rendszerrel.'
+  },
+  {
     icon: Shield,
-    title: 'Megbízhatóság',
-    description: 'Minden szakemberünk háttérellenőrzésen esett át, biztosítottak vagyunk és garanciát vállalunk.'
+    title: 'Biztonság',
+    description: 'Kizárólag ellenőrzött, számlaképes vállalkozók kerülhetnek a platformra. Valós ügyfélértékelések segítik a választást.'
+  },
+  {
+    icon: Zap,
+    title: 'Gyorsaság',
+    description: 'Percek alatt ajánlatot kapsz a közeledben lévő szakemberektől. SOS esetben akár 1-2 óra alatt a helyszínen lehetnek.'
   },
   {
     icon: Target,
     title: 'Átláthatóság',
-    description: 'Fix árak, előzetes árajánlat – nincsenek rejtett költségek.'
-  },
-  {
-    icon: Clock,
-    title: 'Gyorsaság',
-    description: 'SOS esetén 2 órán belül a helyszínen. Normál foglalás 1-3 munkanapon belül.'
-  },
-  {
-    icon: Heart,
-    title: 'Ügyfélközpontúság',
-    description: 'Nem csak javítunk – tanácsot adunk, megelőzünk, és hosszú távon gondolkodunk.'
+    description: 'A szakemberek versengő ajánlatokat adnak, Te döntesz az ár, az értékelés és az elérhetőség alapján. Nincs rejtett költség.'
   },
 ];
 
 const milestones = [
-  { year: '2020', event: 'A VízVillanyFűtés alapítása' },
-  { year: '2021', event: 'Első 1000 elvégzett munka' },
-  { year: '2022', event: 'Fűtésszerelés szolgáltatás indítása' },
-  { year: '2023', event: 'Online foglalási rendszer bevezetése' },
-  { year: '2024', event: 'Pest megyei terjeszkedés' },
-  { year: '2025', event: 'Pályázati tanácsadás indítása' },
+  { year: '2024 Q3', event: 'Az ötlet megszületése. Felismertük, hogy a szakemberkeresés Magyarországon elavult és nehézkes.' },
+  { year: '2024 Q4', event: 'Piackutatás és a platform tervezése az Uber, Wolt és Foodora modellek tanulmányozásával.' },
+  { year: '2025 Q1', event: 'Az első verzió fejlesztése: valós idejű térkép, szakember-fiók és ügyféloldal.' },
+  { year: '2025 Q2', event: 'Béta indulás Budapesten, az első szakemberek és ügyfelek csatlakozása.' },
+  { year: '2025 Q3', event: 'Nyilvános indulás Budapest és Pest megye területén.' },
+  { year: '2026', event: 'Országos terjeszkedés, vidéki városok bevonása és a rendszer folyamatos fejlesztése.' },
+];
+
+const inspirations = [
+  {
+    name: 'Uber',
+    desc: 'Azonnal megmutatja, ki van a közeledben – valós idejű térképes megoldás.',
+  },
+  {
+    name: 'Wolt / Foodora',
+    desc: 'Versengő ajánlatok, gyors kiszolgálás, átlátható értékelések és árak.',
+  },
+  {
+    name: 'Booking.com',
+    desc: 'Összehasonlítható profilok, szűrők, és bizalomépítő ügyfélvélemények.',
+  },
 ];
 
 export default function RolunkPage() {
@@ -59,22 +74,27 @@ export default function RolunkPage() {
           <Breadcrumbs className="mb-8 text-blue-200 [&_a]:text-blue-200 [&_a:hover]:text-white [&_span]:text-white [&_svg]:text-blue-300" />
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold font-heading mb-6">
-                Víz, villany, fűtés – <br />
-                <span className="text-vvm-yellow-400">egy megbízható kézben.</span>
+              <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 text-sm text-blue-200 mb-6 border border-white/20">
+                <Rocket className="w-4 h-4" />
+                <span className="font-semibold tracking-wide">Egy teljesen új megközelítés</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold font-heading mb-6 leading-tight">
+                Mint egy Uber,<br />
+                <span className="text-vvm-yellow-400">de szerelőknek.</span>
               </h1>
-              <p className="text-xl text-blue-100 mb-8">
-                A VízVillanyFűtés nem csak egy szerelő keresés – hanem egy teljes szolgáltatási ökoszisztéma,
-                ahol az ügyfelek, szakemberek és vállalkozások egyaránt nyernek.
+              <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+                A VízVillanyFűtés egy modern magyar platform, ami valós időben
+                összeköt téged a közeledben lévő, ellenőrzött víz-, villany- és
+                fűtésszerelőkkel. A szakemberek versenyeznek a munkádért.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link href="/foglalas" className="btn-primary py-4 px-8">
-                  <Calendar className="w-5 h-5" />
-                  <span>Időpontfoglalás</span>
+                  <User className="w-5 h-5" />
+                  <span>Szakembert keresek</span>
                 </Link>
-                <Link href="/kapcsolat" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center gap-2">
-                  <Phone className="w-5 h-5" />
-                  <span>Kapcsolat</span>
+                <Link href="/csatlakozz-partnerkent" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center gap-2">
+                  <Wrench className="w-5 h-5" />
+                  <span>Szakember vagyok</span>
                 </Link>
               </div>
             </div>
@@ -87,7 +107,7 @@ export default function RolunkPage() {
                   className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center"
                 >
                   <div className="text-4xl font-bold text-white mb-1">
-                    {stat.value}{stat.suffix}
+                    {stat.value}
                   </div>
                   <div className="text-blue-200">{stat.label}</div>
                 </div>
@@ -97,7 +117,7 @@ export default function RolunkPage() {
         </div>
       </section>
 
-      {/* Mission */}
+      {/* The Problem We Solve */}
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-4 mb-8">
@@ -113,31 +133,61 @@ export default function RolunkPage() {
           </div>
 
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-heading mb-6">
-            Küldetésünk
+            A probléma, amit megoldunk
           </h2>
-          <p className="text-xl text-gray-600 leading-relaxed">
-            Azt hisszük, hogy a háztartási problémák megoldása nem lehet stresszes, bizonytalan
-            vagy drága. Célunk, hogy minden magyar otthonban legyen egy megbízható partner,
-            akire számíthatnak – akár sürgős hibaelhárításról, akár tervezett felújításról van szó.
+          <p className="text-xl text-gray-600 leading-relaxed mb-6">
+            Ki ne járt volna úgy, hogy elromlott valami otthon, és <strong>órákig, napokig kellett keresni egy szabad szerelőt?</strong>
+          </p>
+          <p className="text-lg text-gray-500 leading-relaxed">
+            Ismerősök, Facebook-csoportok, elavult telefonkönyv... A hagyományos szakemberkeresés lassú,
+            bizonytalan és tele van rejtett kockázatokkal. Mi ezt gondoltuk újra egy modern,
+            adatvezérelt platformmal, ahol a feladást percek alatt megoldod, és a szakemberek
+            versenyeznek a munkádért.
           </p>
         </div>
       </section>
 
+      {/* Inspiration */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-heading mb-4">
+              Amik inspiráltak minket
+            </h2>
+            <p className="text-lg text-gray-600">
+              A legjobb platformokból merítettünk, és adaptáltuk a magyar piacra.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {inspirations.map((item, index) => (
+              <div key={index} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow text-center">
+                <div className="w-14 h-14 bg-vvm-blue-100 rounded-xl flex items-center justify-center mb-6 mx-auto">
+                  <Lightbulb className="w-7 h-7 text-vvm-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.name}</h3>
+                <p className="text-gray-600">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Values */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-heading mb-4">
               Értékeink
             </h2>
             <p className="text-xl text-gray-600">
-              Ezek az elvek vezérelnek minket minden nap
+              Ezek az alapelvek vezérelnek a fejlesztés minden lépésében
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
-              <div key={index} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow">
+              <div key={index} className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow">
                 <div className="w-14 h-14 bg-vvm-blue-100 rounded-xl flex items-center justify-center mb-6">
                   <value.icon className="w-7 h-7 text-vvm-blue-600" />
                 </div>
@@ -149,17 +199,17 @@ export default function RolunkPage() {
         </div>
       </section>
 
-      {/* How We Work */}
-      <section className="py-20 bg-white">
+      {/* How It Works */}
+      <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-heading mb-6">
-                Hogyan működünk?
+                Hogyan működik?
               </h2>
               <p className="text-lg text-gray-600 mb-8">
-                A VízVillanyFűtés platformon keresztül gyorsan és egyszerűen jut el
-                az ellenőrzött szakemberekhez.
+                A platform lényege az egyszerűség. Ahogy egy Wolt rendelést adsz le,
+                úgy kérsz itt szakembert.
               </p>
 
               <div className="space-y-6">
@@ -168,8 +218,8 @@ export default function RolunkPage() {
                     1
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">Probléma bejelentése</h4>
-                    <p className="text-gray-600">Online vagy telefonon írja le a problémát</p>
+                    <h4 className="font-semibold text-gray-900">Jelezd a problémát</h4>
+                    <p className="text-gray-600">Írd le pár szóban, mi romlott el, a rendszer kategorizálja helyetted.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -177,8 +227,8 @@ export default function RolunkPage() {
                     2
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">Azonnali árajánlat</h4>
-                    <p className="text-gray-600">Kapjon fix ársávot és válasszon időpontot</p>
+                    <h4 className="font-semibold text-gray-900">Szakemberek értesülnek</h4>
+                    <p className="text-gray-600">A közeledben lévő mesterek azonnal push értesítést kapnak és ajánlatot adnak.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -186,33 +236,33 @@ export default function RolunkPage() {
                     3
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">Szakember kiközvetítése</h4>
-                    <p className="text-gray-600">A legközelebbi, megfelelő szakembert küldjük</p>
+                    <h4 className="font-semibold text-gray-900">Te választasz</h4>
+                    <p className="text-gray-600">Hasonlítsd össze az ajánlatokat: ár, értékelés, elérhetőség alapján Te döntesz.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-vvm-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold">
+                  <div className="w-10 h-10 bg-vvm-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 text-gray-900 font-bold">
                     4
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">Garanciális munka</h4>
-                    <p className="text-gray-600">Minden munkánkra 1 év garancia</p>
+                    <h4 className="font-semibold text-gray-900">Értékeld a munkát</h4>
+                    <p className="text-gray-600">A munka után értékeld a mestert, ezzel segítve másokat a választásban.</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="bg-gradient-to-br from-vvm-blue-100 to-vvm-blue-200 rounded-3xl p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Miért minket válasszanak?</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Miért a VízVillanyFűtés?</h3>
               <div className="space-y-4">
                 {[
-                  'Ellenőrzött, minősített szakemberek',
-                  'Biztosított munkavégzés',
-                  'Minimum 1 év garancia minden munkára',
-                  'Átlátható árak, nincs rejtett költség',
-                  'SOS kiszállás 2 órán belül',
-                  'Pályázati dokumentáció készítése',
-                  'Hivatalos számla minden munkáról',
+                  'Valós idejű, térképes szakemberkeresés',
+                  'Versengő ajánlatok, Te döntesz',
+                  'Ellenőrzött, számlaképes mesterek',
+                  'Valós ügyfélértékelések minden munkáról',
+                  'Ingyenes az ügyfeleknek',
+                  'SOS bejelentés perceken belüli válasszal',
+                  'Pályázathoz elfogadott számlák',
                 ].map((item, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -226,12 +276,15 @@ export default function RolunkPage() {
       </section>
 
       {/* Timeline */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-heading mb-4">
-              Történetünk
+              Az utunk
             </h2>
+            <p className="text-lg text-gray-600">
+              Egy ötletből indultunk, és most építjük Magyarország valós idejű szakemberplatformját.
+            </p>
           </div>
 
           <div className="relative">
@@ -242,18 +295,18 @@ export default function RolunkPage() {
                 <div key={index} className={`relative flex items-center ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
                   <div className="w-1/2 pr-8 text-right">
                     {index % 2 === 0 && (
-                      <div className="bg-white rounded-xl p-4 shadow-sm inline-block">
+                      <div className="bg-gray-50 rounded-xl p-4 shadow-sm inline-block">
                         <span className="text-vvm-blue-600 font-bold">{milestone.year}</span>
-                        <p className="text-gray-700">{milestone.event}</p>
+                        <p className="text-gray-700 text-sm">{milestone.event}</p>
                       </div>
                     )}
                   </div>
                   <div className="w-4 h-4 bg-vvm-blue-600 rounded-full border-4 border-white shadow-md z-10"></div>
                   <div className="w-1/2 pl-8">
                     {index % 2 !== 0 && (
-                      <div className="bg-white rounded-xl p-4 shadow-sm inline-block">
+                      <div className="bg-gray-50 rounded-xl p-4 shadow-sm inline-block">
                         <span className="text-vvm-blue-600 font-bold">{milestone.year}</span>
-                        <p className="text-gray-700">{milestone.event}</p>
+                        <p className="text-gray-700 text-sm">{milestone.event}</p>
                       </div>
                     )}
                   </div>
@@ -268,19 +321,19 @@ export default function RolunkPage() {
       <section className="py-20 bg-gradient-to-br from-vvm-blue-600 to-vvm-blue-800 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold font-heading mb-6">
-            Készen áll a megbízható megoldásra?
+            Csatlakozz a jövő platformjához!
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Foglaljon időpontot online, vagy hívjon minket most!
+            Akár ügyfél vagy, akár szakember, nálunk mindenki jól jár.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/foglalas" className="btn-primary py-4 px-10 text-lg">
-              <Calendar className="w-6 h-6" />
-              <span>Időpontfoglalás</span>
+              <User className="w-6 h-6" />
+              <span>Ingyenes ajánlatkérés</span>
             </Link>
-            <Link href="/visszahivas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg">
-              <Phone className="w-6 h-6" />
-              <span>Visszahívást kérek</span>
+            <Link href="/csatlakozz-partnerkent" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg">
+              <Wrench className="w-6 h-6" />
+              <span>Szakemberként csatlakozom</span>
             </Link>
           </div>
         </div>
@@ -288,4 +341,3 @@ export default function RolunkPage() {
     </div>
   );
 }
-

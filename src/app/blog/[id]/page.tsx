@@ -362,16 +362,28 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
                         </h2>
                       );
                     }
+
+                    // Simple bold text replacement for **text**
+                    const renderInlineFormatting = (text: string) => {
+                      const parts = text.split(/(\*\*.*?\*\*)/g);
+                      return parts.map((part, i) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={i} className="font-semibold text-gray-900">{part.slice(2, -2)}</strong>;
+                        }
+                        return part;
+                      });
+                    };
+
                     if (paragraph.startsWith('- ')) {
                       return (
-                        <ul key={index} className="list-disc list-inside text-gray-600 space-y-1">
-                          <li>{paragraph.replace('- ', '')}</li>
+                        <ul key={index} className="list-disc list-inside text-gray-600 space-y-1 mb-2">
+                          <li>{renderInlineFormatting(paragraph.replace('- ', ''))}</li>
                         </ul>
                       );
                     }
                     return (
                       <p key={index} className="text-gray-600 mb-4 leading-relaxed">
-                        {paragraph}
+                        {renderInlineFormatting(paragraph)}
                       </p>
                     );
                   })}
@@ -388,13 +400,17 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
             {/* Sidebar */}
             <div className="lg:col-span-1">
               {/* CTA */}
-              <div className="bg-vvm-blue-600 rounded-2xl p-6 text-white mb-8">
-                <h3 className="font-bold text-lg mb-3">Segítségre van szüksége?</h3>
-                <p className="text-blue-100 text-sm mb-4">
-                  Foglaljon időpontot online, vagy kérjen visszahívást!
+              <div className="bg-gradient-to-br from-vvm-blue-600 to-vvm-blue-800 rounded-2xl p-6 text-white mb-8 shadow-lg">
+                <h3 className="font-bold text-xl mb-3">Sürgős segítség kell?</h3>
+                <p className="text-blue-100 text-sm mb-6">
+                  Add fel a munkát percek alatt, és válogass a közeledben lévő, ellenőrzött szakemberek ajánlatai közül!
                 </p>
-                <Link href="/foglalas" className="btn-primary w-full py-3 text-center block">
-                  Időpontfoglalás
+                <Link href="/foglalas" className="btn-primary w-full py-3 text-center flex items-center justify-center gap-2 mb-3">
+                  <User className="w-5 h-5" />
+                  Szakembert keresek
+                </Link>
+                <Link href="/csatlakozz-partnerkent" className="w-full py-3 text-center flex items-center justify-center gap-2 text-sm text-blue-200 hover:text-white transition-colors">
+                  Szakember vagyok, csatlakozom
                 </Link>
               </div>
 

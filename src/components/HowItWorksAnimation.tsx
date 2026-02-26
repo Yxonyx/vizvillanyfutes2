@@ -178,8 +178,8 @@ export default function HowItWorksAnimation() {
                     <div className="mt-6 bg-red-50 text-red-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-red-100 mb-2">
                         Katasztrófa
                     </div>
-                    <div className="text-sm font-semibold text-slate-800 mb-1">Váratlan Hiba</div>
-                    <p className="text-xs text-slate-500 max-w-[200px] leading-relaxed">
+                    <div className="text-base font-bold text-slate-800 mb-1">Váratlan Hiba</div>
+                    <p className="text-sm text-slate-500 max-w-[200px] leading-relaxed">
                         Írd le 3 kattintással, mi a gond (pl. csöpög a csap, nincs áram), akár fényképpel.
                     </p>
                 </div>
@@ -280,8 +280,8 @@ export default function HowItWorksAnimation() {
                     <div className="mt-6 bg-blue-50 text-blue-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-blue-100 mb-2">
                         Rendszer
                     </div>
-                    <div className="text-sm font-semibold text-slate-800 mb-1">Okos Kiosztás</div>
-                    <p className="text-xs text-slate-500 max-w-[200px] leading-relaxed">
+                    <div className="text-base font-bold text-slate-800 mb-1">Okos Kiosztás</div>
+                    <p className="text-sm text-slate-500 max-w-[200px] leading-relaxed">
                         A rendszerünk másodperceken belül kiküldi a kérésedet a közeledben lévő szakembereknek.
                     </p>
                 </div>
@@ -352,8 +352,8 @@ export default function HowItWorksAnimation() {
                     <div className="mt-6 bg-emerald-50 text-emerald-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-100 mb-2">
                         Megoldás
                     </div>
-                    <div className="text-sm font-semibold text-slate-800 mb-1">Mester Úton!</div>
-                    <p className="text-xs text-slate-500 max-w-[200px] leading-relaxed">
+                    <div className="text-base font-bold text-slate-800 mb-1">Mester Úton!</div>
+                    <p className="text-sm text-slate-500 max-w-[200px] leading-relaxed">
                         A munkát egy minősített szerelő vállalja el, és azonnal indul hozzád!
                     </p>
                 </div>

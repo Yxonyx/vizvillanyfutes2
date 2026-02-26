@@ -18,7 +18,7 @@ const targetProfiles = [
     icon: Droplets,
     color: 'sky',
     title: 'Önálló vízszerelő vállalkozók',
-    description: 'Olyan vízszerelőket keresünk, akik rendelkeznek saját szerszámokkal, autóval, vállalkozói engedélyekkel, és szeretnének kiszámíthatóbb, tervezhetőbb munkamennyiséget.',
+    description: 'Vízszerelőket keresünk, akik saját szerszámokkal és vállalkozói engedéllyel rendelkeznek, és szeretnének kiszámíthatóbb, tervezhetőbb munkamennyiséget.',
   },
   {
     type: 'villanyszerelo',
@@ -40,13 +40,13 @@ const targetProfiles = [
 const benefits = [
   {
     icon: Users,
-    title: 'Stabil leadáramlás',
-    description: 'Nem neked kell hirdetned. Mi hozzuk az ügyfelet, te elvégzed a munkát. Budapest és Pest megye fókusz, szezonban kiemelt terheléssel.',
+    title: 'Megbízható lead generálás',
+    description: 'Mi összekötünk az ügyféllel, te pedig elvégzed a munkát. Hirdetés és marketing helyett elég csak a szakmádra koncentrálnod.',
   },
   {
     icon: DollarSign,
-    title: 'Átlátható kifizetés',
-    description: 'Előre egyeztetett díjszabás, fix jutalékrendszer. Nincs sumákolás, nincs utólagos alkudozás. Egyértelműen látod, mennyit keresel munkánként.',
+    title: 'Egy kávé ára egy ügyfélért',
+    description: 'Nincs százalékos sikerdíj! Minden kiajánlott összekötés (lead) fix összegbe, nagyjából 2.000 Ft kreditbe kerül. A munkadíjat te magad alkudod ki az ügyféllel és 100%-ban nálad marad.',
   },
   {
     icon: Headphones,
@@ -55,20 +55,19 @@ const benefits = [
   },
   {
     icon: Clock,
-    title: 'Rugalmasság',
-    description: 'Nem veszíted el a saját ügyfeleidet, a saját márkádat, a saját szabadságodat. Mi plusz munkát hozunk, nem kiváltjuk, amid már van.',
+    title: 'Kockázatmentes indulás',
+    description: 'A sikeres regisztráció után azonnal adunk 10.000 Ft kreditet ajándékba, így az első néhány ügyfelet teljesen ingyen hozunk neked.',
   },
 ];
 
 // Requirements
 const coreRequirements = [
   'Érvényes egyéni vállalkozói vagy cég státusz (EV, Kkt, Bt, Kft stb.)',
-  'Adószám, bankszámlaszám, számlaképesség',
-  'Saját szerszámok és megbízható jármű',
-  'Legalább 3 év szakmai gyakorlat az adott területen',
-  'Felelősségbiztosítás megléte vagy vállalása 30 napon belüli kötésre',
-  'Megbízhatóság, pontos megjelenés, kulturált kommunikáció',
-  'Alap digitális kompetencia (telefonos app, fotó küldése, státusz jelzés)',
+  'Számlaképesség (KATA, átalányadó, stb.)',
+  'Saját szerszámkészlet az alapvető munkákhoz',
+  'Szakmai gyakorlat és önálló munkavégzés',
+  'Megbízhatóság, pontos megjelenés az egyeztetett időpontban',
+  'Kulturált kommunikáció az ügyfelekkel',
 ];
 
 // Process steps
@@ -132,7 +131,7 @@ const faqs = [
   },
   {
     question: 'Hogyan történik az elszámolás és kifizetés?',
-    answer: 'Előre egyeztetett elszámolási ciklus alapján (általában heti vagy havi), átlátható riporttal. Számlád beérkezését követően banki átutalással fizetünk.',
+    answer: 'A rendszerünk kredites alapon működik. Mi lényegében összehozunk az ügyféllel. Minden ügyfélkapcsolat (lead) feloldása fix, alacsony összegbe kerül (kb. egy kávé ára, ~2.000 Ft). Nincs jutalék, a munkadíjban ti állapodtok meg az ügyféllel, és az mind a tiéd. Induláskor ráadásul 10.000 Ft kezdő kreditet adunk, így az elején ingyen próbálhatod ki a rendszert!',
   },
   {
     question: 'Mennyi munkát tudtok adni havonta?',
@@ -344,91 +343,16 @@ export default function PartnerOnboardingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white pt-28 lg:pt-32 pb-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0di00aC0ydjRoLTR2Mmg0djRoMnYtNGg0di0yaC00em0wLTMwVjBoLTJ2NGgtNHYyaDR2NGgyVjZoNFY0aC00ek02IDM0di00SDR2NEgwdjJoNHY0aDJ2LTRoNHYtMkg2ek02IDRWMEg0djRIMHYyaDR2NGgyVjZoNFY0SDZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30 pointer-events-none"></div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <Breadcrumbs className="mb-8 text-slate-400 [&_a]:text-slate-400 [&_a:hover]:text-white [&_span]:text-white [&_svg]:text-slate-500" />
-
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-emerald-500/20 rounded-full px-4 py-2 text-sm text-emerald-300 mb-6">
-                <Briefcase className="w-4 h-4" />
-                <span>Szakember Regisztráció</span>
-              </div>
-
-              <h1 className="text-4xl md:text-5xl font-bold font-heading mb-6 leading-tight">
-                Legyél te is a <span className="text-vvm-yellow-400">szakemberünk!</span>
-              </h1>
-
-              <p className="text-xl text-slate-300 mb-8">
-                Vízszerelő, villanyszerelő vagy fűtésszerelő vagy? Regisztrálj, és mi küldjük neked az ügyfeleket – te csak végezd el a munkát!
-              </p>
-
-              <ul className="space-y-3 mb-8">
-                {[
-                  'Folyamatos megbízások Budapest és Pest megye területén',
-                  'Mi hozzuk az ügyfelet, te elvégzed a munkát',
-                  'Online rendszerben kezelheted a munkáidat',
-                  'Maradj önálló vállalkozó, mi csak segítünk',
-                ].map((item, index) => (
-                  <li key={index} className="flex items-center gap-3 text-slate-200">
-                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a
-                  href="#szakember_regisztracio"
-                  className="btn-primary py-4 px-8 text-lg"
-                >
-                  <Send className="w-5 h-5" />
-                  <span>Regisztrálok szakemberként</span>
-                </a>
-                <a
-                  href="#miert_erdemes_csatlakozni"
-                  className="bg-white/10 hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2"
-                >
-                  <span>Tudj meg többet</span>
-                  <ArrowRight className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-                <div className="text-4xl font-bold text-vvm-yellow-400 mb-2">150+</div>
-                <div className="text-slate-300">Aktív szakember</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-                <div className="text-4xl font-bold text-green-400 mb-2">500+</div>
-                <div className="text-slate-300">Munka / hó</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-                <div className="text-4xl font-bold text-sky-400 mb-2">4.9★</div>
-                <div className="text-slate-300">Ügyfél értékelés</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-                <div className="text-4xl font-bold text-orange-400 mb-2">48h</div>
-                <div className="text-slate-300">Gyors kifizetés</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Target Profiles */}
-      <section className="py-16 bg-white">
+      {/* Target Profiles - Now acts as Hero */}
+      <section className="pt-28 lg:pt-32 pb-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Breadcrumbs className="mb-12" />
+
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 font-heading mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold font-heading mb-4 text-gray-900">
               Kiket keresünk szakemberként?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Tapasztalt, megbízható szakembereket várunk, akik szeretnének kiszámítható, tervezhető munkamennyiséget.
             </p>
           </div>
@@ -481,17 +405,17 @@ export default function PartnerOnboardingPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 font-heading mb-4">
-              Követelmények
+              Kiket várunk a csapatba?
             </h2>
             <p className="text-lg text-gray-600">
-              Nem dolgozunk akárkivel. Az ügyfélélmény és a bizalom kulcsfontosságú.
+              Olyan szakembereket keresünk, akik szeretik a munkájukat és megbízhatóak. A legfontosabb az ügyfelek elégedettsége.
             </p>
           </div>
 
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8">
             <h3 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
               <Shield className="w-6 h-6 text-vvm-blue-600" />
-              Alapvető követelmények
+              Amire szükség lesz
             </h3>
             <ul className="grid md:grid-cols-2 gap-4">
               {coreRequirements.map((req, index) => (

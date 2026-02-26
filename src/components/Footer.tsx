@@ -4,7 +4,8 @@ import Link from 'next/link';
 import {
   Mail, MapPin,
   Shield, Award, Clock, CheckCircle,
-  Facebook, Linkedin, Instagram, Phone
+  Facebook, Linkedin, Instagram, Phone,
+  ThumbsUp, Star, Users
 } from 'lucide-react';
 import Logo from './Logo';
 
@@ -43,44 +44,24 @@ export default function Footer() {
     <footer className="bg-gradient-to-b from-slate-900 to-slate-950 text-white pb-20 lg:pb-0">
       {/* Trust Badges */}
       <div className="border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-                <Shield className="w-6 h-6 text-green-400" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-6">
+            {[
+              { icon: <ThumbsUp className="w-7 h-7 md:w-5 md:h-5 text-green-400" />, bg: 'bg-green-500/20', title: 'Ingyenes ajánlatkérés', desc: 'Rejtett költségek nélkül' },
+              { icon: <CheckCircle className="w-7 h-7 md:w-5 md:h-5 text-vvm-blue-400" />, bg: 'bg-vvm-blue-500/20', title: 'Ellenőrzött szakik', desc: 'Minősített mesterek' },
+              { icon: <Star className="w-7 h-7 md:w-5 md:h-5 text-vvm-yellow-400" />, bg: 'bg-vvm-yellow-500/20', title: 'Valós értékelések', desc: 'Ügyfelek véleménye' },
+              { icon: <Users className="w-7 h-7 md:w-5 md:h-5 text-indigo-400" />, bg: 'bg-indigo-500/20', title: 'Versengő ajánlatok', desc: 'Legjobb ár garantált' },
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col items-center text-center gap-2 p-4 rounded-xl bg-white/[0.04] md:bg-transparent md:p-0 md:flex-row md:text-left md:items-center md:gap-3">
+                <div className={`w-12 h-12 md:w-10 md:h-10 ${item.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                  {item.icon}
+                </div>
+                <div>
+                  <div className="font-semibold text-white text-sm leading-tight">{item.title}</div>
+                  <div className="text-xs text-slate-400 mt-0.5">{item.desc}</div>
+                </div>
               </div>
-              <div>
-                <div className="font-semibold text-white">Garanciális munka</div>
-                <div className="text-sm text-slate-400">1 év garancia</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-vvm-blue-500/20 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-vvm-blue-400" />
-              </div>
-              <div>
-                <div className="font-semibold text-white">Ellenőrzött szakemberek</div>
-                <div className="text-sm text-slate-400">Minősített mesterek</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-vvm-yellow-500/20 rounded-xl flex items-center justify-center">
-                <Award className="w-6 h-6 text-vvm-yellow-400" />
-              </div>
-              <div>
-                <div className="font-semibold text-white">Garancia</div>
-                <div className="text-sm text-slate-400">Minden elvégzett munkára</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center">
-                <Clock className="w-6 h-6 text-orange-400" />
-              </div>
-              <div>
-                <div className="font-semibold text-white">SOS 0-24</div>
-                <div className="text-sm text-slate-400">Expressz kiszállás</div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

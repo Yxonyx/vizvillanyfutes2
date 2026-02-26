@@ -241,7 +241,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-gray-50">
+      <body className="min-h-screen flex flex-col bg-slate-900">
         <AuthProvider>
           {/* Skip to main content for accessibility */}
           <a

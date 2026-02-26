@@ -2,89 +2,126 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { HelpCircle, ChevronDown, Search, Phone, Calendar, Droplets, Zap, Flame, CreditCard, Shield, Clock } from 'lucide-react';
+import { HelpCircle, ChevronDown, Search, Phone, Calendar, Droplets, CreditCard, Shield, Wrench, User } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 const faqCategories = [
   { id: 'all', name: 'Összes', icon: HelpCircle },
-  { id: 'szolgaltatas', name: 'Szolgáltatás', icon: Droplets },
-  { id: 'arak', name: 'Árak', icon: CreditCard },
-  { id: 'foglalas', name: 'Foglalás', icon: Calendar },
-  { id: 'garancia', name: 'Garancia', icon: Shield },
+  { id: 'platform', name: 'A platform', icon: Droplets },
+  { id: 'ugyfelek', name: 'Ügyfeleknek', icon: Calendar },
+  { id: 'szakemberek', name: 'Szakembereknek', icon: Shield },
+  { id: 'arak', name: 'Árak & Fizetés', icon: CreditCard },
 ];
 
 const faqs = [
+  // --- A platform ---
   {
     id: 1,
-    category: 'szolgaltatas',
-    question: 'Milyen szolgáltatásokat nyújtanak?',
-    answer: 'Teljes körű víz-, villany- és fűtésszerelési szolgáltatásokat nyújtunk. Ez magában foglalja a csőtörés elhárítást, duguláselhárítást, villanyszerelést, biztosítéktábla cserét, fűtéskorszerűsítést, kazáncserét és sok mást. Részletes listát az Árak oldalon talál.'
+    category: 'platform',
+    question: 'Mi az a VízVillanyFűtés platform?',
+    answer: 'A VízVillanyFűtés egy online piactér, amely összeköti azokat, akiknek víz-, villany- vagy fűtésszerelőre van szükségük, a közelükben lévő, ellenőrzött szakemberekkel. Nem mi végezzük a munkát – mi biztosítjuk a platformot, ahol a legjobb szakembert megtalálhatod.'
   },
   {
     id: 2,
-    category: 'szolgaltatas',
-    question: 'Hol működnek, mely területeken vállalnak munkát?',
-    answer: 'Budapesten (minden kerületben) és Pest megye településein vállalunk munkát. SOS hibaelhárítás esetén Budapest teljes területén 2 órán belül a helyszínen vagyunk.'
+    category: 'platform',
+    question: 'Hogyan működik a rendszer?',
+    answer: 'Egyszerű: bejelented a problémádat (pl. csőtörés, villanyszerelés), a közeledben lévő szakemberek azonnal értesítést kapnak, majd versengő ajánlatokat küldenek neked. Te kiválasztod a számodra legjobb ajánlatot – ár, értékelés és elérhetőség alapján.'
   },
   {
     id: 3,
-    category: 'szolgaltatas',
-    question: 'Dolgoznak hétvégén és ünnepnapokon is?',
-    answer: 'Igen, SOS hibaelhárítást 0-24 órában, az év minden napján vállalunk. Hétvégi és ünnepnapi kiszállás esetén a munkadíjra +50% felár kerül felszámolásra.'
+    category: 'platform',
+    question: 'Milyen területen érhető el a szolgáltatás?',
+    answer: 'Jelenleg Budapest összes kerületében és Pest megye településein érhető el a platform. Folyamatosan bővítjük a lefedett területeket – hamarosan vidéki városokban is elérhető leszünk.'
   },
   {
     id: 4,
-    category: 'arak',
-    question: 'Mennyibe kerül a kiszállás?',
-    answer: 'A kiszállási díj Budapest teljes területén egységesen 5.900 Ft. Ha a munkát elfogadja és elvégezzük, ez az összeg nem kerül külön felszámolásra, beépül a munkadíjba.'
+    category: 'platform',
+    question: 'Ellenőrzöttek a szakemberek?',
+    answer: 'Igen! Minden szakember regisztrációja ellenőrzésen esik át. Kizárólag számlaképes, valós vállalkozással rendelkező mesterek kerülhetnek a platformra. Emellett az ügyfelek értékelései is segítenek a legjobb szakember kiválasztásában.'
   },
+
+  // --- Ügyfeleknek ---
   {
     id: 5,
-    category: 'arak',
-    question: 'Az anyagárak benne vannak az árban?',
-    answer: 'Az alapárak a munkadíjat és a segédanyagokat (tömítések, csavarok stb.) tartalmazzák. Nagyobb anyagok (csaptelep, bojler, radiátor) ára külön kerül felszámolásra, amit a helyszíni felméréskor pontosan megadunk.'
+    category: 'ugyfelek',
+    question: 'Hogyan tudok szakembert keresni?',
+    answer: 'A főoldalon kattints az „Ügyfél vagyok" gombra, írd le a problémádat pár szóban, add meg a címedet, és a rendszer azonnal értesíti a közeledben lévő szakembereket. Perceken belül ajánlatokat kapsz.'
   },
   {
     id: 6,
-    category: 'arak',
-    question: 'Hogyan fizethetek?',
-    answer: 'Fizethet készpénzzel vagy bankkártyával a helyszínen a munka végeztével. Céges ügyfeleknek átutalás is lehetséges előzetes egyeztetés alapján.'
+    category: 'ugyfelek',
+    question: 'Ingyenes az ajánlatkérés?',
+    answer: 'Igen, az ajánlatkérés teljesen ingyenes az ügyfelek számára. Semmilyen regisztrációs díjat vagy platformdíjat nem számolunk fel. A fizetés közvetlenül a szakemberrel történik a munka elvégzése után.'
   },
   {
     id: 7,
-    category: 'foglalas',
-    question: 'Hogyan tudok időpontot foglalni?',
-    answer: 'Időpontot foglalhat online a weboldalunkon vagy visszahívást kérhet. Online foglalásnál azonnal látja az elérhető időpontokat és a becsült árat.'
+    category: 'ugyfelek',
+    question: 'Honnan tudom, hogy jó szakembert választok?',
+    answer: 'Minden szakembernek van profilja, amelyen látható a korábbi munkáinak értékelése, a tapasztalata és az elérhetősége. Az ügyfelek valós értékeléseket hagynak, így könnyedén kiválaszthatod a legmegbízhatóbb mestert.'
   },
   {
     id: 8,
-    category: 'foglalas',
-    question: 'Mennyi időn belül tudnak jönni?',
-    answer: 'SOS hibaelhárítás esetén (csőtörés, áramkimaradás) 2 órán belül a helyszínen vagyunk. Normál foglalás esetén általában 1-3 munkanapon belül tudunk időpontot adni.'
+    category: 'ugyfelek',
+    question: 'Mi van, ha sürgős a probléma (pl. csőtörés)?',
+    answer: 'SOS hibabejelentésnél a rendszer kiemelt, azonnali értesítést küld a közeledben elérhető szakembereknek. Ilyen esetben a szakemberek jellemzően perceken belül válaszolnak, és akár 1-2 órán belül a helyszínre érhetnek.'
   },
   {
     id: 9,
-    category: 'foglalas',
-    question: 'Lemondhatom a foglalást?',
-    answer: 'Igen, a munka megkezdése előtt 24 órával díjmentesen lemondható. 24 órán belüli lemondás esetén a kiszállási díj felszámolásra kerülhet.'
+    category: 'ugyfelek',
+    question: 'Lemondhatom az ajánlatot vagy a megbeszélt időpontot?',
+    answer: 'Igen, amíg a munka el nem kezdődik, bármikor lemondhatod. Javasoljuk, hogy minél előbb jelezd a lemondást a kiválasztott szakembernek, hogy ő is tudjon tervezni.'
   },
+
+  // --- Szakembereknek ---
   {
     id: 10,
-    category: 'garancia',
-    question: 'Kapok garanciát a munkára?',
-    answer: 'Igen! Minden elvégzett munkára minimum 12 hónap garanciát vállalunk. A beépített anyagokra a gyártói garancia érvényes (általában 2-5 év). A garancia részleteit a számla melléklete tartalmazza.'
+    category: 'szakemberek',
+    question: 'Hogyan csatlakozhatok a platformhoz szakemberként?',
+    answer: 'A „Szakember vagyok" gombra kattintva egyszerűen regisztrálhatsz. Szükséged lesz egy érvényes vállalkozói igazolásra és számlaképességre. A regisztrációt követően profilod ellenőrzésen esik át, és utána azonnal elkezdhetsz ajánlatokat adni.'
   },
   {
     id: 11,
-    category: 'garancia',
-    question: 'Mi történik, ha probléma van a munkával?',
-    answer: 'Ha a garancia ideje alatt bármilyen probléma merül fel az elvégzett munkával kapcsolatban, díjmentesen kijavítjuk. Minden munkánkra 1 év garancia van.'
+    category: 'szakemberek',
+    question: 'Mennyibe kerül a regisztráció szakembereknek?',
+    answer: 'A regisztráció ingyenes! A platform kredit-alapú rendszerrel működik: 10.000 Ft induló kreditet kapsz, és csak akkor fizetsz, ha egy megbízást elfogadsz. Nincs havidíj, nincs százalékos jutalék – kizárólag az elfogadott munkáknál használsz kreditet.'
   },
   {
     id: 12,
-    category: 'garancia',
+    category: 'szakemberek',
+    question: 'Hogyan kapok értesítést új munkákról?',
+    answer: 'A közeledben feladott hibabejelentésekről azonnal push értesítést kapsz. Beállíthatod, hogy milyen típusú munkákat (víz, villany, fűtés) és milyen távolságon belül szeretnéd fogadni.'
+  },
+  {
+    id: 13,
+    category: 'szakemberek',
+    question: 'Hogyan építhetem a reputációmat?',
+    answer: 'Minden elvégzett munka után az ügyfél értékelést hagy, amelyben pontozza a munkád minőségét, a pontosságodat és az árazásodat. Minél jobb értékeléseid vannak, annál előrébb jelensz meg a listában, és annál több megbízást kaphatsz.'
+  },
+
+  // --- Árak & Fizetés ---
+  {
+    id: 14,
+    category: 'arak',
+    question: 'Mennyibe kerül egy szerelő?',
+    answer: 'Az árakat közvetlenül a szakemberek adják meg ajánlatukban. A VízVillanyFűtés nem szab meg fix árakat – a szakemberek versenyeznek egymással, így Te mindig versenyképes, átlátható árat kapsz. Az Árak oldalon tájékoztató, piaci átlagárakat találsz.'
+  },
+  {
+    id: 15,
+    category: 'arak',
+    question: 'Hogyan fizetek a szakembernek?',
+    answer: 'A fizetés közvetlenül a szakemberrel történik, a munka elvégzése után. A legtöbb mester elfogad készpénzt és bankkártyát is. Az árat és a fizetési módot előre megbeszélitek.'
+  },
+  {
+    id: 16,
+    category: 'arak',
     question: 'Kapok számlát a munkáról?',
-    answer: 'Természetesen! Minden munkáról hivatalos, NAV-kompatibilis számlát állítunk ki, amely pályázatokhoz is felhasználható. A számlát letöltheti az ügyfélfiókjából.'
+    answer: 'Igen! Kizárólag számlaképes vállalkozással rendelkező szakemberek regisztrálhatnak a platformra, tehát minden munkáról hivatalos számlát kapsz, ami pályázatokhoz is felhasználható.'
+  },
+  {
+    id: 17,
+    category: 'arak',
+    question: 'Kell-e a platformnak fizetnem?',
+    answer: 'Ügyfeleknek a platform használata teljesen ingyenes. Szakembereknek kredit-alapú rendszerrel működik: csak akkor „fizetsz", ha elfogadsz egy megbízást. Nincs havi előfizetés, nincs jutalékrendszer.'
   },
 ];
 
@@ -201,17 +238,21 @@ export default function GyikPage() {
             Nem találta meg a választ?
           </h2>
           <p className="text-gray-600 mb-8">
-            Lépjen kapcsolatba ügyfélszolgálatunkkal, szívesen segítünk!
+            Vegye fel velünk a kapcsolatot, vagy próbálja ki a platformot – az ajánlatkérés ingyenes!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+36302696406" className="btn-primary py-4 px-8">
-              <Phone className="w-5 h-5" />
-              <span>+36 30 269 6406</span>
-            </a>
-            <Link href="/kapcsolat" className="btn-outline py-4 px-8">
-              <span>Kapcsolatfelvétel</span>
+            <Link href="/foglalas" className="btn-primary py-4 px-8">
+              <User className="w-5 h-5" />
+              <span>Ingyenes ajánlatkérés</span>
+            </Link>
+            <Link href="/csatlakozz-partnerkent" className="btn-outline py-4 px-8">
+              <Wrench className="w-5 h-5" />
+              <span>Szakemberként csatlakozom</span>
             </Link>
           </div>
+          <p className="text-sm text-gray-400 mt-6">
+            Vagy hívjon minket: <a href="tel:+36302696406" className="text-vvm-blue-600 hover:underline">+36 30 269 6406</a>
+          </p>
         </div>
       </section>
     </div>
