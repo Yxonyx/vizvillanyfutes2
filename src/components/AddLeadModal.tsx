@@ -1,6 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
-import { X, MapPin, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, MapPin, Loader2, AlertCircle, CheckCircle2, Search, Droplets, Zap, Flame, Wrench, Building2, Home } from 'lucide-react';
+
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
+
+interface GeocodingSuggestion {
+    id: string;
+    place_name: string;
+    text: string;
+    center: [number, number]; // [lng, lat]
+}
 
 interface AddLeadModalProps {
     lat: number;
@@ -11,10 +20,10 @@ interface AddLeadModalProps {
 }
 
 const CATEGORIES = [
-    { id: 'viz', label: 'Vízszerelés', icon: '💧', color: 'bg-sky-100 text-sky-700 border-sky-200' },
-    { id: 'villany', label: 'Villanyszerelés', icon: '⚡', color: 'bg-amber-100 text-amber-700 border-amber-200' },
-    { id: 'futes', label: 'Fűtésszerelés', icon: '🔥', color: 'bg-orange-100 text-orange-700 border-orange-200' },
-    { id: 'egyeb', label: 'Egyéb', icon: '🔧', color: 'bg-slate-100 text-slate-700 border-slate-200' },
+    { id: 'viz', label: 'Vízszerelés', icon: <Droplets className="w-4 h-4" />, color: 'bg-sky-100 text-sky-700 border-sky-200' },
+    { id: 'villany', label: 'Villanyszerelés', icon: <Zap className="w-4 h-4" />, color: 'bg-amber-100 text-amber-700 border-amber-200' },
+    { id: 'futes', label: 'Fűtésszerelés', icon: <Flame className="w-4 h-4" />, color: 'bg-orange-100 text-orange-700 border-orange-200' },
+    { id: 'egyeb', label: 'Egyéb', icon: <Wrench className="w-4 h-4" />, color: 'bg-slate-100 text-slate-700 border-slate-200' },
 ];
 
 // Budapest districts with approximate center coordinates
@@ -91,9 +100,111 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Get the final lat/lng based on selected location (with small random offset so pins don't stack)
+    // Geocoding autocomplete state
+    const [geoSuggestions, setGeoSuggestions] = useState<GeocodingSuggestion[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [geoLoading, setGeoLoading] = useState(false);
+    const [customCoords, setCustomCoords] = useState<{ lat: number; lng: number } | null>(null);
+    const debounceRef = useRef<NodeJS.Timeout | null>(null);
+    const suggestionsRef = useRef<HTMLDivElement>(null);
+
+    // Close suggestions on outside click
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node)) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Lock body scroll when modal is open (prevents background sliding on mobile)
+    useEffect(() => {
+        const scrollY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            document.body.style.overflow = '';
+            window.scrollTo(0, scrollY);
+        };
+    }, []);
+
+    // Geocoding search with debounce
+    const searchAddress = useCallback((query: string) => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+
+        if (query.length < 3) {
+            setGeoSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+
+        setGeoLoading(true);
+        debounceRef.current = setTimeout(async () => {
+            try {
+                // Build a proximity bias based on selected location
+                let proximity = '19.04,47.50'; // Budapest center default
+                if (locationType === 'budapest' && selectedDistrict) {
+                    const d = BUDAPEST_DISTRICTS.find(d => d.id === selectedDistrict);
+                    if (d) proximity = `${d.lng},${d.lat}`;
+                } else if (locationType === 'pest' && selectedZip) {
+                    const z = PEST_MEGYE.find(z => z.zip === selectedZip);
+                    if (z) proximity = `${z.lng},${z.lat}`;
+                }
+
+                const res = await fetch(
+                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?` +
+                    `access_token=${MAPBOX_TOKEN}&` +
+                    `country=hu&` +
+                    `proximity=${proximity}&` +
+                    `types=address,poi&` +
+                    `language=hu&` +
+                    `limit=5`
+                );
+                const data = await res.json();
+
+                if (data.features) {
+                    setGeoSuggestions(
+                        data.features.map((f: any) => ({
+                            id: f.id,
+                            place_name: f.place_name,
+                            text: f.text + (f.address ? ' ' + f.address : ''),
+                            center: f.center,
+                        }))
+                    );
+                    setShowSuggestions(true);
+                }
+            } catch {
+                // Silently fail
+            } finally {
+                setGeoLoading(false);
+            }
+        }, 350);
+    }, [locationType, selectedDistrict, selectedZip]);
+
+    const handleSelectSuggestion = (suggestion: GeocodingSuggestion) => {
+        // Use the text field (street + house number) as the display value
+        setStreet(suggestion.text);
+        setCustomCoords({ lat: suggestion.center[1], lng: suggestion.center[0] });
+        setShowSuggestions(false);
+        setGeoSuggestions([]);
+    };
+
+    // Get the final lat/lng - prefer geocoded coords, then district/zip center, then map click
     const finalCoords = useMemo(() => {
-        const jitter = () => (Math.random() - 0.5) * 0.008; // ~400m jitter
+        const jitter = () => (Math.random() - 0.5) * 0.002; // ~100m jitter
+        // If we have geocoded coordinates from the autocomplete, use those
+        if (customCoords) {
+            return { lat: customCoords.lat + jitter(), lng: customCoords.lng + jitter() };
+        }
         if (locationType === 'budapest' && selectedDistrict) {
             const d = BUDAPEST_DISTRICTS.find(d => d.id === selectedDistrict);
             if (d) return { lat: d.lat + jitter(), lng: d.lng + jitter() };
@@ -103,7 +214,7 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
             if (z) return { lat: z.lat + jitter(), lng: z.lng + jitter() };
         }
         return { lat: lat + jitter(), lng: lng + jitter() };
-    }, [locationType, selectedDistrict, selectedZip, lat, lng]);
+    }, [locationType, selectedDistrict, selectedZip, lat, lng, customCoords]);
 
     // Build the district display string
     const districtLabel = useMemo(() => {
@@ -202,7 +313,7 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
                                             : `border-slate-100 hover:border-slate-300 hover:bg-slate-50 text-slate-600`
                                             }`}
                                     >
-                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs border ${cat.color}`}>
+                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center border ${cat.color}`}>
                                             {cat.icon}
                                         </div>
                                         <span className={`font-bold ${type === cat.id ? 'text-slate-800' : ''}`}>
@@ -228,7 +339,7 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
                                         : 'border-slate-100 text-slate-500 hover:border-slate-300'
                                         }`}
                                 >
-                                    🏙️ Budapest
+                                    <Building2 className="w-4 h-4" /> Budapest
                                 </button>
                                 <button
                                     type="button"
@@ -238,7 +349,7 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
                                         : 'border-slate-100 text-slate-500 hover:border-slate-300'
                                         }`}
                                 >
-                                    🏘️ Pest megye
+                                    <Home className="w-4 h-4" /> Pest megye
                                 </button>
                             </div>
                         </div>
@@ -280,19 +391,66 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
                             </div>
                         )}
 
-                        {/* Street input */}
-                        <div>
+                        {/* Street input with geocoding autocomplete */}
+                        <div className="relative" ref={suggestionsRef}>
                             <label className="block text-sm font-bold text-slate-700 mb-1.5">
                                 Utca, házszám <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="text"
-                                required
-                                value={street}
-                                onChange={(e) => setStreet(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 outline-none transition-all placeholder:text-slate-400 font-medium text-sm"
-                                placeholder="Pl.: Kossuth Lajos utca 12."
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    required
+                                    value={street}
+                                    onChange={(e) => {
+                                        setStreet(e.target.value);
+                                        setCustomCoords(null); // Reset coords when typing again
+                                        searchAddress(e.target.value);
+                                    }}
+                                    onFocus={() => {
+                                        if (geoSuggestions.length > 0) setShowSuggestions(true);
+                                    }}
+                                    className="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 outline-none transition-all placeholder:text-slate-400 font-medium text-sm"
+                                    placeholder="Kezdj el gépelni... pl.: Kossuth Lajos utca 12."
+                                    autoComplete="off"
+                                />
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                    {geoLoading ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : customCoords ? (
+                                        <MapPin className="w-4 h-4 text-emerald-500" />
+                                    ) : (
+                                        <Search className="w-4 h-4" />
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Geocoding suggestions dropdown */}
+                            {showSuggestions && geoSuggestions.length > 0 && (
+                                <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden max-h-48 overflow-y-auto">
+                                    {geoSuggestions.map((s) => (
+                                        <button
+                                            key={s.id}
+                                            type="button"
+                                            onClick={() => handleSelectSuggestion(s)}
+                                            className="w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors flex items-start gap-2.5 border-b border-slate-50 last:border-0"
+                                        >
+                                            <MapPin className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                                            <div className="min-w-0">
+                                                <div className="font-semibold text-sm text-slate-800 truncate">{s.text}</div>
+                                                <div className="text-xs text-slate-400 truncate">{s.place_name}</div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Geocoded location indicator */}
+                            {customCoords && (
+                                <div className="mt-1.5 flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                                    <MapPin className="w-3 h-3" />
+                                    <span>Pontos helyszín rögzítve ({customCoords.lat.toFixed(4)}, {customCoords.lng.toFixed(4)})</span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Title input */}

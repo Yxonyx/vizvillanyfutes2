@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, LogIn, User, Wrench } from 'lucide-react';
 
@@ -10,6 +10,24 @@ interface AuthModalProps {
 
 export default function AuthModal({ onClose }: AuthModalProps) {
     const router = useRouter();
+
+    // Lock body scroll when modal is open (prevents background sliding on mobile)
+    useEffect(() => {
+        const scrollY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            document.body.style.overflow = '';
+            window.scrollTo(0, scrollY);
+        };
+    }, []);
 
     const handleLogin = (role: 'customer' | 'contractor') => {
         onClose();

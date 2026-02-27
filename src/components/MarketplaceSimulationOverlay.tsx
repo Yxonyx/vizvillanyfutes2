@@ -106,6 +106,24 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
     const [creditBalance, setCreditBalance] = useState<number | null>(null);
     const [acceptedLeads, setAcceptedLeads] = useState<any[]>([]);
 
+    // Lock body scroll when overlay is open (prevents background sliding on mobile)
+    useEffect(() => {
+        const scrollY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            document.body.style.overflow = '';
+            window.scrollTo(0, scrollY);
+        };
+    }, []);
+
     // Auto-open add modal if requested (from 'Probléma bejelentése' button)
     useEffect(() => {
         if (autoAddOnOpen && isAuthenticated && !showAuthOverlay) {

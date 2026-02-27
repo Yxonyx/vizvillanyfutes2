@@ -256,7 +256,8 @@ export default function HomePage() {
                       ))}
                     </div>
                   </div>
-                  <div className="border-l border-white/20 pl-3 lg:border-l-0 lg:pl-0 lg:ml-1">
+                  <div className="border-l border-white/20 pl-3 lg:border-l-0 lg:pl-0 lg:ml-1 flex items-center gap-2">
+                    <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" className="w-5 h-5 bg-white/90 rounded-full p-0.5" />
                     <span className="text-blue-100 text-sm font-medium">Google értékelés</span>
                   </div>
                 </div>
@@ -316,7 +317,7 @@ export default function HomePage() {
       <section className="py-16 md:py-24 bg-gradient-to-b from-blue-100 via-blue-50 to-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <HowItWorksAnimation />
-          <p className="text-center text-xs sm:text-sm text-slate-400 font-medium tracking-wider mt-12 px-4">
+          <p className="text-center text-xs sm:text-sm text-vvm-yellow-500 font-bold tracking-wider mt-12 px-4 shadow-sm py-2">
             —&nbsp;Magyarország leginnovatívabb szakember kereső rendszere&nbsp;—
           </p>
         </div>
@@ -683,12 +684,9 @@ export default function HomePage() {
           {/* Google Reviews Badge */}
           <div className="mt-12 flex justify-center">
             <div className="bg-white rounded-xl shadow-lg px-8 py-4 flex items-center gap-6">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" className="w-8 h-8" />
-                <div>
-                  <div className="font-bold text-gray-800">4.9 / 5</div>
-                  <div className="text-sm text-gray-500">1200+ sikeres kiszállás</div>
-                </div>
+                <div className="font-extrabold text-gray-800 text-xl">4.9 / 5</div>
               </div>
               <div className="h-8 w-px bg-gray-200"></div>
               <div className="flex items-center gap-1">

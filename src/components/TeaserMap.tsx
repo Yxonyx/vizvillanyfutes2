@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Map, { Marker, Popup, NavigationControl, MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Droplets, Zap, Flame, Wrench, Clock, Search, Shield, ArrowRight, Maximize2, Plus, LogOut, Trash2, Award, AlertTriangle, FileCheck } from 'lucide-react';
+import { Droplets, Zap, Flame, Wrench, Clock, Search, Shield, ArrowRight, Maximize2, Plus, LogOut, Trash2, Award, AlertTriangle, FileCheck, Sparkles, LogIn, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import MarketplaceSimulationOverlay from './MarketplaceSimulationOverlay';
 import { supabase } from '@/lib/supabase/client';
@@ -206,18 +206,18 @@ export default function TeaserMap() {
             <div className="absolute top-4 inset-x-2 sm:inset-x-4 z-20 flex justify-between items-start pointer-events-none">
 
                 {/* Left side decorators (Stacked on very small screens, row on larger) */}
-                <div className="flex flex-col md:flex-row gap-2 sm:gap-3 pointer-events-none">
-                    <div className="bg-white/95 text-slate-700 backdrop-blur-md rounded-full px-3 py-1.5 sm:px-4 sm:py-2.5 shadow-md flex items-center gap-2 border border-slate-200/80 pointer-events-auto self-start transition-all hover:-translate-y-1">
-                        <div className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
+                <div className="flex flex-col md:flex-row gap-1.5 sm:gap-3 pointer-events-none">
+                    <div className="bg-white/70 text-slate-800 backdrop-blur-md rounded-full px-2.5 py-1 sm:px-4 sm:py-2.5 shadow-sm flex items-center gap-1.5 sm:gap-2 border border-white/40 pointer-events-auto self-start transition-all hover:-translate-y-1">
+                        <div className="relative flex h-1.5 w-1.5 sm:h-2.5 sm:w-2.5">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-red-500"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2.5 sm:w-2.5 bg-red-500"></span>
                         </div>
-                        <span className="text-[10px] sm:text-[12px] font-bold whitespace-nowrap tracking-wide uppercase">Élő Munkák: {displayLeads.length}</span>
+                        <span className="text-[9px] sm:text-[12px] font-bold whitespace-nowrap tracking-wide uppercase">Élő Munkák: 643</span>
                     </div>
 
-                    <div className="bg-white/95 text-slate-700 backdrop-blur-md rounded-full px-3 py-1.5 sm:px-4 sm:py-2.5 shadow-md flex items-center gap-2 border border-slate-200/80 pointer-events-auto self-start transition-all hover:-translate-y-1">
-                        <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                        <span className="text-[10px] sm:text-[12px] font-bold whitespace-nowrap tracking-wide uppercase">Szakik: 42</span>
+                    <div className="bg-white/70 text-slate-800 backdrop-blur-md rounded-full px-2.5 py-1 sm:px-4 sm:py-2.5 shadow-sm flex items-center gap-1.5 sm:gap-2 border border-white/40 pointer-events-auto self-start transition-all hover:-translate-y-1">
+                        <div className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                        <span className="text-[9px] sm:text-[12px] font-bold whitespace-nowrap tracking-wide uppercase">Aktív szakik: 312</span>
                     </div>
                 </div>
 
@@ -236,11 +236,25 @@ export default function TeaserMap() {
                 {/* Emptied Right label as it's merged above */}
             </div>
 
-            {/* Instruction Badge */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 bg-vvm-blue-900/90 text-white backdrop-blur-md rounded-full px-5 py-2.5 shadow-2xl flex items-center gap-2 border border-blue-500/30 pointer-events-none transition-opacity duration-500 group-hover:opacity-0 w-max max-w-[90%]">
-                <span className="text-xs sm:text-sm font-medium text-center">
-                    {user ? '✨ Mozgasd a térképet és kattints bárhova új hiba bejelentéséhez!' : '✨ Jelentkezz be a fenti menüben, hogy új hibát jelenthess be!'}
-                </span>
+            {/* Instruction Badge - Full width bottom bar */}
+            <div className="absolute bottom-0 left-0 w-full z-20">
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (!user) setAuthModalOpen(true);
+                    }}
+                    className={`w-full bg-white/90 backdrop-blur-md px-4 py-2 border-t border-white/50 flex flex-row items-center justify-center gap-3 transition-colors ${!user
+                        ? 'cursor-pointer hover:bg-white active:bg-slate-50'
+                        : 'pointer-events-none'
+                        }`}
+                >
+                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${user ? 'bg-vvm-blue-500/80' : 'bg-slate-600/90'}`}>
+                        {user ? <MapPin className="w-3 h-3 text-white" /> : <LogIn className="w-3 h-3 text-white" />}
+                    </div>
+                    <span className="text-[11px] sm:text-[13px] font-bold text-slate-700">
+                        {user ? 'Kattints a térképre egy új hiba bejelentéséhez' : 'Jelentkezz be, hogy hibát jelenthess'}
+                    </span>
+                </button>
             </div>
 
             <style>{`
@@ -266,7 +280,7 @@ export default function TeaserMap() {
                 mapboxAccessToken={MAPBOX_TOKEN}
                 interactive={true}
                 scrollZoom={false}
-                cooperativeGestures={true}
+                cooperativeGestures={false}
                 onClick={handleMapClick}
                 cursor="crosshair"
             >

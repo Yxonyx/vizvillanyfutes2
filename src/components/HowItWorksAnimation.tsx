@@ -131,8 +131,8 @@ export default function HowItWorksAnimation() {
 
             <div className="text-center mb-16 fade-in-up">
                 <h2 className="section-title">Hogyan működik a platform?</h2>
-                <p className="section-subtitle max-w-2xl mx-auto">
-                    Szupergyors és átlátható – kötjük össze az elromlott csapokat a leggyorsabban kiérkező szerelőkkel. Mint a taxirendelés, csak a lakásodhoz.
+                <p className="text-lg md:text-xl font-medium text-slate-700 max-w-2xl mx-auto leading-relaxed mt-4">
+                    Szupergyors és átlátható: összekötjük az elromlott csapokat a leggyorsabban kiérkező szerelőkkel. Mint a taxirendelés, csak a lakásodhoz.
                 </p>
             </div>
 
@@ -175,11 +175,11 @@ export default function HowItWorksAnimation() {
                     </div>
 
                     {/* Label */}
-                    <div className="mt-6 bg-red-50 text-red-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-red-100 mb-2">
+                    <div className="mt-8 bg-red-50 text-red-600 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-red-100 mb-2.5 shadow-sm">
                         Katasztrófa
                     </div>
-                    <div className="text-base font-bold text-slate-800 mb-1">Váratlan Hiba</div>
-                    <p className="text-sm text-slate-500 max-w-[200px] leading-relaxed">
+                    <div className="text-lg md:text-xl font-extrabold text-slate-900 mb-2">Váratlan Hiba</div>
+                    <p className="text-sm sm:text-base text-slate-700 max-w-[260px] leading-relaxed font-medium">
                         Írd le 3 kattintással, mi a gond (pl. csöpög a csap, nincs áram), akár fényképpel.
                     </p>
                 </div>
@@ -277,11 +277,11 @@ export default function HowItWorksAnimation() {
                     </div>
 
                     {/* Label */}
-                    <div className="mt-6 bg-blue-50 text-blue-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-blue-100 mb-2">
+                    <div className="mt-8 bg-blue-50 text-blue-600 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-blue-100 mb-2.5 shadow-sm">
                         Rendszer
                     </div>
-                    <div className="text-base font-bold text-slate-800 mb-1">Okos Kiosztás</div>
-                    <p className="text-sm text-slate-500 max-w-[200px] leading-relaxed">
+                    <div className="text-lg md:text-xl font-extrabold text-slate-900 mb-2">Okos Kiosztás</div>
+                    <p className="text-sm sm:text-base text-slate-700 max-w-[260px] leading-relaxed font-medium">
                         A rendszerünk másodperceken belül kiküldi a kérésedet a közeledben lévő szakembereknek.
                     </p>
                 </div>
@@ -349,11 +349,11 @@ export default function HowItWorksAnimation() {
                     </div>
 
                     {/* Label */}
-                    <div className="mt-6 bg-emerald-50 text-emerald-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-100 mb-2">
+                    <div className="mt-8 bg-emerald-50 text-emerald-600 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-100 mb-2.5 shadow-sm">
                         Megoldás
                     </div>
-                    <div className="text-base font-bold text-slate-800 mb-1">Mester Úton!</div>
-                    <p className="text-sm text-slate-500 max-w-[200px] leading-relaxed">
+                    <div className="text-lg md:text-xl font-extrabold text-slate-900 mb-2">Mester Úton!</div>
+                    <p className="text-sm sm:text-base text-slate-700 max-w-[260px] leading-relaxed font-medium">
                         A munkát egy minősített szerelő vállalja el, és azonnal indul hozzád!
                     </p>
                 </div>

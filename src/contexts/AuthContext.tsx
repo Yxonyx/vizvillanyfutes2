@@ -98,6 +98,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(sessionData.user);
         setContractorProfile(sessionData.contractor_profile || null);
 
+        // Also set the Supabase client session so auth.uid() works for RLS
+        if (response.data.session?.access_token && response.data.session?.refresh_token) {
+          await supabase.auth.setSession({
+            access_token: response.data.session.access_token,
+            refresh_token: response.data.session.refresh_token,
+          });
+        }
+
         return { success: true };
       }
 
