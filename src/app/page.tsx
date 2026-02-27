@@ -314,17 +314,17 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-blue-100 via-blue-50 to-white overflow-hidden">
+      <section className="pt-16 md:pt-24 pb-8 bg-gradient-to-b from-blue-100 via-blue-50 to-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <HowItWorksAnimation />
-          <p className="text-center text-xs sm:text-sm text-vvm-yellow-500 font-bold tracking-wider mt-12 px-4 shadow-sm py-2">
+          <p className="text-center text-xs sm:text-sm text-vvm-yellow-500 font-bold tracking-wider mt-6 px-4 py-2 opacity-80">
             —&nbsp;Magyarország leginnovatívabb szakember kereső rendszere&nbsp;—
           </p>
         </div>
       </section>
 
       {/* Services Grid */}
-      <section className="py-16 md:py-24 bg-gray-50 border-t border-gray-100">
+      <section className="pt-12 md:pt-16 pb-16 md:pb-24 bg-gray-50 border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="section-title">Miben tudunk segíteni?</h2>
@@ -545,7 +545,7 @@ export default function HomePage() {
 
               <p className="text-lg text-emerald-100 mb-8">
                 Víz–villany–fűtés korszerűsítésre pályázati támogatás igényelhető.
-                Mi segítünk a teljes ügyintézésben – a papírmunkától a kivitelezésig.
+                A regisztrált kivitelezők segítséget nyújtanak a teljes ügyintézésben – a papírmunkától a kivitelezésig.
               </p>
 
               <div className="space-y-3 mb-8">

@@ -119,7 +119,7 @@ export default function ASZFPage() {
                 <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-green-800">
-                    A pontos munkadíjat a helyszíni felmérés után, a munka megkezdése előtt közöljük.
+                    A pontos munkadíjat a szakember a helyszíni felmérés után, a munka megkezdése előtt közli.
                     A munka csak a Megrendelő jóváhagyása után kezdődik meg.
                   </p>
                 </div>
@@ -128,11 +128,11 @@ export default function ASZFPage() {
               <section id="arak" className="mb-10">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Árak és fizetési feltételek</h2>
                 <p className="text-gray-600 mb-4">
-                  Az árak bruttó árak, az ÁFÁ-t tartalmazzák. A kiszállási díj Budapest teljes területén egységes.
+                  Az árak bruttó árak, az ÁFÁ-t tartalmazzák. A kiszállási díjak és a szolgáltatás árai szakemberenként eltérőek lehetnek.
                 </p>
                 <p className="text-gray-600 mb-4">
-                  <strong>SOS felár:</strong> Éjszakai (20:00-08:00), hétvégi, ünnepnapi és sürgős (2 órán belüli)
-                  kiszállás esetén a munkadíj +50%-a kerül felszámolásra.
+                  <strong>SOS felár:</strong> Éjszakai (20:00-08:00), hétvégi, ünnepnapi és sürgős (azonnali)
+                  kiszállás esetén a szakember sürgősségi felárat számíthat fel.
                 </p>
                 <p className="text-gray-600">
                   <strong>Fizetési módok:</strong> Készpénz vagy bankkártya a helyszínen,
@@ -162,7 +162,7 @@ export default function ASZFPage() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Elállás és felmondás</h2>
                 <p className="text-gray-600 mb-4">
                   A Megrendelő a foglalást a munka megkezdése előtt 24 órával díjmentesen lemondhatja.
-                  24 órán belüli lemondás esetén a kiszállási díj felszámolásra kerülhet.
+                  24 órán belüli lemondás esetén a kiválasztott szakember jogosult lehet a kiszállási díj kiszámlázására.
                 </p>
                 <p className="text-gray-600">
                   A munka megkezdése után történő elállás esetén az addig elvégzett munkák és felhasznált

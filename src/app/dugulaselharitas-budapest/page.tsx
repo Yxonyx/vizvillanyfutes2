@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import {
   Droplets, CheckCircle, ArrowRight, Phone, Calendar, Clock,
-  Shield, Star, ChevronDown, AlertTriangle,
-  Wrench, Award, HelpCircle, Waves
+  Shield, Star, ChevronDown, AlertTriangle, Search,
+  Wrench, Award, HelpCircle, Waves, FileText, Bell
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -52,11 +52,11 @@ const services = [
 const faqs = [
   {
     question: 'Mennyibe kerül a duguláselhárítás?',
-    answer: 'A duguláselhárítás ára a dugulás típusától és súlyosságától függ. Egyszerű mosdó vagy mosogató dugulás 12.000-18.000 Ft, WC dugulás 15.000-25.000 Ft, fővezeték tisztítás 35.000 Ft-tól. A kiszállási díj (5.900 Ft) csak akkor kerül felszámolásra, ha nem rendeli meg a szolgáltatást.'
+    answer: 'A duguláselhárítás ára a dugulás típusától és súlyosságától függ. Egyszerű mosdó vagy mosogató dugulás 12.000-18.000 Ft, WC dugulás 15.000-25.000 Ft, fővezeték tisztítás 35.000 Ft-tól. A kiszállási díjat az adott szakember határozza meg, így ez eltérő lehet.'
   },
   {
     question: 'Milyen gyorsan tudnak kijönni?',
-    answer: 'SOS esetén (teljes dugulás, visszafolyás) 2 órán belül a helyszínen vagyunk – ez esetben +50% expressz felár fizetendő. Normál esetben 24-48 órán belül tudunk időpontot adni.'
+    answer: 'SOS esetén (teljes dugulás, visszafolyás) a rendszer prioritással kezeli a bejelentést, és értesíti a közelben lévő szakembereket. A kiszállási idő a szakemberek kapacitásától függ. Normál esetben a szakemberek 24-48 órán belül tudnak időpontot adni.'
   },
   {
     question: 'Mi okozza a dugulást?',
@@ -68,11 +68,7 @@ const faqs = [
   },
   {
     question: 'Mit tegyek, ha visszafolyik a víz?',
-    answer: 'Ha a víz visszafolyik (akár a WC-ből, akár a lefolyókból), az sürgős helyzet – azonnal hívjon minket! Addig ne használja az érintett csapokat/WC-t, és ha teheti, zárja el a főcsapot. SOS esetén 2 órán belül ott vagyunk.'
-  },
-  {
-    question: 'Kapok garanciát a munkára?',
-    answer: 'A platformunkon lévő szakemberek a duguláselhárításra általában 30 napos garanciát vállalnak. Ha ugyanazon a helyen, ugyanazon okból ismét dugulás keletkezik, a szakember ingyenesen visszatér.'
+    answer: 'Ha a víz visszafolyik (akár a WC-ből, akár a lefolyókból), az sürgős helyzet – kérjen SOS segítséget online! Addig ne használja az érintett csapokat/WC-t, és ha teheti, zárja el a főcsapot. A szakemberek azonnal jelentkezni fognak.'
   },
 ];
 
@@ -90,7 +86,7 @@ export default function DugulaselharitasPage() {
             <div className="text-white">
               <div className="inline-flex items-center gap-2 bg-red-500/80 rounded-full px-4 py-2 text-sm mb-6 animate-pulse">
                 <AlertTriangle className="w-4 h-4" />
-                <span className="font-semibold">SOS – 2 órán belül kiszállunk!</span>
+                <span className="font-semibold">SOS – rövid határidővel!</span>
               </div>
 
               <h1 className="text-4xl md:text-5xl font-bold font-heading mb-6">
@@ -100,13 +96,13 @@ export default function DugulaselharitasPage() {
 
               <p className="text-xl text-cyan-100 mb-8">
                 Gépi és kézi duguláselhárítás Budapesten és Pest megyében.
-                Mosdó, WC, lefolyó, fővezeték – gyors, garanciális megoldás.
+                Mosdó, WC, lefolyó, fővezeték – a platformon található szakemberek elvégzik a javítást gyorsan, és szakszerűen.
               </p>
 
               <div className="flex flex-wrap gap-4 mb-8">
                 <div className="flex items-center gap-2 text-cyan-100">
                   <CheckCircle className="w-5 h-5 text-cyan-200" />
-                  <span>2 órán belüli kiszállás</span>
+                  <span>Gyors kiszállás</span>
                 </div>
                 <div className="flex items-center gap-2 text-cyan-100">
                   <CheckCircle className="w-5 h-5 text-cyan-200" />
@@ -119,11 +115,17 @@ export default function DugulaselharitasPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <a href="tel:+36302696406" className="btn-primary py-4 px-8 text-lg">
-                  <Phone className="w-6 h-6" />
-                  <span>+36 30 269 6406</span>
-                </a>
-                <Link href="/login?role=customer&service=dugulas&sos=true" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
+                <Link
+                  href="/login?role=customer"
+                  className="btn-primary py-4 px-8 text-lg"
+                >
+                  <AlertTriangle className="w-6 h-6" />
+                  <span>SOS Bejelentés</span>
+                </Link>
+                <Link
+                  href="/login?role=customer"
+                  className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20"
+                >
                   <Calendar className="w-5 h-5" />
                   <span>Online foglalás</span>
                 </Link>
@@ -138,7 +140,7 @@ export default function DugulaselharitasPage() {
                   </div>
                   <div>
                     <div className="text-xl font-bold text-gray-900">SOS Dugulás?</div>
-                    <div className="text-gray-600">Azonnal segítünk!</div>
+                    <div className="text-gray-600">Azonnali riasztás!</div>
                   </div>
                 </div>
 
@@ -146,8 +148,8 @@ export default function DugulaselharitasPage() {
                   <div className="flex items-center gap-3 p-3 bg-red-50 rounded-xl">
                     <Clock className="w-5 h-5 text-red-600" />
                     <div>
-                      <div className="font-semibold text-gray-900">2 órán belül</div>
-                      <div className="text-sm text-gray-600">SOS kiszállás</div>
+                      <div className="font-semibold text-gray-900">Gyors</div>
+                      <div className="text-sm text-gray-600">Kiszállás</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-cyan-50 rounded-xl">
@@ -166,10 +168,13 @@ export default function DugulaselharitasPage() {
                   </div>
                 </div>
 
-                <a href="tel:+36302696406" className="btn-secondary w-full py-4 text-lg">
-                  <Phone className="w-5 h-5" />
-                  <span>Hívjon most: +36 30 269 6406</span>
-                </a>
+                <Link
+                  href="/login?role=customer"
+                  className="btn-secondary w-full py-4 text-lg inline-flex items-center justify-center gap-2"
+                >
+                  <AlertTriangle className="w-5 h-5" />
+                  <span>Azonnali segítség kérése</span>
+                </Link>
               </div>
             </div>
           </div>
@@ -181,10 +186,10 @@ export default function DugulaselharitasPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 font-heading mb-4">
-              Milyen dugulásban segítünk?
+              Milyen dugulástípusok esetén talál szakembert?
             </h2>
             <p className="text-lg text-gray-600">
-              Minden típusú dugulást megszüntetünk – háztartásitól az ipariig.
+              Szakembereink minden típusú dugulást megszüntetnek – háztartásitól az ipariig.
             </p>
           </div>
 
@@ -221,13 +226,16 @@ export default function DugulaselharitasPage() {
               </div>
               <div>
                 <h3 className="text-2xl font-bold">Sürgős dugulás?</h3>
-                <p className="text-red-100">2 órán belül a helyszínen vagyunk!</p>
+                <p className="text-red-100">SOS szakember értesítése azonnal!</p>
               </div>
             </div>
-            <a href="tel:+36302696406" className="bg-white text-red-600 font-bold py-4 px-8 rounded-xl hover:bg-red-50 transition-colors inline-flex items-center gap-2 text-lg">
-              <Phone className="w-6 h-6" />
-              <span>+36 30 269 6406</span>
-            </a>
+            <Link
+              href="/login?role=customer"
+              className="bg-white text-red-600 font-bold py-4 px-8 rounded-xl hover:bg-red-50 transition-colors inline-flex items-center gap-2 text-lg whitespace-nowrap"
+            >
+              <AlertTriangle className="w-6 h-6" />
+              <span>Szakember riasztása</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -243,10 +251,10 @@ export default function DugulaselharitasPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { icon: Phone, title: 'Hívás/Foglalás', desc: 'Hívjon minket vagy foglaljon online.' },
-              { icon: Clock, title: 'Gyors kiszállás', desc: 'SOS: 2 óra, normál: 24-48 óra.' },
-              { icon: Wrench, title: 'Diagnosztika + Javítás', desc: 'Megállapítjuk és megoldjuk a problémát.' },
-              { icon: Shield, title: 'Megbízhatóság', desc: 'Szakszerű és gyors segítség a bajban.' },
+              { icon: FileText, title: 'Foglalás', desc: 'Online hibabejelentés és időpontfoglalás.' },
+              { icon: Search, title: 'Felmérés', desc: 'A szakember felméri a problémát helyszínen.' },
+              { icon: Wrench, title: 'Javítás', desc: 'Elfogadott árajánlat után a szakember azonnal megkezdi a munkát.' },
+              { icon: Shield, title: 'Megbízhatóság', desc: 'Ellenőrzött, számlaképes szakemberek.' },
             ].map((step, index) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -304,21 +312,27 @@ export default function DugulaselharitasPage() {
       <section className="py-16 bg-gradient-to-br from-cyan-600 to-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold font-heading mb-6">
-            Dugulás? Ne várjon – hívjon most!
+            Dugulás? Ne várjon – kérjen ajánlatot most!
           </h2>
           <p className="text-xl text-cyan-100 mb-8">
-            SOS esetén 2 órán belül a helyszínen vagyunk. Gépi duguláselhárítás, azonnali kiszállás.
+            Kérjen ajánlatot online – SOS szakemberek azonnali riasztása!
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+36302696406" className="btn-primary py-4 px-10 text-lg">
-              <Phone className="w-6 h-6" />
-              <span>SOS Hívás: +36 30 269 6406</span>
-            </a>
-            <Link href="/login?role=customer&service=dugulas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer', autoAdd: true } }))}
+              className="btn-primary py-4 px-10 text-lg"
+            >
+              <AlertTriangle className="w-6 h-6" />
+              <span>Gyors bejelentés</span>
+            </button>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer' } }))}
+              className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20"
+            >
               <Calendar className="w-6 h-6" />
               <span>Online foglalás</span>
-            </Link>
+            </button>
           </div>
         </div>
       </section>

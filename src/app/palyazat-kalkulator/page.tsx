@@ -6,7 +6,7 @@ import {
   Award, CheckCircle, ArrowRight, Phone, Calendar,
   Shield, HelpCircle,
   Clock, Building, Home,
-  Flame, Leaf, FileCheck, AlertCircle, XCircle
+  Flame, Leaf, FileCheck, AlertCircle, XCircle, AlertTriangle
 } from 'lucide-react';
 
 // Form options
@@ -216,8 +216,8 @@ export default function PalyazatKalkulatorPage() {
                         key={option.value}
                         onClick={() => setFormData(prev => ({ ...prev, buildingYear: option.value }))}
                         className={`p-4 rounded-xl border-2 text-left transition-all ${formData.buildingYear === option.value
-                            ? 'border-emerald-500 bg-emerald-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-emerald-500 bg-emerald-50'
+                          : 'border-gray-200 hover:border-gray-300'
                           }`}
                       >
                         <span className="font-medium text-gray-800">{option.label}</span>
@@ -237,8 +237,8 @@ export default function PalyazatKalkulatorPage() {
                         key={option.value}
                         onClick={() => setFormData(prev => ({ ...prev, propertyType: option.value }))}
                         className={`p-4 rounded-xl border-2 text-left transition-all ${formData.propertyType === option.value
-                            ? 'border-emerald-500 bg-emerald-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-emerald-500 bg-emerald-50'
+                          : 'border-gray-200 hover:border-gray-300'
                           }`}
                       >
                         <span className="font-medium text-gray-800">{option.label}</span>
@@ -258,8 +258,8 @@ export default function PalyazatKalkulatorPage() {
                         key={option.value}
                         onClick={() => setFormData(prev => ({ ...prev, heatingType: option.value }))}
                         className={`w-full p-4 rounded-xl border-2 text-left transition-all ${formData.heatingType === option.value
-                            ? 'border-emerald-500 bg-emerald-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-emerald-500 bg-emerald-50'
+                          : 'border-gray-200 hover:border-gray-300'
                           }`}
                       >
                         <span className="font-medium text-gray-800">{option.label}</span>
@@ -279,8 +279,8 @@ export default function PalyazatKalkulatorPage() {
                         key={option.value}
                         onClick={() => setFormData(prev => ({ ...prev, renovationType: option.value }))}
                         className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-center gap-4 ${formData.renovationType === option.value
-                            ? 'border-emerald-500 bg-emerald-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-emerald-500 bg-emerald-50'
+                          : 'border-gray-200 hover:border-gray-300'
                           }`}
                       >
                         <option.icon className={`w-6 h-6 ${formData.renovationType === option.value ? 'text-emerald-600' : 'text-gray-400'}`} />
@@ -397,10 +397,10 @@ export default function PalyazatKalkulatorPage() {
               <div className="space-y-8 animate-fade-in">
                 {/* Result Banner */}
                 <div className={`p-6 rounded-2xl ${result === 'likely'
-                    ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white'
-                    : result === 'conditional'
-                      ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-white'
-                      : 'bg-gradient-to-br from-gray-500 to-gray-600 text-white'
+                  ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white'
+                  : result === 'conditional'
+                    ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-white'
+                    : 'bg-gradient-to-br from-gray-500 to-gray-600 text-white'
                   }`}>
                   <div className="flex items-center gap-4 mb-4">
                     {result === 'likely' && <CheckCircle className="w-12 h-12" />}
@@ -484,14 +484,20 @@ export default function PalyazatKalkulatorPage() {
                     Szakértőink hamarosan felhívják a megadott számon: <strong>{formData.phone}</strong>
                   </p>
                   <div className="flex gap-4">
-                    <Link href="/login?role=customer" className="btn-primary flex-1">
+                    <button
+                      onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer' } }))}
+                      className="btn-primary flex-1"
+                    >
                       <Calendar className="w-5 h-5" />
-                      <span>Helyszíni felmérés kérése</span>
-                    </Link>
-                    <a href="tel:+3612345678" className="btn-outline flex-1">
-                      <Phone className="w-5 h-5" />
-                      <span>Hívjon most</span>
-                    </a>
+                      <span>Szakember keresése</span>
+                    </button>
+                    <button
+                      onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer', autoAdd: true } }))}
+                      className="btn-outline flex-1"
+                    >
+                      <AlertTriangle className="w-5 h-5" />
+                      <span>SOS Bejelentés</span>
+                    </button>
                   </div>
                 </div>
 

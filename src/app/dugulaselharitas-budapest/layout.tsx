@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Duguláselhárítás Budapest - SOS 0-24 Gépi Tisztítás | Azonnali Kiszállás',
-  description: 'Duguláselhárítás Budapesten 0-24 órában. ✓ Gépi csőtisztítás ✓ WC dugulás ✓ Lefolyó dugulás ✓ Kameradiagnosztika ✓ Azonnali kiszállás ✓ Fix árak. Hívjon most!',
+  description: 'Duguláselhárítás Budapesten 0-24 órában. ✓ Gépi csőtisztítás ✓ WC dugulás ✓ Lefolyó dugulás ✓ Kameradiagnosztika ✓ Azonnali riasztás ✓ Fix árak. Kérjen ajánlatot most!',
   keywords: [
     'duguláselhárítás budapest',
     'duguláselhárítás sos',

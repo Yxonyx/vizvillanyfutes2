@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Map, { Marker, NavigationControl, MapRef } from 'react-map-gl/mapbox';
 import { X, User, ChevronRight, Briefcase, Wallet, Settings, Menu, Shield, MapPin, Clock, ArrowRight, ArrowLeft, AlertTriangle, Plus, Check, XCircle, Phone, Mail, UserCheck } from 'lucide-react';

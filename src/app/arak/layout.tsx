@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Árak - Vízszerelés, Villanyszerelés, Fűtésszerelés Árlista',
-  description: 'Átlátható árak vízszerelésre, villanyszerelésre és fűtésszerelésre. ✓ Kiszállási díj 5.900 Ft ✓ Fix munkadíjak ✓ Rejtett költségek nélkül ✓ Megbízható mesterek.',
+  description: 'Átlátható árak vízszerelésre, villanyszerelésre és fűtésszerelésre. ✓ Fix munkadíjak ✓ Rejtett költségek nélkül ✓ Megbízható mesterek.',
   keywords: [
     'vízszerelő árak',
     'villanyszerelő árak',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Árak - Vízszerelés, Villanyszerelés Árlista | VízVillanyFűtés',
-    description: 'Átlátható, fix árak rejtett költségek nélkül. Kiszállási díj 5.900 Ft.',
+    description: 'Átlátható árak rejtett költségek nélkül az online platformon.',
     url: 'https://www.vizvillanyfutes.hu/arak',
   },
 };

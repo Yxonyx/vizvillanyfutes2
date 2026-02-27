@@ -23,18 +23,10 @@ const faqSchema = {
     },
     {
       '@type': 'Question',
-      name: 'Kapok garanciát a munkára?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'A platformunkon lévő szakemberek vállalják, hogy az általuk elvégzett munkára ésszerű garanciát nyújtanak. A pontos garanciális feltételeket a kivitelezővel kötött megállapodás tartalmazza. A beépített anyagokra a gyártói garancia érvényes.',
-      },
-    },
-    {
-      '@type': 'Question',
       name: 'Mennyi időn belül tudnak jönni?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SOS hibaelhárítás esetén (csőtörés, áramkimaradás) 2 órán belül a helyszínen vagyunk. Normál foglalás esetén általában 1-3 munkanapon belül tudunk időpontot adni.',
+        text: 'SOS hibaelhárítás esetén (csőtörés, áramkimaradás) a szakemberek gyorsan kiérnek. Normál bejelentés esetén általában 1-3 munkanapon belül tudnak időpontot adni.',
       },
     },
     {
@@ -50,7 +42,7 @@ const faqSchema = {
       name: 'Hol működnek, mely területeken vállalnak munkát?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Budapesten (minden kerületben) és Pest megye településein vállalunk munkát. SOS hibaelhárítás esetén Budapest teljes területén 2 órán belül a helyszínen vagyunk.',
+        text: 'Budapesten (minden kerületben) és Pest megye településein is találhat szakembert. SOS hibaelhárítás esetén Budapest teljes területén gyorsan találhat azonnali segítséget.',
       },
     },
     {

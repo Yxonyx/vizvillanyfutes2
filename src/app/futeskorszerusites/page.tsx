@@ -52,23 +52,23 @@ const services = [
 const faqs = [
   {
     question: 'Milyen pályázati lehetőségek vannak fűtéskorszerűsítésre?',
-    answer: 'Jelenleg az Otthonfelújítási Program keretében igényelhető támogatás fűtéskorszerűsítésre is. A támogatás összege a projekt költségének 50%-a, maximum 3 millió forint (teljes felújításnál max. 6 millió). Emellett vannak energetikai pályázatok is hőszivattyú, napelem rendszerekre. Segítünk a pályázati jogosultság ellenőrzésében és az ügyintézésben is!'
+    answer: 'Jelenleg az Otthonfelújítási Program keretében igényelhető támogatás fűtéskorszerűsítésre is. A támogatás összege a projekt költségének 50%-a, maximum 3 millió forint (teljes felújításnál max. 6 millió). Emellett vannak energetikai pályázatok is hőszivattyú, napelem rendszerekre. Kivitelező partnereink sok esetben támogatást nyújtanak a pályázati jogosultság ellenőrzésében és az ügyintézésben is.'
   },
   {
     question: 'Mennyibe kerül egy fűtéskorszerűsítés?',
-    answer: 'A költség nagyban függ a lakás méretétől és a választott megoldástól. Egy 60-80 m2-es lakás teljes fűtés-korszerűsítése (kazáncsere + radiátorok + szabályozás) 800.000 - 1.500.000 Ft körül mozog. Hőszivattyúval drágább, de ott nagyobb a megtérülés. Minden esetben helyszíni felmérés alapján adunk pontos árajánlatot.'
+    answer: 'A költség nagyban függ a lakás méretétől és a választott megoldástól. Egy 60-80 m2-es lakás teljes fűtés-korszerűsítése (kazáncsere + radiátorok + szabályozás) 800.000 - 1.500.000 Ft körül mozog. Hőszivattyúval drágább, de ott nagyobb a megtérülés. A szakemberek minden esetben helyszíni felmérés alapján adnak pontos árajánlatot.'
   },
   {
     question: 'Mennyit lehet spórolni a fűtéskorszerűsítéssel?',
-    answer: 'A megtakarítás jelentős lehet: egy régi, 20+ éves kazán cseréje modern kondenzációs kazánra 20-30%-os gázmegtakarítást hozhat. Hőszivattyúval akár 50-70% is lehet a megtakarítás. A pontos összeget a jelenlegi fogyasztás és az ingatlan paraméterei alapján tudjuk becsülni.'
+    answer: 'A megtakarítás jelentős lehet: egy régi, 20+ éves kazán cseréje modern kondenzációs kazánra 20-30%-os gázmegtakarítást hozhat. Hőszivattyúval akár 50-70% is lehet a megtakarítás. A pontos összeget partnereink a jelenlegi fogyasztás és az ingatlan paraméterei alapján tudják becsülni.'
   },
   {
     question: 'Tudnak gázszerelőt is küldeni?',
-    answer: 'A fűtéskorszerűsítés gázos részét (kazán, gázvezeték) partnereinken keresztül oldjuk meg. Mi végezzük a víz-oldali és elektromos munkákat (radiátorok, csövezés, termosztátok, elektromos bekötés), és koordináljuk a teljes projektet egy kézből.'
+    answer: 'A fűtéskorszerűsítés gázos részét (kazán, gázvezeték) is meg tudják oldani a platformon regisztrált megfelelő gázszerelő szakemberek. Más szakemberek a víz-oldali és elektromos munkákat (radiátorok, csövezés, termosztátok, elektromos bekötés) is elvégzik, így komplett megoldást talál a platformon.'
   },
   {
     question: 'Érdemes hőszivattyúra cserélni?',
-    answer: 'Hőszivattyú ideális választás jól szigetelt épületeknél, ahol padlófűtés vagy fan-coil van, és ahol a rezsiköltség csökkentése a cél. Gázkazán cseréjéhez képest drágább beruházás, de a működési költség alacsonyabb és pályázati támogatás is igényelhető. Segítünk eldönteni, mi a legjobb megoldás az Ön esetében.'
+    answer: 'Hőszivattyú ideális választás jól szigetelt épületeknél, ahol padlófűtés vagy fan-coil van, és ahol a rezsiköltség csökkentése a cél. Gázkazán cseréjéhez képest drágább beruházás, de a működési költség alacsonyabb és pályázati támogatás is igényelhető. Szakembereink az ingyenes helyszíni felmérés során segítenek eldönteni, mi a legjobb megoldás az Ön esetében.'
   },
 ];
 
@@ -119,9 +119,12 @@ export default function FuteskorszerusitesPage() {
                   <Award className="w-5 h-5" />
                   <span>Pályázat kalkulátor</span>
                 </Link>
-                <Link href="/login?role=customer" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
+                <Link
+                  href="/login?role=customer"
+                  className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20"
+                >
                   <Calendar className="w-5 h-5" />
-                  <span>Helyszíni felmérés</span>
+                  <span>Szakember keresése</span>
                 </Link>
               </div>
             </div>
@@ -188,10 +191,10 @@ export default function FuteskorszerusitesPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{service.name}</h3>
                 <p className="text-gray-600 mb-4">{service.description}</p>
                 <Link
-                  href={`/login?role=customer`}
+                  href="/login?role=customer"
                   className="inline-flex items-center gap-2 text-orange-600 font-semibold hover:text-orange-700"
                 >
-                  <span>Érdeklődés</span>
+                  <span>Szakember keresése</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -217,7 +220,7 @@ export default function FuteskorszerusitesPage() {
 
               <p className="text-lg text-emerald-100 mb-6">
                 Az Otthonfelújítási Program keretében a fűtésrendszer korszerűsítése is támogatható.
-                Mi segítünk a teljes folyamatban – a jogosultság ellenőrzésétől a pályázat beadásáig.
+                A regisztrált kivitelezők segítséget tudnak nyújtani a teljes folyamatban – a jogosultság ellenőrzésétől a pályázat beadásáig.
               </p>
 
               <div className="space-y-4 mb-8">
@@ -325,10 +328,13 @@ export default function FuteskorszerusitesPage() {
               <Award className="w-6 h-6" />
               <span>Pályázat ellenőrzés</span>
             </Link>
-            <Link href="/visszahivas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20">
-              <Phone className="w-6 h-6" />
-              <span>Visszahívást kérek</span>
-            </Link>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer' } }))}
+              className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20"
+            >
+              <Calendar className="w-6 h-6" />
+              <span>Szakember keresése</span>
+            </button>
           </div>
         </div>
       </section>

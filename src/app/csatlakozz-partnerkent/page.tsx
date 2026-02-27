@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -228,7 +228,7 @@ const mapTapasztalatToYears = (tapasztalat: string): number => {
   return mapping[tapasztalat] || 1;
 };
 
-export default function PartnerOnboardingPage() {
+function PartnerOnboardingContent() {
   const searchParams = useSearchParams();
   const referralCode = searchParams.get('ref');
 
@@ -1055,6 +1055,14 @@ export default function PartnerOnboardingPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function PartnerOnboardingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center"><div className="w-10 h-10 border-4 border-vvm-blue-500 border-t-transparent rounded-full animate-spin"></div></div>}>
+      <PartnerOnboardingContent />
+    </Suspense>
   );
 }
 

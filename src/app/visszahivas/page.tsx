@@ -49,10 +49,10 @@ export default function VisszahivasPage() {
       if (response.ok) {
         setIsSubmitted(true);
       } else {
-        alert('Hiba történt a küldés során. Kérjük próbálja újra vagy hívjon minket telefonon.');
+        alert('Hiba történt a küldés során. Kérjük próbálja újra később.');
       }
     } catch {
-      alert('Hiba történt a küldés során. Kérjük próbálja újra vagy hívjon minket telefonon.');
+      alert('Hiba történt a küldés során. Kérjük próbálja újra később.');
     } finally {
       setIsLoading(false);
     }

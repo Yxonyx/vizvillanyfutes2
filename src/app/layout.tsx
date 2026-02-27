@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: 'VízVillanyFűtés - Vízszerelő és Villanyszerelő Budapest | SOS 0-24',
     template: '%s | VízVillanyFűtés',
   },
-  description: 'Professzionális vízszerelő, villanyszerelő és fűtésszerelő Budapest és Pest megye területén. ✓ SOS 2 órán belül ✓ Megbízható mesterek ✓ Fix árak ✓ Online időpontfoglalás. Hívjon most!',
+  description: 'Professzionális vízszerelő, villanyszerelő és fűtésszerelő Budapest és Pest megye területén. ✓ Gyors kiszállás ✓ Megbízható mesterek ✓ Fix árak ✓ Online ajánlatkérés. Kérjen ajánlatot most!',
   keywords: [
     'vízszerelő budapest',
     'villanyszerelő budapest',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'VízVillanyFűtés - Vízszerelő, Villanyszerelő, Fűtésszerelő Budapest',
-    description: 'Megbízható szakemberek Budapesten és Pest megyében. SOS 2 órán belül, gyors és okos kiajánlás, fix árak. Foglaljon online!',
+    description: 'Megbízható szakemberek Budapesten és Pest megyében. Gyors SOS kiszállás, gyors és okos kiajánlás, fix árak. Foglaljon online!',
     url: 'https://www.vizvillanyfutes.hu',
     siteName: 'VízVillanyFűtés',
     locale: 'hu_HU',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'VízVillanyFűtés - Vízszerelő, Villanyszerelő Budapest',
-    description: 'Megbízható szakemberek Budapesten. SOS 2 órán belül, ellenőrzött mesterek, fix árak.',
+    description: 'Megbízható szakemberek Budapesten. Gyors SOS kiszállás, ellenőrzött mesterek, fix árak.',
     creator: '@vizvillanyfutes',
   },
   robots: {

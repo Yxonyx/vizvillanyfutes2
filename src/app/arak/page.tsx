@@ -17,7 +17,7 @@ const priceCategories = [
     color: 'bg-sky-500',
     colorLight: 'bg-sky-100 text-sky-700',
     prices: [
-      { name: 'Kiszállási díj', price: '5 900 Ft', note: 'Budapest teljes területén' },
+      { name: 'Kiszállási díj', price: 'Ajánlat alapján', note: 'Szakemberenként eltérő' },
       { name: 'Mosdó csaptelep csere', price: '16 500 Ft-tól', includes: 'Munkadíj + segédanyagok' },
       { name: 'Konyhai csaptelep csere', price: '18 500 Ft-tól', includes: 'Munkadíj + segédanyagok' },
       { name: 'WC tartály javítás', price: '12 000 Ft-tól', includes: 'Munkadíj + kisebb alkatrészek' },
@@ -37,7 +37,7 @@ const priceCategories = [
     color: 'bg-amber-500',
     colorLight: 'bg-amber-100 text-amber-700',
     prices: [
-      { name: 'Kiszállási díj', price: '5 900 Ft', note: 'Budapest teljes területén' },
+      { name: 'Kiszállási díj', price: 'Ajánlat alapján', note: 'Szakemberenként eltérő' },
       { name: 'Konnektor csere', price: '8 500 Ft-tól', includes: 'Munkadíj + standard konnektor' },
       { name: 'Kapcsoló csere', price: '7 500 Ft-tól', includes: 'Munkadíj + kapcsoló' },
       { name: 'Lámpa szerelés (egyszerű)', price: '9 000 Ft-tól', includes: 'Munkadíj' },
@@ -57,7 +57,7 @@ const priceCategories = [
     color: 'bg-orange-500',
     colorLight: 'bg-orange-100 text-orange-700',
     prices: [
-      { name: 'Kiszállás + felmérés', price: '9 900 Ft', note: 'Levonva megrendeléskor' },
+      { name: 'Kiszállás + felmérés', price: 'Ajánlat alapján', note: 'Szakemberenként eltérő' },
       { name: 'Radiátor csere (db)', price: '18 000 Ft-tól', includes: 'Munkadíj, radiátor külön' },
       { name: 'Termosztát szelep csere', price: '8 500 Ft-tól', includes: 'Munkadíj + szelep' },
       { name: 'Termosztát fej csere', price: '6 500 Ft-tól', includes: 'Munkadíj + fej' },
@@ -74,7 +74,7 @@ const priceCategories = [
 const faqs = [
   {
     q: 'Mi tartozik a kiszállási díjba?',
-    a: 'A kiszállási díj tartalmazza a helyszínre érkezést Budapest bármely kerületében, a probléma felmérését és a pontos árajánlat elkészítését. Ha a javítást elfogadja, a kiszállási díj nem kerül külön felszámolásra.'
+    a: 'A kiszállási díjat az adott szakember határozza meg. Általában tartalmazza a helyszínre érkezést és a probléma felmérését. Sok esetben, ha a javítást megrendeli, a kiszállási díj beépül a munkadíjba, de ez a szakember egyedi feltételeitől függ.'
   },
   {
     q: 'Az anyagárak benne vannak az árban?',
@@ -82,15 +82,11 @@ const faqs = [
   },
   {
     q: 'Mikor kell SOS felárat fizetni?',
-    a: 'SOS felár (a munkadíj +50%-a) fizetendő éjszakai (20:00-08:00), hétvégi és ünnepnapi kiszállás esetén, valamint sürgős, 2 órán belüli kiszállás esetén. Ezt a foglalásnál mindig előre jelezzük.'
+    a: 'Sürgősségi SOS felár fizetendő lehet éjszakai (20:00-08:00), hétvégi és ünnepnapi kiszállás esetén, valamint sürgős SOS kiszállás esetén. Ezt a kiválasztott szakember a foglalásnál/egyeztetésnél mindig előre jelzi.'
   },
   {
     q: 'Hogyan fizethetek?',
     a: 'Fizethet készpénzzel vagy bankkártyával a helyszínen a munka végeztével. Céges ügyfeleknek átutalás is lehetséges előzetes egyeztetés alapján.'
-  },
-  {
-    q: 'Kapok garanciát a munkára?',
-    a: 'A rendszerünkben regisztrált szakemberek vállalják az elvégzett munkák garanciális hátterét. Anyaggal végzett munkák esetén az anyag gyártói garanciája is érvényes.'
   },
 ];
 
@@ -121,7 +117,7 @@ export default function ArakPage() {
             Átlátható, fix árak – nincsenek rejtett költségek.
           </p>
           <p className="text-blue-200">
-            A pontos árat minden esetben a helyszíni felmérés után adjuk meg.
+            A pontos árat minden esetben a szakember a helyszíni felmérés után adja meg.
           </p>
         </div>
       </section>
@@ -192,7 +188,7 @@ export default function ArakPage() {
               <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-amber-800">
                 <strong>SOS felár:</strong> Éjszakai (20:00-08:00), hétvégi, ünnepnapi és sürgős kiszállás
-                esetén a munkadíj +50%-a kerül felszámolásra.
+                esetén a szakember sürgősségi felárat számíthat fel.
               </div>
             </div>
 
@@ -200,7 +196,7 @@ export default function ArakPage() {
               <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-blue-800">
                 <strong>Megjegyzés:</strong> Az árak tájékoztató jellegűek és az anyagárat nem tartalmazzák.
-                A végleges árat a helyszíni felmérés után adjuk meg, az elfogadás előtt.
+                A végleges árat a szakember a helyszíni felmérés után adja meg, az elfogadás előtt.
               </div>
             </div>
           </div>

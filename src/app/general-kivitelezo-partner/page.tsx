@@ -440,7 +440,7 @@ export default function B2BPage() {
             Beszéljük meg a részleteket!
           </h2>
           <p className="text-xl text-slate-300 mb-8">
-            Hívjon minket vagy írjon – személyre szabott ajánlattal jelentkezünk.
+            Kérjen ajánlatot online – személyre szabott ajánlattal jelentkezünk.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

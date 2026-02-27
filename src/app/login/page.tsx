@@ -21,12 +21,13 @@ function LoginPageContent() {
   const redirect = searchParams.get('redirect');
   const expired = searchParams.get('expired');
   const roleParam = searchParams.get('role');
+  const modeParam = searchParams.get('mode');
 
   const [loginMode, setLoginMode] = useState<'contractor' | 'customer'>(roleParam === 'customer' ? 'customer' : 'contractor');
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerPassword, setCustomerPassword] = useState('');
   const [showCustomerPassword, setShowCustomerPassword] = useState(false);
-  const [isCustomerRegister, setIsCustomerRegister] = useState(false);
+  const [isCustomerRegister, setIsCustomerRegister] = useState(modeParam === 'register');
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const justRegistered = useRef(false);

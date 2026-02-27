@@ -4,7 +4,7 @@ import { MapPin, CheckCircle, Clock, Phone, Calendar, AlertTriangle } from 'luci
 
 export const metadata: Metadata = {
   title: 'Szolgáltatási Területek | VízVillanyFűtés Budapest és Pest megye',
-  description: 'VízVillanyFűtés szolgáltatási területei: Budapest összes kerülete és Pest megye települései. SOS kiszállás 2 órán belül!',
+  description: 'VízVillanyFűtés szolgáltatási területei: Budapest összes kerülete és Pest megye települései. Kérjen ajánlatot a platformon!',
 };
 
 const budapestDistricts = [
@@ -79,7 +79,7 @@ export default function SzolgaltatasiTeruletekPage() {
               Budapest
             </h2>
             <p className="text-gray-600">
-              Minden kerületben vállalunk munkát – SOS kiszállás átlagosan 1 órán belül
+              Minden kerületben vállalunk munkát – és szakembereink gyorsan kiszállnak.
             </p>
           </div>
 
@@ -162,13 +162,19 @@ export default function SzolgaltatasiTeruletekPage() {
             Kérjük, érdeklődjön telefonon vagy online!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+36302696406" className="btn-primary py-4 px-8">
-              <Phone className="w-5 h-5" />
-              <span>+36 30 269 6406</span>
-            </a>
-            <Link href="/login?role=customer" className="btn-outline py-4 px-8">
+            <Link
+              href="/login?role=customer"
+              className="btn-primary py-4 px-8"
+            >
+              <AlertTriangle className="w-5 h-5" />
+              <span>SOS Bejelentés</span>
+            </Link>
+            <Link
+              href="/login"
+              className="btn-outline py-4 px-8"
+            >
               <Calendar className="w-5 h-5" />
-              <span>Időpontfoglalás</span>
+              <span>Szakember keresése</span>
             </Link>
           </div>
         </div>

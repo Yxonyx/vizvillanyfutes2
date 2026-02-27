@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Vízszerelő Budapest - SOS Csőtörés, Duguláselhárítás | 2 Órán Belül',
-  description: 'Megbízható vízszerelő Budapest területén. ✓ SOS csőtörés elhárítás 2 órán belül ✓ Duguláselhárítás ✓ Csaptelep csere ✓ Bojler szerelés ✓ Számlaképes mesterek ✓ Fix árak. Hívjon most!',
+  description: 'Megbízható vízszerelő Budapest területén. ✓ SOS csőtörés elhárítás ✓ Duguláselhárítás ✓ Csaptelep csere ✓ Bojler szerelés ✓ Számlaképes mesterek ✓ Fix árak. Kérjen ajánlatot most!',
   keywords: [
     'vízszerelő budapest',
     'vízszerelő sos',

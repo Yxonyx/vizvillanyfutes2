@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Villanyszerelő Budapest - SOS Áramszünet, Biztosítéktábla | 0-24',
-  description: 'Megbízható villanyszerelő Budapest területén. ✓ SOS áramkimaradás ✓ Fi-relé beépítés ✓ Biztosítéktábla csere ✓ EV töltő telepítés ✓ Minősített mesterek ✓ Fix árak. Hívjon most!',
+  description: 'Megbízható villanyszerelő Budapest területén. ✓ SOS áramkimaradás ✓ Fi-relé beépítés ✓ Biztosítéktábla csere ✓ EV töltő telepítés ✓ Minősített mesterek ✓ Fix árak. Kérjen ajánlatot most!',
   keywords: [
     'villanyszerelő budapest',
     'villanyszerelő sos',

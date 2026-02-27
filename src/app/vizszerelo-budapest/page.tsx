@@ -2,15 +2,13 @@
 
 import Link from 'next/link';
 import {
-  Droplets, CheckCircle, ArrowRight, Phone, Calendar, Clock,
-  Shield, Star, MapPin, ChevronDown, Play, AlertTriangle,
-  Wrench, Award, FileCheck, ThumbsUp, HelpCircle
+  Wrench, Shield, CheckCircle, ArrowRight, Phone, Calendar, Star, Clock, MapPin, Search, Plus, Award, AlertTriangle, Droplets, Droplets as WaterDrop, Thermometer, PenTool, Zap, Home, ThumbsUp, FileText, Bell, FileCheck, HelpCircle, ChevronDown
 } from 'lucide-react';
 import { useState } from 'react';
 
 // Price list data
 const priceList = [
-  { name: 'Kiszállási díj', price: '5 900 Ft', note: 'Budapest teljes területén' },
+  { name: 'Kiszállási díj', price: 'Ajánlat alapján', note: 'Szakemberenként eltérő lehet' },
   { name: 'Mosdó csaptelep csere', price: '16 500 Ft-tól', includes: 'Munkadíj + segédanyagok' },
   { name: 'Konyhai csaptelep csere', price: '18 500 Ft-tól', includes: 'Munkadíj + segédanyagok' },
   { name: 'WC tartály javítás', price: '12 000 Ft-tól', includes: 'Munkadíj + kisebb alkatrészek' },
@@ -18,7 +16,7 @@ const priceList = [
   { name: 'Szifon csere', price: '8 500 Ft-tól', includes: 'Munkadíj + standard szifon' },
   { name: 'Bojler vízkőtelenítés', price: '19 500 Ft-tól', includes: 'Teljes körű karbantartás' },
   { name: 'Bojler csere (80L)', price: '32 000 Ft-tól', includes: 'Munkadíj, bojler külön' },
-  { name: 'Csőtörés elhárítás', price: '25 000 Ft-tól', includes: 'Éjszaka/hétvége +50%' },
+  { name: 'Csőtörés elhárítás', price: '25 000 Ft-tól', includes: 'Sürgősségi felár egyeztetés szerint' },
   { name: 'Duguláselhárítás (kézi)', price: '15 000 Ft-tól', includes: 'Standard dugulás' },
   { name: 'Duguláselhárítás (gépi)', price: '28 000 Ft-tól', includes: 'Súlyosabb dugulás' },
 ];
@@ -27,28 +25,16 @@ const priceList = [
 const faqs = [
   {
     question: 'Mennyi idő alatt tudnak kijönni?',
-    answer: 'Normál esetben 2-3 munkanapon belül tudunk időpontot adni. SOS hibaelhárítás (csőtörés, súlyos vízszivárgás) esetén akár 2 órán belül is a helyszínen vagyunk – ez esetben +50% expressz felár fizetendő.'
-  },
-  {
-    question: 'Mi van, ha nem tudom pontosan, mi a probléma?',
-    answer: 'Semmi gond! A szakember a helyszínen felmérést végez és megállapítja a pontos hibát. A felmérés a kiszállási díjban benne van. Ha a javítást elfogadja, a kiszállási díj nem kerül felszámolásra külön.'
-  },
-  {
-    question: 'Kapok garanciát a munkára?',
-    answer: 'A platformunkon lévő szakemberek vállalják, hogy az általuk elvégzett munkára ésszerű garanciát nyújtanak. Anyaggal végzett munkák esetén az anyag gyártói garanciája is érvényes.'
-  },
-  {
-    question: 'Mi történik, ha a javítás után újra elromlik?',
-    answer: 'Garanciális probléma esetén a szakember ingyenesen visszatér és kijavítja a hibát. Ha a probléma más okból merül fel, új árajánlatot ad, de kedvezményes kiszállási díjat alkalmazhat.'
+    answer: 'A kiszállási idő a kiválasztott szakember kapacitásától függ. Sürgős esetekben a platformon lévő szakemberek akár azonnal is tudnak indulni, de pontos időpontot a szakemberrel történt egyeztetés során kap.'
   },
   {
     question: 'Kaphatok számlát a munkáról?',
-    answer: 'Természetesen! Minden munkáról hivatalos, NAV-kompatibilis számlát állítunk ki, ami pályázatokhoz (pl. Otthonfelújítási Program) is felhasználható.'
+    answer: 'A platformon található szakemberek többsége tud hivatalos, NAV-kompatibilis számlát kiállítani, ami pályázatokhoz is felhasználható. Ezt érdemes a kiválasztott szakember profilján ellenőrizni vagy vele előre egyeztetni.'
   },
   {
     question: 'Hogyan tudok fizetni?',
-    answer: 'Készpénzzel vagy bankkártyával a helyszínen a munka végeztével. Céges ügyfeleknek átutalás is lehetséges előzetes egyeztetés alapján.'
-  },
+    answer: 'A fizetés módja (készpénz, bankkártya, átutalás) a megrendelő és a kiválasztott szakember közötti megállapodástól függ.'
+  }
 ];
 
 // Services list
@@ -129,13 +115,19 @@ export default function VizszereloPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/login?role=customer" className="btn-primary py-4 px-8 text-lg">
+                <Link
+                  href="/login?role=customer&mode=register"
+                  className="btn-primary py-4 px-8 text-lg inline-flex items-center gap-2"
+                >
                   <Calendar className="w-5 h-5" />
-                  <span>Időpontfoglalás</span>
+                  <span>Szakember keresése</span>
                 </Link>
-                <Link href="/visszahivas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
-                  <Phone className="w-5 h-5" />
-                  <span>Visszahívást kérek</span>
+                <Link
+                  href="/login?role=customer"
+                  className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20"
+                >
+                  <AlertTriangle className="w-5 h-5" />
+                  <span>SOS Bejelentés</span>
                 </Link>
               </div>
             </div>
@@ -157,8 +149,8 @@ export default function VizszereloPage() {
                     <div className="flex items-center gap-3">
                       <Clock className="w-5 h-5 text-cyan-300" />
                       <div>
-                        <div className="font-semibold text-white">2 órán belül</div>
-                        <div className="text-sm text-sky-200">SOS kiszállás</div>
+                        <div className="font-semibold text-white">Gyors</div>
+                        <div className="text-sm text-sky-200">Kiszállás</div>
                       </div>
                     </div>
                   </div>
@@ -220,10 +212,10 @@ export default function VizszereloPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{service.name}</h3>
                 <p className="text-gray-600 mb-4">{service.description}</p>
                 <Link
-                  href={`/login?role=customer`}
+                  href="/login?role=customer"
                   className="inline-flex items-center gap-2 text-sky-600 font-semibold hover:text-sky-700"
                 >
-                  <span>Időpont kérése</span>
+                  <span>Szakember keresése</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -246,10 +238,10 @@ export default function VizszereloPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { icon: Calendar, title: 'Foglalás', desc: 'Online hibabejelentés és időpontfoglalás.' },
-              { icon: Wrench, title: 'Felmérés', desc: 'A szakember felméri a problémát helyszínen.' },
-              { icon: ThumbsUp, title: 'Javítás', desc: 'Elfogadott árajánlat után azonnal dolgozunk.' },
-              { icon: Award, title: 'Megbízhatóság', desc: 'Ellenőrzött, számlaképes szakemberek.' },
+              { icon: FileText, title: 'Foglalás', desc: 'Online hibabejelentés és időpontfoglalás.' },
+              { icon: Search, title: 'Felmérés', desc: 'A szakember felméri a problémát helyszínen.' },
+              { icon: Wrench, title: 'Javítás', desc: 'Elfogadott árajánlat után a szakember azonnal megkezdi a munkát.' },
+              { icon: Shield, title: 'Megbízhatóság', desc: 'Ellenőrzött, számlaképes szakemberek.' },
             ].map((step, index) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -305,10 +297,13 @@ export default function VizszereloPage() {
           </div>
 
           <div className="text-center mt-8">
-            <Link href="/login?role=customer" className="btn-primary inline-flex py-4 px-8">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer' } }))}
+              className="btn-primary inline-flex py-4 px-8"
+            >
               <Calendar className="w-5 h-5" />
-              <span>Kérjen árajánlatot</span>
-            </Link>
+              <span>Szakember keresése</span>
+            </button>
           </div>
         </div>
       </section>
@@ -402,18 +397,24 @@ export default function VizszereloPage() {
             Szüksége van vízszerelőre?
           </h2>
           <p className="text-xl text-sky-100 mb-8">
-            Foglaljon időpontot online vagy hívjon minket – SOS esetén 2 órán belül a helyszínen vagyunk!
+            Kérjen ajánlatot online – szakembereink gyorsan reagálnak az SOS riasztásokra!
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/login?role=customer" className="btn-primary py-4 px-10 text-lg">
+            <Link
+              href="/login?role=customer&mode=register"
+              className="btn-primary py-4 px-10 text-lg inline-flex items-center gap-2"
+            >
               <Calendar className="w-6 h-6" />
-              <span>Online foglalás</span>
+              <span>Szakember keresése</span>
             </Link>
-            <Link href="/visszahivas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20">
-              <Phone className="w-6 h-6" />
-              <span>Visszahívást kérek</span>
-            </Link>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer', autoAdd: true } }))}
+              className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20"
+            >
+              <AlertTriangle className="w-6 h-6" />
+              <span>SOS Bejelentés</span>
+            </button>
           </div>
         </div>
       </section>

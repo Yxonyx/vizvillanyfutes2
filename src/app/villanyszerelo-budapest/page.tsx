@@ -11,7 +11,7 @@ import { useState } from 'react';
 
 // Price list data
 const priceList = [
-  { name: 'Kiszállási díj', price: '5 900 Ft', note: 'Budapest teljes területén' },
+  { name: 'Kiszállási díj', price: 'Ajánlat alapján', note: 'Szakemberenként eltérő lehet' },
   { name: 'Konnektor csere', price: '8 500 Ft-tól', includes: 'Munkadíj + standard konnektor' },
   { name: 'Kapcsoló csere', price: '7 500 Ft-tól', includes: 'Munkadíj + kapcsoló' },
   { name: 'Lámpa szerelés (egyszerű)', price: '9 000 Ft-tól', includes: 'Munkadíj' },
@@ -32,7 +32,7 @@ const faqs = [
   },
   {
     question: 'Mennyire sürgős, ha nincs áram?',
-    answer: 'Ha a teljes lakásban nincs áram, érdemes először ellenőrizni, hogy nem-e az elektromos szolgáltatónál van a hiba (szomszédoknál is kikapcsolt-e). Ha csak Önnél nincs, az SOS kategória – azonnal hívjon minket! Ha csak részlegesen van áram, az kevésbé sürgős, de mielőbb vizsgáltassa meg.'
+    answer: 'Ha a teljes lakásban nincs áram, érdemes először ellenőrizni, hogy nincs-e az elektromos szolgáltatónál hiba (szomszédoknál is kikapcsolt-e). Ha csak Önnél nincs, az SOS kategória – azonnal kérjen segítséget online! Ha csak részlegesen van áram, az kevésbé sürgős, de mielőbb vizsgáltassa meg.'
   },
   {
     question: 'Mi az a Fi-relé és miért fontos?',
@@ -40,7 +40,7 @@ const faqs = [
   },
   {
     question: 'Szükség van-e engedélyre a villanyszereléshez?',
-    answer: 'Kisebb munkákhoz (konnektor, kapcsoló, lámpa csere) nem kell engedély. Nagyobb átalakításokhoz, biztosítéktábla cseréhez, teljes átvezetékeléshez vagy új bekötéshez engedély és szabványossági felülvizsgálat szükséges – ebben is segítünk.'
+    answer: 'Kisebb munkákhoz (konnektor, kapcsoló, lámpa csere) nem kell engedély. Nagyobb átalakításokhoz, biztosítéktábla cseréhez, teljes átvezetékeléshez vagy új bekötéshez engedély és szabványossági felülvizsgálat szükséges – a platformon található szakemberek ebben is segíteni tudnak.'
   },
   {
     question: 'Mennyibe kerül egy teljes lakás átvezetékelése?',
@@ -48,7 +48,7 @@ const faqs = [
   },
   {
     question: 'Tudnak elektromos autótöltőt is telepíteni?',
-    answer: 'Igen! Elektromos autótöltő (EV töltő, wallbox) telepítését vállaljuk. Ez magában foglalja a szükséges áramkör kiépítését, a töltő felszerelését és üzembe helyezését. Társasházi parkolóban külön engedélyeztetés szükséges, amiben szintén segítünk.'
+    answer: 'Igen! A platformon találhat olyan szakembereket, akik elektromos autótöltő (EV töltő, wallbox) telepítését vállalják. Ez magában foglalja a szükséges áramkör kiépítését, a töltő felszerelését és üzembe helyezését. Társasházi parkolóban külön engedélyeztetés szükséges, amiben a legtöbb minősített szerelő szintén támogatást tud nyújtani.'
   },
 ];
 
@@ -135,14 +135,20 @@ export default function VillanyszerelPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/login?role=customer" className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 shadow-lg">
+                <Link
+                  href="/login?role=customer&mode=register"
+                  className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 shadow-lg"
+                >
                   <Calendar className="w-5 h-5" />
-                  <span>Időpontfoglalás</span>
+                  <span>Szakember keresése</span>
                 </Link>
-                <Link href="/visszahivas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
-                  <Phone className="w-5 h-5" />
-                  <span>Visszahívást kérek</span>
-                </Link>
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer', autoAdd: true } }))}
+                  className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20"
+                >
+                  <AlertTriangle className="w-5 h-5" />
+                  <span>SOS Bejelentés</span>
+                </button>
               </div>
             </div>
 
@@ -163,8 +169,8 @@ export default function VillanyszerelPage() {
                     <div className="flex items-center gap-3">
                       <Clock className="w-5 h-5 text-amber-200" />
                       <div>
-                        <div className="font-semibold text-white">2 órán belül</div>
-                        <div className="text-sm text-amber-200">SOS kiszállás</div>
+                        <div className="font-semibold text-white">Gyors</div>
+                        <div className="text-sm text-amber-200">Kiszállás</div>
                       </div>
                     </div>
                   </div>
@@ -238,13 +244,13 @@ export default function VillanyszerelPage() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{service.name}</h3>
                 <p className="text-gray-600 mb-4">{service.description}</p>
-                <Link
-                  href={`/login?role=customer`}
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer' } }))}
                   className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700"
                 >
-                  <span>Időpont kérése</span>
+                  <span>Szakember keresése</span>
                   <ArrowRight className="w-4 h-4" />
-                </Link>
+                </button>
               </div>
             ))}
           </div>
@@ -285,10 +291,13 @@ export default function VillanyszerelPage() {
                 </div>
               </div>
 
-              <Link href="/login?role=customer" className="btn-primary inline-flex">
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer' } }))}
+                className="btn-primary inline-flex"
+              >
                 <span>Fi-relé beépítés kérése</span>
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </button>
             </div>
 
             <div className="bg-slate-700/50 rounded-2xl p-8">
@@ -351,16 +360,19 @@ export default function VillanyszerelPage() {
           <div className="mt-6 p-4 bg-amber-50 rounded-xl flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-amber-800">
-              <strong>Megjegyzés:</strong> Az árak tájékoztató jellegűek. A pontos árat a helyszíni felmérés után adjuk meg.
+              <strong>Megjegyzés:</strong> Az árak tájékoztató jellegűek. A pontos árat a szakember a helyszíni felmérés után adja meg.
               Nagyobb munkákhoz (átvezetékelés, tábla csere) mindig helyszíni felmérés szükséges.
             </p>
           </div>
 
           <div className="text-center mt-8">
-            <Link href="/login?role=customer" className="btn-primary inline-flex py-4 px-8">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer' } }))}
+              className="btn-primary inline-flex py-4 px-8"
+            >
               <Calendar className="w-5 h-5" />
-              <span>Kérjen árajánlatot</span>
-            </Link>
+              <span>Szakember keresése</span>
+            </button>
           </div>
         </div>
       </section>
@@ -411,18 +423,24 @@ export default function VillanyszerelPage() {
             Szüksége van villanyszerelőre?
           </h2>
           <p className="text-xl text-amber-100 mb-8">
-            Foglaljon időpontot online vagy hívjon minket – SOS esetén 2 órán belül a helyszínen vagyunk!
+            Kérjen ajánlatot online – szakembereink gyorsan reagálnak az SOS riasztásokra!
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/login?role=customer" className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg shadow-lg">
+            <Link
+              href="/login?role=customer&mode=register"
+              className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg shadow-lg"
+            >
               <Calendar className="w-6 h-6" />
-              <span>Online foglalás</span>
+              <span>Szakember keresése</span>
             </Link>
-            <Link href="/visszahivas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20">
-              <Phone className="w-6 h-6" />
-              <span>Visszahívást kérek</span>
-            </Link>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer', autoAdd: true } }))}
+              className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20"
+            >
+              <AlertTriangle className="w-6 h-6" />
+              <span>SOS Bejelentés</span>
+            </button>
           </div>
         </div>
       </section>

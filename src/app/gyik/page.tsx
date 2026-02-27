@@ -63,7 +63,7 @@ const faqs = [
     id: 8,
     category: 'ugyfelek',
     question: 'Mi van, ha sürgős a probléma (pl. csőtörés)?',
-    answer: 'SOS hibabejelentésnél a rendszer kiemelt, azonnali értesítést küld a közeledben elérhető szakembereknek. Ilyen esetben a szakemberek jellemzően perceken belül válaszolnak, és akár 1-2 órán belül a helyszínre érhetnek.'
+    answer: 'SOS hibabejelentésnél a rendszer kiemelt, azonnali értesítést küld a közeledben elérhető szakembereknek. Ilyen esetben a szakemberek jellemzően perceken belül válaszolnak, és akár azonnal a helyszínre érhetnek.'
   },
   {
     id: 9,
@@ -241,7 +241,10 @@ export default function GyikPage() {
             Vegye fel velünk a kapcsolatot, vagy próbálja ki a platformot – az ajánlatkérés ingyenes!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/login?role=customer" className="btn-primary py-4 px-8">
+            <Link
+              href="/login?role=customer"
+              className="btn-primary py-4 px-8"
+            >
               <User className="w-5 h-5" />
               <span>Ingyenes ajánlatkérés</span>
             </Link>
@@ -250,9 +253,6 @@ export default function GyikPage() {
               <span>Szakemberként csatlakozom</span>
             </Link>
           </div>
-          <p className="text-sm text-gray-400 mt-6">
-            Vagy hívjon minket: <a href="tel:+36302696406" className="text-vvm-blue-600 hover:underline">+36 30 269 6406</a>
-          </p>
         </div>
       </section>
     </div>
