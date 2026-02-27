@@ -324,11 +324,17 @@ export default function HomePage() {
       </section>
 
       {/* Services Grid */}
-      <section className="pt-12 md:pt-16 pb-16 md:pb-24 bg-gray-50 border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative pt-12 md:pt-16 pb-16 md:pb-24 bg-gray-50 overflow-hidden border-t border-gray-100">
+        {/* Map Background Pattern (Light) */}
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='800' height='800' viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h800v800H0z' fill='none'/%3E%3Cpath d='M100 0v800M200 0v800M300 0v800M400 0v800M500 0v800M600 0v800M700 0v800M0 100h800M0 200h800M0 300h800M0 400h800M0 500h800M0 600h800M0 700h800' stroke='%23000' stroke-width='0.5' stroke-opacity='0.2'/%3E%3Cpath d='M150 0c50 100 200 150 250 300s100 400 300 500M600 0c-100 200-50 400-200 600s-300 100-400 200' stroke='%23000' stroke-width='1.5' stroke-opacity='0.3' fill='none'/%3E%3C/svg%3E")`,
+          backgroundSize: '800px 800px'
+        }}></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
-            <h2 className="section-title">Miben tudunk segíteni?</h2>
-            <p className="section-subtitle max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-vvm-blue-800 mb-4">Miben tudunk segíteni?</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Platformunk összeköti azokat, akiknek víz-, villany- vagy fűtésproblémájuk van, azokkal a szakemberekkel, akik azonnal meg tudják oldani. Gyorsan, egyszerűen, megbízhatóan.
             </p>
           </div>
@@ -365,7 +371,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Contractor Registration Hero (Moved from registration page) */}
+      {/* Contractor Registration Hero */}
       <section className="relative bg-gradient-to-br from-vvm-blue-800 via-vvm-blue-700 to-vvm-blue-900 text-white overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0di00aC0ydjRoLTR2Mmg0djRoMnYtNGg0di0yaC00em0wLTMwVjBoLTJ2NGgtNHYyaDR2NGgyVjZoNFY0aC00ek02IDM0di00SDR2NEgwdjJoNHY0aDJ2LTRoNHYtMkg2ek02IDRWMEg0djRIMHYyaDR2NGgyVjZoNFY0SDZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30 pointer-events-none"></div>
 
@@ -522,11 +528,11 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
 
       {/* Grant Calculator Lead Magnet */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 relative overflow-hidden">
+      < section className="py-16 md:py-24 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 relative overflow-hidden" >
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzR2LTRoLTJ2NGgtNHYyGjR2NGgydi00aDR2LTJoLTR6bTAtMzBWMGgtMnY0aC00djJoNHY0aDJWNmg0VjRoLTR6TTYgMzR2LTRINHY0SDB2Mmg0djRoMnYtNGg0di0ySDZ6TTYgNFYwSDR2NEgwdjJoNHY0aDJWNmg0VjRINnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -642,10 +648,10 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Testimonials */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      < section className="py-16 md:py-24 bg-gray-50" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="section-title">Amit ügyfeleink mondanak</h2>
@@ -697,10 +703,10 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Final CTA */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-vvm-blue-600 to-vvm-blue-800 text-white relative overflow-hidden">
+      < section className="py-16 md:py-24 bg-gradient-to-br from-vvm-blue-600 to-vvm-blue-800 text-white relative overflow-hidden" >
         <div className="absolute inset-0 bg-hero-pattern opacity-20"></div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
@@ -739,8 +745,8 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   );
 }
 
