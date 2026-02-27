@@ -130,7 +130,7 @@ export default function VillanyszerelPage() {
                 </div>
                 <div className="flex items-center gap-2 text-amber-100">
                   <CheckCircle className="w-5 h-5 text-amber-200" />
-                  <span>1 év garancia</span>
+                  <span>Megbízható szakértelem</span>
                 </div>
               </div>
 

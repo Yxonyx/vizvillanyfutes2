@@ -208,7 +208,10 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row flex-wrap items-center justify-between gap-4">
+            <div className="text-sm text-slate-500 w-full md:w-auto text-center md:text-left mb-2 md:mb-0">
+              A VízVillanyFűtés.hu információs piactérként működik, a kivitelezési szerződés és a fizetési/garanciális feltételek a Megrendelő és a választott Szakember között jönnek létre.
+            </div>
             <div className="text-sm text-slate-500">
               © {new Date().getFullYear()} VízVillanyFűtés. Minden jog fenntartva.
             </div>

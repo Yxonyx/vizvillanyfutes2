@@ -228,8 +228,8 @@ export default function JobCard({
             <span className="font-medium text-blue-900">Kiosztva:</span>
             <span className="text-blue-800">{activeAssignment.contractor.display_name}</span>
             <span className={`ml-2 px-2 py-0.5 rounded text-xs font-medium ${activeAssignment.status === 'accepted'
-                ? 'bg-green-100 text-green-700'
-                : 'bg-amber-100 text-amber-700'
+              ? 'bg-green-100 text-green-700'
+              : 'bg-amber-100 text-amber-700'
               }`}>
               {activeAssignment.status === 'accepted' ? 'Elfogadva' : 'Válaszra vár'}
             </span>
@@ -288,7 +288,7 @@ export default function JobCard({
               className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-vvm-yellow-400 hover:bg-vvm-yellow-500 text-vvm-blue-800 rounded-lg text-sm font-bold transition-colors shadow-md"
             >
               <Zap className="w-4 h-4" />
-              Munka feloldása ({job.lead_price || 0} Ft)
+              Adatok feloldása ({job.lead_price || 0} Ft)
             </button>
           )}
 

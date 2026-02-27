@@ -171,7 +171,7 @@ export default function FuteskorszerusitesPage() {
               Fűtéskorszerűsítési szolgáltatásaink
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Teljes körű fűtéskorszerűsítés a felméréstől a garanciáig.
+              Teljes körű fűtéskorszerűsítés a felméréstől az átadásig.
             </p>
           </div>
 

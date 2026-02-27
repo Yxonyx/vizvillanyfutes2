@@ -137,9 +137,9 @@ export default function ImpresszumPage() {
 
               <div className="space-y-6">
                 <div>
-                  <p className="text-sm text-gray-500 mb-2">Garancia</p>
-                  <p className="text-green-600 font-medium">Minimum 1 év garancia</p>
-                  <p className="text-gray-600 text-sm">Minden elvégzett munkánkra.</p>
+                  <p className="text-sm text-gray-500 mb-2">Megbízhatóság</p>
+                  <p className="text-green-600 font-medium">Ellenőrzött szakemberek</p>
+                  <p className="text-gray-600 text-sm">Biztonságos partneri hálózat.</p>
                 </div>
 
                 <div>

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Árak - Vízszerelés, Villanyszerelés, Fűtésszerelés Árlista',
-  description: 'Átlátható árak vízszerelésre, villanyszerelésre és fűtésszerelésre. ✓ Kiszállási díj 5.900 Ft ✓ Fix munkadíjak ✓ Rejtett költségek nélkül ✓ 1 év garancia.',
+  description: 'Átlátható árak vízszerelésre, villanyszerelésre és fűtésszerelésre. ✓ Kiszállási díj 5.900 Ft ✓ Fix munkadíjak ✓ Rejtett költségek nélkül ✓ Megbízható mesterek.',
   keywords: [
     'vízszerelő árak',
     'villanyszerelő árak',

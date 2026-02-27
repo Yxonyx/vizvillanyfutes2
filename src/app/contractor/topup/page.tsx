@@ -86,7 +86,7 @@ function TopupContent() {
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 font-heading mb-2">Egyenleg feltöltése</h1>
                             <p className="text-gray-600 max-w-2xl">
-                                Vásárolj kreditet, hogy azonnal feloldhasd a számodra szimpatikus munkákat. A fizetés a Stripe biztonságos rendszerén keresztül történik.
+                                Vásárolj előrefizetett lead-hozzáférési keretet (kreditet), hogy azonnal feloldhasd a számodra szimpatikus munkák kapcsolati adatait. A befizetésről a tranzakciót követően elektronikus számlát állítunk ki (közvetítői díjelőleg). A fizetés a Stripe biztonságos rendszerén keresztül történik.
                             </p>
                         </div>
                         {contractorProfile && (

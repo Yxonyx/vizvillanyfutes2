@@ -8,7 +8,7 @@ import {
   Search, ChevronRight, ArrowRight, Phone, Calendar,
   Droplets, Zap, Flame, AlertTriangle, Shield, FileCheck,
   Receipt, Star, Clock, MapPin, CheckCircle, Users, User,
-  Building, Wrench, ThumbsUp, Award, Briefcase, Send
+  Building, Wrench, ThumbsUp, Award, Briefcase, Send, Gift
 } from 'lucide-react';
 
 // Problem suggestions for the search
@@ -92,7 +92,7 @@ const stats = [
   { value: '500+', label: 'Regisztrált Szakember' },
   { value: '15 perc', label: 'Átlagos Elfogadási Idő' },
   { value: '4.9', label: 'Átlagos Értékelés', suffix: '★' },
-  { value: '1 év', label: 'Alap Garancia a Munkákra' },
+  { value: '100%', label: 'Minőség és Megbízhatóság' },
 ];
 
 interface GrantFormState {
@@ -266,7 +266,7 @@ export default function HomePage() {
                   {[
                     { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Ellenőrzött mesterek' },
                     { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Gyorsabb kereső' },
-                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Számlaképes munka' },
+                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Számlaképes szakember' },
                     { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: '24/7 Elérhető' },
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-1.5 text-sm text-blue-100 font-medium">
@@ -297,16 +297,16 @@ export default function HomePage() {
               <span className="font-medium text-gray-800">Ellenőrzött szakemberek</span>
             </div>
             <div className="trust-badge">
-              <Shield className="w-8 h-8 text-vvm-blue-500" />
-              <span className="font-medium text-gray-800">Garanciális munka</span>
+              <Zap className="w-8 h-8 text-vvm-yellow-500" />
+              <span className="font-medium text-gray-800">Gyors és okos kiajánlás</span>
             </div>
             <div className="trust-badge">
-              <Receipt className="w-8 h-8 text-vvm-yellow-500" />
-              <span className="font-medium text-gray-800">Hivatalos számla</span>
+              <MapPin className="w-8 h-8 text-vvm-blue-500" />
+              <span className="font-medium text-gray-800">Helyi mesterek a közeledben</span>
             </div>
             <div className="trust-badge">
-              <FileCheck className="w-8 h-8 text-orange-500" />
-              <span className="font-medium text-gray-800">Pályázathoz elfogadott</span>
+              <Shield className="w-8 h-8 text-slate-500" />
+              <span className="font-medium text-gray-800">Közvetlen kapcsolatfelvétel</span>
             </div>
           </div>
         </div>
@@ -427,6 +427,27 @@ export default function HomePage() {
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Link>
               </div>
+
+              {/* Mobile Affiliate Banner (Hidden on Desktop) */}
+              <div className="mt-8 lg:hidden animate-fade-in-up">
+                <Link href="/ajanlo-program" className="relative overflow-hidden block bg-white/5 border border-white/10 rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-md group transition-all active:scale-[0.98] hover:bg-white/10 hover:border-white/20">
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-12 h-12 bg-gradient-to-br from-vvm-yellow-400 to-amber-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(250,204,21,0.4)] relative overflow-hidden">
+                      <Gift className="w-6 h-6 text-gray-900" />
+                      {/* Shine effect on icon */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent -translate-x-full animate-shine opacity-50" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-white font-bold leading-tight mb-1 text-[14px]">Érdekel, hogyan szerezhetsz még <span className="text-vvm-yellow-400">10.000 Ft</span> értékben kreditet?</h4>
+                      <div className="flex items-center gap-1.5 text-blue-200 text-[11px] font-semibold tracking-wide uppercase">
+                        Kreditgyűjtő program <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                  {/* Subtle decorative glow */}
+                  <div className="absolute -right-8 -top-8 w-24 h-24 bg-vvm-yellow-400/15 blur-2xl rounded-full pointer-events-none"></div>
+                </Link>
+              </div>
             </div>
 
             {/* Right - Desktop figure (hidden on mobile, shown on lg+) */}
@@ -472,7 +493,7 @@ export default function HomePage() {
               </div>
 
               {/* Floating Badge: You set the price */}
-              <div className="absolute bottom-16 -right-4 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 1.5s infinite' }}>
+              <div className="absolute bottom-4 -right-2 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 1.5s infinite' }}>
                 <div className="w-9 h-9 bg-sky-100 rounded-lg flex items-center justify-center">
                   <Briefcase className="w-5 h-5 text-sky-600" />
                 </div>
@@ -481,6 +502,22 @@ export default function HomePage() {
                   <div className="text-[10px] text-gray-500 font-medium">az árat az ügyféllel</div>
                 </div>
               </div>
+
+              {/* Floating Affiliate Banner */}
+              <Link href="/ajanlo-program" className="absolute top-1/2 -right-16 -translate-y-1/2 bg-white rounded-xl shadow-2xl p-4 flex flex-col gap-3 z-30 transform transition-transform hover:scale-105 border border-emerald-100 group" style={{ animation: 'float 4s ease-in-out 0.2s infinite' }}>
+                <div className="flex items-start gap-3 w-56">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-green-600 rounded-xl flex items-center justify-center shadow-inner flex-shrink-0">
+                    <Gift className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-[13px] font-bold text-slate-800 leading-tight mb-1">Érdekel, hogyan szerezhetsz még 10.000 Ft értékben kreditet?</h4>
+                  </div>
+                </div>
+                <div className="bg-emerald-50 text-emerald-700 font-semibold text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-1 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                  Mutasd a részleteket <ArrowRight className="w-3 h-3" />
+                </div>
+              </Link>
+
             </div>
           </div>
         </div>

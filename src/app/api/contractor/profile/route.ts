@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
-    
+
     if (userError || !user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -45,12 +45,32 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
+    // Get referral stats
+    let totalReferrals = 0;
+    let paidReferrals = 0;
+
+    if (profile && profile.id) {
+      const { data: referrals } = await supabase
+        .from('contractor_profiles')
+        .select('id, referral_reward_paid')
+        .eq('referred_by', profile.id);
+
+      if (referrals) {
+        totalReferrals = referrals.length;
+        paidReferrals = referrals.filter(r => r.referral_reward_paid).length;
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
         profile,
         user_meta: userMeta,
         email: user.email,
+        affiliate_stats: {
+          total_referrals: totalReferrals,
+          total_earned: paidReferrals * 10000
+        }
       },
     });
 
@@ -71,7 +91,7 @@ export async function PUT(request: NextRequest) {
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
-    
+
     if (userError || !user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },

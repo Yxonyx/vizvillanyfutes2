@@ -72,7 +72,7 @@ const faqs = [
   },
   {
     question: 'Kapok garanciát a munkára?',
-    answer: 'Igen, a duguláselhárításra 30 napos garanciát vállalunk. Ha ugyanazon a helyen, ugyanazon okból ismét dugulás keletkezik, ingyenesen kijövünk és megoldjuk.'
+    answer: 'A platformunkon lévő szakemberek a duguláselhárításra általában 30 napos garanciát vállalnak. Ha ugyanazon a helyen, ugyanazon okból ismét dugulás keletkezik, a szakember ingyenesen visszatér.'
   },
 ];
 
@@ -114,7 +114,7 @@ export default function DugulaselharitasPage() {
                 </div>
                 <div className="flex items-center gap-2 text-cyan-100">
                   <CheckCircle className="w-5 h-5 text-cyan-200" />
-                  <span>30 nap garancia</span>
+                  <span>Gyors megoldás</span>
                 </div>
               </div>
 
@@ -160,8 +160,8 @@ export default function DugulaselharitasPage() {
                   <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
                     <Shield className="w-5 h-5 text-green-600" />
                     <div>
-                      <div className="font-semibold text-gray-900">30 nap garancia</div>
-                      <div className="text-sm text-gray-600">Minden munkára</div>
+                      <div className="font-semibold text-gray-900">Hatékony elhárítás</div>
+                      <div className="text-sm text-gray-600">Szakszerű segítség</div>
                     </div>
                   </div>
                 </div>
@@ -246,7 +246,7 @@ export default function DugulaselharitasPage() {
               { icon: Phone, title: 'Hívás/Foglalás', desc: 'Hívjon minket vagy foglaljon online.' },
               { icon: Clock, title: 'Gyors kiszállás', desc: 'SOS: 2 óra, normál: 24-48 óra.' },
               { icon: Wrench, title: 'Diagnosztika + Javítás', desc: 'Megállapítjuk és megoldjuk a problémát.' },
-              { icon: Shield, title: 'Garancia', desc: '30 napos garancia a munkára.' },
+              { icon: Shield, title: 'Megbízhatóság', desc: 'Szakszerű és gyors segítség a bajban.' },
             ].map((step, index) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -307,7 +307,7 @@ export default function DugulaselharitasPage() {
             Dugulás? Ne várjon – hívjon most!
           </h2>
           <p className="text-xl text-cyan-100 mb-8">
-            SOS esetén 2 órán belül a helyszínen vagyunk. Gépi duguláselhárítás, 30 nap garancia.
+            SOS esetén 2 órán belül a helyszínen vagyunk. Gépi duguláselhárítás, azonnali kiszállás.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

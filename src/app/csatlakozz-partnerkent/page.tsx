@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
   Droplets, Zap, Flame, CheckCircle, ArrowRight,
   Users, DollarSign, Headphones, Clock, Shield,
   ChevronDown, Phone, Mail, Building, Briefcase,
-  Calendar, Star, MapPin, FileText, Send, Lock
+  Calendar, Star, MapPin, FileText, Send, Lock,
+  Gift, Sparkles, Trophy, User, AlertTriangle
 } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { formatHungarianPhone, isValidHungarianPhone } from '@/utils/phoneFormat';
@@ -57,7 +59,7 @@ const benefits = [
   {
     icon: Clock,
     title: 'Kockázatmentes indulás',
-    description: 'A sikeres regisztráció után azonnal adunk 10.000 Ft kreditet ajándékba, így az első néhány ügyfelet teljesen ingyen hozunk neked.',
+    description: 'A sikeres regisztráció és adminisztrátori jóváhagyás után 10.000 Ft induló kreditet* írunk jóvá, így az első néhány ügyfelet teljesen ingyen hozunk neked.',
   },
 ];
 
@@ -112,7 +114,7 @@ const testimonials = [
     name: 'Lakatos Ádám',
     role: 'Villanyszerelő',
     location: 'Pest megye',
-    quote: 'Átlátható rendszer, fix elszámolás. Nem volt még vita a pénzen, azt kapom, amit előre megbeszéltünk.',
+    quote: 'Végre egy rendszer, ahol nem húznak le százalékos jutalékkal. Fix áron megkapom a címet, onnantól pedig velem egyezik meg az ügyfél. Tiszta sor.',
   },
 ];
 
@@ -227,6 +229,9 @@ const mapTapasztalatToYears = (tapasztalat: string): number => {
 };
 
 export default function PartnerOnboardingPage() {
+  const searchParams = useSearchParams();
+  const referralCode = searchParams.get('ref');
+
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -299,6 +304,7 @@ export default function PartnerOnboardingPage() {
           trades: mapSzakmaToTrades(formData.szakma),
           service_areas: mapMunkateruletToServiceAreas(formData.munkaterulet),
           years_experience: mapTapasztalatToYears(formData.tapasztalat),
+          referralCode: referralCode || undefined,
         }),
       });
 
@@ -343,58 +349,142 @@ export default function PartnerOnboardingPage() {
     formData.adatkezelesElfogadva;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Target Profiles - Now acts as Hero */}
-      <section className="pt-28 lg:pt-32 pb-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Breadcrumbs className="mb-12" />
+    <div className="min-h-screen bg-slate-50 font-sans selection:bg-vvm-blue-500 selection:text-white">
+      {/* Hero Section - Premium Modern Look */}
+      <section className="relative pt-28 md:pt-32 lg:pt-36 pb-20 lg:pb-32 overflow-hidden">
+        {/* Abstract Background Elements */}
+        <div className="absolute inset-0 z-0 bg-slate-900">
+          <Image
+            src="/login_bg.webp"
+            alt="Background"
+            fill
+            className="object-cover opacity-30 scale-[1.02]"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/40 to-slate-50"></div>
+        </div>
 
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold font-heading mb-4 text-gray-900">
-              Kiket keresünk szakemberként?
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Tapasztalt, megbízható szakembereket várunk, akik szeretnének kiszámítható, tervezhető munkamennyiséget.
-            </p>
-          </div>
+        {/* Animated Glow Orbs */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-vvm-blue-500/20 rounded-full blur-3xl animate-pulse delay-700 pointer-events-none"></div>
+        <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {targetProfiles.map((profile) => (
-              <div
-                key={profile.type}
-                className={`bg-gradient-to-br from-${profile.color}-50 to-${profile.color}-100 rounded-2xl p-8 border-2 border-${profile.color}-200`}
-              >
-                <div className={`w-16 h-16 bg-${profile.color}-500 rounded-2xl flex items-center justify-center mb-6`}>
-                  <profile.icon className="w-8 h-8 text-white" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+            {/* Left Column: Copy & Value Proposition */}
+            <div className="max-w-2xl">
+              {referralCode ? (
+                <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-300 transform transition-transform hover:scale-105 backdrop-blur-md">
+                  <Gift className="w-5 h-5" />
+                  <span className="text-sm font-semibold tracking-wide">Meghívóval érkeztél! 10.000 Ft bónusz a regisztrációhoz</span>
                 </div>
-                <h3 className={`text-xl font-bold text-${profile.color}-800 mb-4`}>{profile.title}</h3>
-                <p className="text-gray-600">{profile.description}</p>
+              ) : (
+                <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-vvm-blue-500/20 border border-vvm-blue-500/30 text-vvm-blue-300 backdrop-blur-md">
+                  <Trophy className="w-4 h-4" />
+                  <span className="text-sm font-semibold tracking-wide">Csatlakozz a legjobb szakikhoz Magyarországon</span>
+                </div>
+              )}
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6 drop-shadow-lg">
+                {referralCode ? 'Gyorsabb növekedés, ' : 'Kiszámítható munkák, '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-vvm-blue-400 to-sky-300">
+                  NULLA jutalék.
+                </span>
+              </h1>
+
+              <p className="text-lg sm:text-xl text-slate-300 mb-8 leading-relaxed max-w-xl">
+                {referralCode
+                  ? 'Egy ismerősöd meghívott a rendszerbe! Regisztrálj most, végezd el az első munkádat, és csatlakozz ahhoz az exkluzív szakemberhálózathoz, ahol a munkadíj 100%-ban nálad marad.'
+                  : 'Csatlakozz Magyarország legdinamikusabban fejlődő víz-villany-fűtésszerelő hálózatához. Te elvégzed a munkát, a díjat te\u00A0szabod\u00A0meg mi csak összekötünk az ügyféllel.'}
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button onClick={() => document.getElementById('szakember_regisztracio')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 rounded-xl bg-vvm-blue-600 hover:bg-vvm-blue-500 text-white font-bold text-lg shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] flex items-center justify-center gap-2">
+                  {referralCode ? 'Kérem a bónuszt & Csatlakozom' : 'Regisztráció indítása'}
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+                <button onClick={() => document.getElementById('miert_erdemes_csatlakozni')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-lg backdrop-blur-sm transition-all flex items-center justify-center">
+                  Mire számíthatok?
+                </button>
               </div>
-            ))}
+
+              <div className="mt-10 flex items-center gap-6 text-sm text-slate-400 font-medium">
+                <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> Nincs hűségidő</div>
+                <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> Nincs %-os rablás</div>
+                <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> Ingyenes regisztráció</div>
+              </div>
+            </div>
+
+            {/* Right Column: Dynamic Feature Cards Container */}
+            <div className="relative lg:h-[500px] hidden md:block">
+              <div className="absolute inset-0 flex flex-col items-end gap-6 pt-10">
+
+                {/* Floating Card 1: 10k Bonus Target */}
+                <div className="w-full max-w-sm bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-2xl transform transition-transform hover:-translate-x-4 hover:bg-white/15">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center shadow-inner flex-shrink-0">
+                      <DollarSign className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-1">Garantált Induló Kredit</h3>
+                      <p className="text-slate-300 text-sm leading-snug">10.000 Ft értékű ajándék kredit az első címed igényléséhez {referralCode && 'a meghívódnak köszönhetően'}. Kockázatmentes indulás.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating Card 2: 100% Revenue */}
+                <div className="w-full max-w-sm bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-2xl transform transition-transform hover:-translate-x-4 hover:bg-white/15 mr-12 lg:mr-20">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-vvm-blue-400 to-indigo-600 flex items-center justify-center shadow-inner flex-shrink-0">
+                      <Briefcase className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-1">Fix Lead Árak</h3>
+                      <p className="text-slate-300 text-sm leading-snug">~2.000 Ft-ért kapod meg az ügyfél adatait. Onnantól a te üzleted, a munkadíj 100%-ban nálad marad.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating Card 3: Automation */}
+                <div className="w-full max-w-sm bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-2xl transform transition-transform hover:-translate-x-4 hover:bg-white/15">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-inner flex-shrink-0">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-1">Precízen Szűrt Ügyfelek</h3>
+                      <p className="text-slate-300 text-sm leading-snug">Csak valós, megerősített igényeket továbbítunk neked. Vége a komolytalan érdeklődőknek.</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
+
       {/* Why Join */}
-      <section id="miert_erdemes_csatlakozni" className="py-16 bg-gray-50">
+      <section id="miert_erdemes_csatlakozni" className="py-24 bg-white relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 font-heading mb-4">
-              Miért éri meg csatlakozni?
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 font-heading mb-4">
+              Miért éri meg velünk dolgozni?
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              A VízVillanyFűtés ökoszisztéma előnyei szakemberek számára
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              A hagyományos hirdetési modellek elavultak. Mi egy fair, átlátható és költséghatékony alternatívát kínálunk a modern szakembereknek.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit, index) => (
-              <div key={index} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                <div className="w-14 h-14 bg-vvm-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <benefit.icon className="w-7 h-7 text-vvm-blue-600" />
+              <div key={index} className="group bg-slate-50 rounded-3xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-slate-100 group-hover:scale-110 transition-transform duration-300">
+                  <benefit.icon className="w-8 h-8 text-vvm-blue-600 group-hover:text-vvm-blue-500" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{benefit.title}</h3>
-                <p className="text-gray-600 text-sm">{benefit.description}</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{benefit.title}</h3>
+                <p className="text-slate-600 leading-relaxed">{benefit.description}</p>
               </div>
             ))}
           </div>
@@ -402,30 +492,50 @@ export default function PartnerOnboardingPage() {
       </section>
 
       {/* Requirements */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 font-heading mb-4">
-              Kiket várunk a csapatba?
-            </h2>
-            <p className="text-lg text-gray-600">
-              Olyan szakembereket keresünk, akik szeretik a munkájukat és megbízhatóak. A legfontosabb az ügyfelek elégedettsége.
-            </p>
-          </div>
+      <section className="py-24 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row gap-12 items-center">
+            <div className="lg:w-1/2">
+              <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full bg-slate-200 text-slate-700 text-sm font-semibold">
+                <Shield className="w-4 h-4" /> Alapkövetelmények
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 font-heading mb-6">
+                Kiket várunk a csapatba?
+              </h2>
+              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+                Platformunk minőségének kulcsa a megbízható szakemberbázis. Olyan kollégákat keresünk, akik szeretik a szakmájukat, tisztelik az ügyfeleket, és hosszú távon terveznek velünk.
+              </p>
+              <div className="grid gap-4">
+                {coreRequirements.slice(0, 3).map((req, index) => (
+                  <div key={index} className="flex items-start gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                    <div className="mt-1 bg-green-100 p-1 rounded-full flex-shrink-0">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                    </div>
+                    <span className="text-slate-700 font-medium">{req}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="lg:w-1/2 w-full">
+              <div className="grid gap-4">
+                {coreRequirements.slice(3).map((req, index) => (
+                  <div key={index} className="flex items-start gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                    <div className="mt-1 bg-green-100 p-1 rounded-full flex-shrink-0">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                    </div>
+                    <span className="text-slate-700 font-medium">{req}</span>
+                  </div>
+                ))}
 
-          <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8">
-            <h3 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Shield className="w-6 h-6 text-vvm-blue-600" />
-              Amire szükség lesz
-            </h3>
-            <ul className="grid md:grid-cols-2 gap-4">
-              {coreRequirements.map((req, index) => (
-                <li key={index} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">{req}</span>
-                </li>
-              ))}
-            </ul>
+                <div className="mt-4 p-6 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
+                  <h4 className="font-bold text-amber-900 mb-2 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-amber-600" />
+                    Előnyt jelent
+                  </h4>
+                  <p className="text-amber-800 text-sm">Azonnali rendelkezésre állás (hibaelhárítás), precíz ügyfélkommunikáció modern eszközökön keresztül, referenciák.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -523,343 +633,408 @@ export default function PartnerOnboardingPage() {
       </section>
 
       {/* Application Form */}
-      <section id="szakember_regisztracio" className="py-10 sm:py-16 relative">
-        {/* Blurred background image */}
-        <div className="fixed inset-0 -z-10 bg-slate-900 leading-none">
+      <section id="szakember_regisztracio" className="py-24 relative overflow-hidden">
+        {/* Blurred background image with sophisticated gradient overlay */}
+        <div className="absolute inset-0 -z-10 bg-slate-900">
           <Image
             src="/login_bg.webp"
             alt="Háttér"
             fill
-            className="object-cover blur-[8px] opacity-60"
+            className="object-cover opacity-60 mix-blend-overlay"
             quality={80}
+            priority
           />
+          <div className="absolute inset-0 bg-gradient-to-br from-vvm-blue-900/90 via-slate-900/95 to-slate-900/90 backdrop-blur-[2px]"></div>
         </div>
 
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-8 sm:mb-12">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white mb-3 sm:mb-4">
-              <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span>Fiók létrehozása</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white font-heading mb-2 sm:mb-4 shadow-sm">
-              Szakember regisztráció
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+          <div className="text-center mb-10">
+            {referralCode && (
+              <div className="inline-flex items-center gap-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl px-6 py-4 mb-8 shadow-lg shadow-emerald-500/10">
+                <div className="bg-emerald-500 p-2.5 rounded-xl text-white shadow-inner">
+                  <Gift className="w-7 h-7" />
+                </div>
+                <div className="text-left">
+                  <h4 className="text-emerald-800 font-black text-sm uppercase tracking-wider mb-0.5">Aktivált bónusz</h4>
+                  <p className="text-emerald-950 font-semibold text-sm sm:text-base">Jóváhagyás után: <span className="text-emerald-700 font-bold">10.000 Ft*</span> induló egyenleg a fiókodban.</p>
+                </div>
+              </div>
+            )}
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 font-heading mb-4 tracking-tight">
+              Regisztrálj és növeld a bevételed
             </h2>
-            <p className="text-base sm:text-lg text-gray-200 drop-shadow-sm">
-              Hozd létre a fiókodat, és kezdj el munkákat kapni! A regisztráció után munkatársunk jóváhagyja a jelentkezésedet.
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Töltsd ki az alábbi felvételi űrlapot. Munkatársunk hamarosan felveszi veled a kapcsolatot a megadott elérhetőségeken.
             </p>
           </div>
 
           {isSubmitted ? (
-            <div className="bg-green-50 rounded-2xl p-8 text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-10 h-10 text-green-600" />
+            <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-10 text-center shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-emerald-500"></div>
+              <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg shadow-green-500/30">
+                <CheckCircle className="w-12 h-12 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Sikeres regisztráció!</h3>
-              <p className="text-gray-600 mb-4">
-                A szakember fiókod létrejött és jóváhagyásra vár.
-                Amint munkatársunk ellenőrizte az adataidat, e-mailben értesítünk és megkezdheted a munkát!
+              <h3 className="text-3xl font-black text-white mb-4">Sikeres regisztráció!</h3>
+              <p className="text-slate-300 mb-8 text-lg">
+                Fiókod sikeresen létrejött a rendszerben és jelenleg adminisztrátori jóváhagyásra vár.
+                Kérjük türelmedet!
               </p>
-              <div className="bg-white rounded-xl p-4 mb-6 inline-block">
-                <p className="text-sm text-gray-500 mb-1">Mi történik most?</p>
-                <ul className="text-sm text-gray-700 text-left space-y-1">
-                  <li>✓ Ellenőrizzük a regisztrációs adatokat</li>
-                  <li>✓ E-mailben értesítünk a jóváhagyásról</li>
-                  <li>✓ Bejelentkezhetsz és kapod az első munkákat</li>
+
+              <div className="bg-slate-900/50 rounded-2xl p-6 mb-10 max-w-md mx-auto border border-slate-700/50">
+                <p className="text-slate-400 font-semibold mb-3 uppercase tracking-wider text-sm">A következő lépések:</p>
+                <ul className="text-slate-200 text-left space-y-3 font-medium">
+                  <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-500/20 text-vvm-blue-400 flex items-center justify-center text-xs">1</div> Adatok ellenőrzése a rendszerben</li>
+                  <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-500/20 text-vvm-blue-400 flex items-center justify-center text-xs">2</div> Értesítés a fiók aktiválásáról</li>
+                  <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-500/20 text-vvm-blue-400 flex items-center justify-center text-xs">3</div> Bejelentkezés és munkák feloldása</li>
                 </ul>
               </div>
-              <p className="text-sm text-gray-500 mb-6">
-                Ez általában 1-2 munkanapot vesz igénybe.
-              </p>
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/" className="btn-primary inline-flex">
+                <Link href="/" className="px-8 py-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all">
                   Vissza a főoldalra
                 </Link>
-                <Link href="/login" className="btn-outline inline-flex">
-                  Bejelentkezés
+                <Link href="/login" className="px-8 py-4 rounded-xl bg-vvm-blue-600 hover:bg-vvm-blue-500 text-white font-bold shadow-lg shadow-vvm-blue-500/30 transition-all">
+                  Tovább a bejelentkezéshez
                 </Link>
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="bg-gray-50 rounded-2xl p-5 sm:p-8 space-y-4 sm:space-y-6">
+            <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-4 sm:p-10 space-y-6 sm:space-y-8 shadow-2xl relative">
+              {/* Dynamic glass effect at top */}
+              <div className="absolute top-0 inset-x-0 h-4 bg-gradient-to-b from-white/40 to-transparent rounded-t-3xl pointer-events-none"></div>
+
               {/* Error message */}
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
-                  {error}
+                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-red-700 font-medium">{error}</p>
+                  </div>
                 </div>
               )}
 
               {/* Basic Info */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Teljes név *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    className="input-field"
-                    placeholder="Kovács János"
-                    value={formData.teljesNev}
-                    onChange={(e) => setFormData(prev => ({ ...prev, teljesNev: e.target.value }))}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    E-mail cím *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    className="input-field"
-                    placeholder="pelda@email.hu"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  />
-                </div>
-              </div>
-
-              {/* Password fields */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Jelszó *
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    className={`input-field ${formData.password && !isPasswordValid ? 'border-red-500' : ''}`}
-                    placeholder="Minimum 8 karakter"
-                    value={formData.password}
-                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  />
-                  {formData.password && !isPasswordValid && (
-                    <p className="mt-1 text-sm text-red-600">Minimum 8 karakter szükséges</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Jelszó megerősítése *
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    className={`input-field ${formData.passwordConfirm && !doPasswordsMatch ? 'border-red-500' : ''}`}
-                    placeholder="Jelszó újra"
-                    value={formData.passwordConfirm}
-                    onChange={(e) => setFormData(prev => ({ ...prev, passwordConfirm: e.target.value }))}
-                  />
-                  {formData.passwordConfirm && !doPasswordsMatch && (
-                    <p className="mt-1 text-sm text-red-600">A két jelszó nem egyezik</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Telefonszám *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    className={`input-field ${!isPhoneValid ? 'border-red-500' : ''}`}
-                    placeholder="+36 30 123 4567"
-                    value={formData.telefon}
-                    onChange={handlePhoneChange}
-                  />
-                  {!isPhoneValid && (
-                    <p className="mt-1 text-sm text-red-600">Érvényes magyar telefonszámot adj meg</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Szakterület *
-                  </label>
-                  <select
-                    required
-                    className="input-field"
-                    value={formData.szakma}
-                    onChange={(e) => setFormData(prev => ({ ...prev, szakma: e.target.value }))}
-                  >
-                    <option value="">Válassz...</option>
-                    {szakmaOptions.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Work Area */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Munkaterület(ek) *
-                </label>
-                <div className="grid sm:grid-cols-2 gap-2">
-                  {munkateruletOptions.map(opt => (
-                    <label key={opt} className="flex items-center gap-2 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-vvm-blue-300 transition-colors">
-                      <input
-                        type="checkbox"
-                        checked={formData.munkaterulet.includes(opt)}
-                        onChange={() => handleMunkateruletChange(opt)}
-                        className="w-4 h-4 rounded border-gray-300 text-vvm-blue-600"
-                      />
-                      <span className="text-sm text-gray-700">{opt}</span>
+              <div className="bg-slate-50 p-4 sm:p-8 rounded-2xl border border-slate-100">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2 border-b border-slate-200 pb-3 sm:pb-4">
+                  <User className="w-5 h-5 text-vvm-blue-600" /> Alapvető adatok
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Teljes név <span className="text-red-500">*</span>
                     </label>
-                  ))}
+                    <input
+                      type="text"
+                      required
+                      className="input-field"
+                      placeholder="Kovács János"
+                      value={formData.teljesNev}
+                      onChange={(e) => setFormData(prev => ({ ...prev, teljesNev: e.target.value }))}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      E-mail cím *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      className="input-field"
+                      placeholder="pelda@email.hu"
+                      value={formData.email}
+                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Password & Security */}
+              <div className="bg-slate-50 p-4 sm:p-8 rounded-2xl border border-slate-100">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2 border-b border-slate-200 pb-3 sm:pb-4">
+                  <Lock className="w-5 h-5 text-vvm-blue-600" /> Biztonsági adatok
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Jelszó <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      className={`input-field ${formData.password && !isPasswordValid ? 'border-red-500 ring-1 ring-red-500' : ''}`}
+                      placeholder="Minimum 8 karakter"
+                      value={formData.password}
+                      onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    />
+                    {formData.password && !isPasswordValid && (
+                      <p className="mt-2 text-sm text-red-600 flex items-center gap-1"><AlertTriangle className="w-4 h-4" /> Minimum 8 karakter szükséges</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Jelszó megerősítése <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      className={`input-field ${formData.passwordConfirm && !doPasswordsMatch ? 'border-red-500 ring-1 ring-red-500' : ''}`}
+                      placeholder="Jelszó újra"
+                      value={formData.passwordConfirm}
+                      onChange={(e) => setFormData(prev => ({ ...prev, passwordConfirm: e.target.value }))}
+                    />
+                    {formData.passwordConfirm && !doPasswordsMatch && (
+                      <p className="mt-2 text-sm text-red-600 flex items-center gap-1"><AlertTriangle className="w-4 h-4" /> A két jelszó nem egyezik</p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vállalkozói forma *
+              {/* Professional Details */}
+              <div className="bg-slate-50 p-4 sm:p-8 rounded-2xl border border-slate-100">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2 border-b border-slate-200 pb-3 sm:pb-4">
+                  <Briefcase className="w-5 h-5 text-vvm-blue-600" /> Szakmai adatok
+                </h3>
+
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Telefonszám <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input
+                        type="tel"
+                        required
+                        className={`input-field pl-12 ${!isPhoneValid ? 'border-red-500 ring-1 ring-red-500' : ''}`}
+                        placeholder="+36 30 123 4567"
+                        value={formData.telefon}
+                        onChange={handlePhoneChange}
+                      />
+                    </div>
+                    {!isPhoneValid && (
+                      <p className="mt-2 text-sm text-red-600 flex items-center gap-1"><AlertTriangle className="w-4 h-4" /> Érvényes magyar telefonszámot adj meg</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Fő szakterület <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      required
+                      className="input-field bg-white"
+                      value={formData.szakma}
+                      onChange={(e) => setFormData(prev => ({ ...prev, szakma: e.target.value }))}
+                    >
+                      <option value="" disabled>Válassz szakterületet...</option>
+                      {szakmaOptions.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Work Area */}
+                <div className="mb-4 sm:mb-6">
+                  <label className="block text-sm font-bold text-slate-700 mb-2 sm:mb-3">
+                    Munkaterület(ek) <span className="text-red-500">*</span> <span className="text-slate-500 text-xs font-normal">(több is választható)</span>
                   </label>
-                  <select
-                    required
-                    className="input-field"
-                    value={formData.vallalkozoiForma}
-                    onChange={(e) => setFormData(prev => ({ ...prev, vallalkozoiForma: e.target.value }))}
-                  >
-                    <option value="">Válassz...</option>
-                    {vallalkozoiFormaOptions.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
+                  <div className="grid sm:grid-cols-2 gap-2 sm:gap-3">
+                    {munkateruletOptions.map(opt => (
+                      <label key={opt} className={`flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.munkaterulet.includes(opt) ? 'border-vvm-blue-500 bg-vvm-blue-50/50 shadow-sm' : 'border-slate-200 bg-white hover:border-vvm-blue-200'}`}>
+                        <div className={`w-5 h-5 sm:w-5 sm:h-5 shrink-0 rounded flex items-center justify-center border transition-colors ${formData.munkaterulet.includes(opt) ? 'bg-vvm-blue-500 border-vvm-blue-500' : 'bg-white border-slate-300'}`}>
+                          {formData.munkaterulet.includes(opt) && <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />}
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={formData.munkaterulet.includes(opt)}
+                          onChange={() => handleMunkateruletChange(opt)}
+                          className="sr-only"
+                        />
+                        <span className={`text-sm sm:text-sm font-medium leading-tight ${formData.munkaterulet.includes(opt) ? 'text-vvm-blue-900' : 'text-slate-700'}`}>{opt}</span>
+                      </label>
                     ))}
-                  </select>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Szakmai tapasztalat *
+                <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Vállalkozói forma <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      required
+                      className="input-field bg-white"
+                      value={formData.vallalkozoiForma}
+                      onChange={(e) => setFormData(prev => ({ ...prev, vallalkozoiForma: e.target.value }))}
+                    >
+                      <option value="" disabled>Válassz...</option>
+                      {vallalkozoiFormaOptions.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Szakmai tapasztalat <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      required
+                      className="input-field bg-white"
+                      value={formData.tapasztalat}
+                      onChange={(e) => setFormData(prev => ({ ...prev, tapasztalat: e.target.value }))}
+                    >
+                      <option value="" disabled>Válassz...</option>
+                      {tapasztalatOptions.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Felelősségbiztosítás <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      required
+                      className="input-field bg-white"
+                      value={formData.biztositas}
+                      onChange={(e) => setFormData(prev => ({ ...prev, biztositas: e.target.value }))}
+                    >
+                      <option value="" disabled>Válassz...</option>
+                      {biztositasOptions.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Heti kapacitás <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      required
+                      className="input-field bg-white"
+                      value={formData.kapacitas}
+                      onChange={(e) => setFormData(prev => ({ ...prev, kapacitas: e.target.value }))}
+                    >
+                      <option value="" disabled>Válassz...</option>
+                      {kapacitasOptions.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Details */}
+              <div className="bg-slate-50 p-4 sm:p-8 rounded-2xl border border-slate-100">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2 border-b border-slate-200 pb-3 sm:pb-4">
+                  <FileText className="w-5 h-5 text-vvm-blue-600" /> Bemutatkozás és Portfólió
+                </h3>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-slate-700 mb-2">
+                    Rövid szakmai bemutatkozás <span className="text-red-500">*</span>
                   </label>
-                  <select
+                  <textarea
                     required
-                    className="input-field"
-                    value={formData.tapasztalat}
-                    onChange={(e) => setFormData(prev => ({ ...prev, tapasztalat: e.target.value }))}
-                  >
-                    <option value="">Válassz...</option>
-                    {tapasztalatOptions.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Felelősségbiztosítás *
-                  </label>
-                  <select
-                    required
-                    className="input-field"
-                    value={formData.biztositas}
-                    onChange={(e) => setFormData(prev => ({ ...prev, biztositas: e.target.value }))}
-                  >
-                    <option value="">Válassz...</option>
-                    {biztositasOptions.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Heti kapacitás *
-                  </label>
-                  <select
-                    required
-                    className="input-field"
-                    value={formData.kapacitas}
-                    onChange={(e) => setFormData(prev => ({ ...prev, kapacitas: e.target.value }))}
-                  >
-                    <option value="">Válassz...</option>
-                    {kapacitasOptions.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Rövid szakmai bemutatkozás *
-                </label>
-                <textarea
-                  required
-                  rows={4}
-                  maxLength={1500}
-                  className="input-field"
-                  placeholder="Mivel foglalkozol pontosan, milyen típusú munkákat vállalsz szívesen?"
-                  value={formData.bemutatkozas}
-                  onChange={(e) => setFormData(prev => ({ ...prev, bemutatkozas: e.target.value }))}
-                />
-                <p className="mt-1 text-sm text-gray-500">{formData.bemutatkozas.length}/1500 karakter</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Weboldal / Facebook / Google profil (opcionális)
-                </label>
-                <input
-                  type="url"
-                  className="input-field"
-                  placeholder="https://..."
-                  value={formData.weboldal}
-                  onChange={(e) => setFormData(prev => ({ ...prev, weboldal: e.target.value }))}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Megjegyzés (opcionális)
-                </label>
-                <textarea
-                  rows={3}
-                  maxLength={1000}
-                  className="input-field"
-                  placeholder="Kérdés, speciális igény, egyéb információ..."
-                  value={formData.megjegyzes}
-                  onChange={(e) => setFormData(prev => ({ ...prev, megjegyzes: e.target.value }))}
-                />
-              </div>
-
-              <div>
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    required
-                    className="w-5 h-5 mt-0.5 rounded border-gray-300 text-vvm-blue-600"
-                    checked={formData.adatkezelesElfogadva}
-                    onChange={(e) => setFormData(prev => ({ ...prev, adatkezelesElfogadva: e.target.checked }))}
+                    rows={4}
+                    maxLength={1500}
+                    className="input-field bg-white resize-none"
+                    placeholder="Mivel foglalkozol pontosan? Milyen típusú munkákat vállalsz legszívesebben? Mi a te 'szupererőd' szakemberként?"
+                    value={formData.bemutatkozas}
+                    onChange={(e) => setFormData(prev => ({ ...prev, bemutatkozas: e.target.value }))}
                   />
-                  <span className="text-sm text-gray-700">
-                    Elfogadom az <Link href="/adatkezeles" className="text-vvm-blue-600 hover:underline">Adatkezelési Tájékoztatót</Link> és
-                    hozzájárulok, hogy a megadott adataim alapján felvegyék velem a kapcsolatot. *
-                  </span>
-                </label>
+                  <div className="flex justify-end mt-2">
+                    <span className={`text-xs font-medium ${formData.bemutatkozas.length > 1400 ? 'text-amber-500' : 'text-slate-400'}`}>
+                      {formData.bemutatkozas.length}/1500 karakter
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-slate-700 mb-2">
+                    Weboldal / Facebook / Google profil <span className="text-slate-400 font-normal">(opcionális)</span>
+                  </label>
+                  <input
+                    type="url"
+                    className="input-field bg-white"
+                    placeholder="https://szerelo-mester.hu | fb.com/..."
+                    value={formData.weboldal}
+                    onChange={(e) => setFormData(prev => ({ ...prev, weboldal: e.target.value }))}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">
+                    Megjegyzés / Egyéb információ <span className="text-slate-400 font-normal">(opcionális)</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    maxLength={1000}
+                    className="input-field bg-white resize-none"
+                    placeholder="Ide írhatsz bármilyen egyéb információt, speciális igényt..."
+                    value={formData.megjegyzes}
+                    onChange={(e) => setFormData(prev => ({ ...prev, megjegyzes: e.target.value }))}
+                  />
+                </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={!canSubmit || isSubmitting}
-                className="btn-primary w-full py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Regisztráció folyamatban...</span>
-                  </>
-                ) : (
-                  <>
-                    <Lock className="w-5 h-5" />
-                    <span>Fiók létrehozása és regisztráció</span>
-                  </>
+              {/* Submit Area */}
+              <div className="pt-4 border-t border-slate-100">
+                <div className="mb-8">
+                  <label className="flex items-start gap-4 cursor-pointer group">
+                    <div className={`mt-0.5 w-6 h-6 rounded-md flex-shrink-0 flex items-center justify-center border-2 transition-colors ${formData.adatkezelesElfogadva ? 'bg-vvm-blue-500 border-vvm-blue-500' : 'bg-white border-slate-300 group-hover:border-vvm-blue-400'}`}>
+                      {formData.adatkezelesElfogadva && <CheckCircle className="w-4 h-4 text-white" />}
+                    </div>
+                    <input
+                      type="checkbox"
+                      required
+                      className="sr-only"
+                      checked={formData.adatkezelesElfogadva}
+                      onChange={(e) => setFormData(prev => ({ ...prev, adatkezelesElfogadva: e.target.checked }))}
+                    />
+                    <span className="text-slate-600 leading-relaxed font-medium">
+                      Kijelentem, hogy elolvastam és elfogadom az <Link href="/adatkezeles" className="text-vvm-blue-600 font-bold hover:underline" target="_blank" rel="noopener noreferrer">Adatkezelési Tájékoztatót</Link> valamint az <Link href="/aszf" className="text-vvm-blue-600 font-bold hover:underline" target="_blank" rel="noopener noreferrer">ÁSZF</Link>-et, és hozzájárulok, hogy a megadott adataim alapján felvegyék velem a kapcsolatot. <span className="text-red-500">*</span>
+                    </span>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={!canSubmit || isSubmitting}
+                  className={`w-full py-5 px-8 rounded-2xl text-lg font-bold text-white shadow-xl transition-all flex items-center justify-center gap-3 ${!canSubmit || isSubmitting
+                    ? 'bg-slate-300 cursor-not-allowed shadow-none'
+                    : 'bg-gradient-to-r from-vvm-blue-600 to-sky-500 hover:from-vvm-blue-700 hover:to-sky-600 hover:-translate-y-1 hover:shadow-2xl shadow-vvm-blue-500/30'
+                    }`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Regisztráció véglegesítése...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-6 h-6" />
+                      <span>Regisztráció és fiók létrehozása</span>
+                    </>
+                  )}
+                </button>
+                {!canSubmit && (
+                  <p className="text-center text-sm text-slate-500 mt-4">A regisztrációhoz minden kötelező mezőt (*) ki kell tölteni, és el kell fogadni a feltételeket.</p>
                 )}
-              </button>
+                <p className="text-center text-xs text-slate-400 mt-6 max-w-2xl mx-auto">
+                  *A 10.000 Ft promóciós kredit készpénzre vagy azonnali átutalásra nem váltható, kizárólag a platformon történő kapcsolatfelvételi adatok vásárlására (lead-feloldásra) használható fel a fiók sikeres adminisztrátori jóváhagyását követően. A szolgáltatás nyújtója a <Link href="/aszf" className="underline">Szabályzatban</Link> leírtak szerint fenntartja a promóció visszavonásának jogát visszaélés gyanúja esetén.
+                </p>
+              </div>
             </form>
           )}
         </div>

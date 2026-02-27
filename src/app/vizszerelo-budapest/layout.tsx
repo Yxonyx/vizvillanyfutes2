@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Vízszerelő Budapest - SOS Csőtörés, Duguláselhárítás | 2 Órán Belül',
-  description: 'Megbízható vízszerelő Budapest területén. ✓ SOS csőtörés elhárítás 2 órán belül ✓ Duguláselhárítás ✓ Csaptelep csere ✓ Bojler szerelés ✓ 1 év garancia ✓ Fix árak. Hívjon most!',
+  description: 'Megbízható vízszerelő Budapest területén. ✓ SOS csőtörés elhárítás 2 órán belül ✓ Duguláselhárítás ✓ Csaptelep csere ✓ Bojler szerelés ✓ Számlaképes mesterek ✓ Fix árak. Hívjon most!',
   keywords: [
     'vízszerelő budapest',
     'vízszerelő sos',
@@ -12,6 +12,8 @@ export const metadata: Metadata = {
     'bojler szerelés',
     'wc szerelés',
     'szivárgás javítás',
+    'vízszerelő pest megye',
+    'vízszerelés agglomeráció',
   ],
   alternates: {
     canonical: 'https://www.vizvillanyfutes.hu/vizszerelo-budapest',
@@ -35,10 +37,16 @@ const serviceSchema = {
     name: 'VízVillanyFűtés',
     url: 'https://www.vizvillanyfutes.hu',
   },
-  areaServed: {
-    '@type': 'City',
-    name: 'Budapest',
-  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Budapest',
+    },
+    {
+      '@type': 'State',
+      name: 'Pest megye',
+    },
+  ],
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Vízszerelési szolgáltatások',

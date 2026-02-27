@@ -35,11 +35,11 @@ const faqs = [
   },
   {
     question: 'Kapok garanciát a munkára?',
-    answer: 'Igen! Minden elvégzett munkára minimum 1 év garanciát vállalunk. Anyaggal végzett munkák esetén az anyag gyártói garanciája is érvényes (általában 2-5 év).'
+    answer: 'A platformunkon lévő szakemberek vállalják, hogy az általuk elvégzett munkára ésszerű garanciát nyújtanak. Anyaggal végzett munkák esetén az anyag gyártói garanciája is érvényes.'
   },
   {
     question: 'Mi történik, ha a javítás után újra elromlik?',
-    answer: 'A garancia időn belül ingyenesen kijövünk és kijavítjuk a hibát. Ha a probléma más okból merül fel, új árajánlatot adunk, de kedvezményes kiszállási díjat alkalmazunk törzsvásárlóinknak.'
+    answer: 'Garanciális probléma esetén a szakember ingyenesen visszatér és kijavítja a hibát. Ha a probléma más okból merül fel, új árajánlatot ad, de kedvezményes kiszállási díjat alkalmazhat.'
   },
   {
     question: 'Kaphatok számlát a munkáról?',
@@ -120,11 +120,11 @@ export default function VizszereloPage() {
                 </div>
                 <div className="flex items-center gap-2 text-sky-100">
                   <CheckCircle className="w-5 h-5 text-cyan-300" />
-                  <span>1 év garancia</span>
+                  <span>Kizárólag ellenőrzött szakemberek</span>
                 </div>
                 <div className="flex items-center gap-2 text-sky-100">
                   <CheckCircle className="w-5 h-5 text-cyan-300" />
-                  <span>Garancia minden munkára</span>
+                  <span>Megbízható szakértelem</span>
                 </div>
               </div>
 
@@ -166,8 +166,8 @@ export default function VizszereloPage() {
                     <div className="flex items-center gap-3">
                       <Shield className="w-5 h-5 text-cyan-300" />
                       <div>
-                        <div className="font-semibold text-white">Garanciális munkavégzés</div>
-                        <div className="text-sm text-sky-200">Min. 1 év garancia</div>
+                        <div className="font-semibold text-white">Megbízható szakemberek</div>
+                        <div className="text-sm text-sky-200">Kizárólag ellenőrzött partnerek</div>
                       </div>
                     </div>
                   </div>
@@ -175,7 +175,7 @@ export default function VizszereloPage() {
                     <div className="flex items-center gap-3">
                       <FileCheck className="w-5 h-5 text-cyan-300" />
                       <div>
-                        <div className="font-semibold text-white">Hivatalos számla</div>
+                        <div className="font-semibold text-white">Számlaképes partnerek</div>
                         <div className="text-sm text-sky-200">Pályázathoz elfogadott</div>
                       </div>
                     </div>
@@ -249,7 +249,7 @@ export default function VizszereloPage() {
               { icon: Calendar, title: 'Foglalás', desc: 'Online hibabejelentés és időpontfoglalás.' },
               { icon: Wrench, title: 'Felmérés', desc: 'A szakember felméri a problémát helyszínen.' },
               { icon: ThumbsUp, title: 'Javítás', desc: 'Elfogadott árajánlat után azonnal dolgozunk.' },
-              { icon: Award, title: 'Garancia', desc: 'Garanciális munka, hivatalos számlával.' },
+              { icon: Award, title: 'Megbízhatóság', desc: 'Ellenőrzött, számlaképes szakemberek.' },
             ].map((step, index) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center mx-auto mb-4">

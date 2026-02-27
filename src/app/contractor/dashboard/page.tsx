@@ -7,7 +7,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 import {
   Briefcase, CheckCircle, AlertTriangle,
-  LogOut, RefreshCw, Phone, Settings, X, Zap, CreditCard, Droplets, Flame, User, MapPin
+  LogOut, RefreshCw, Phone, Settings, X, Zap, CreditCard, Droplets, Flame, User, MapPin, Gift, Copy, Link as LinkIcon
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -84,11 +84,15 @@ function DashboardContent() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'map' | 'active' | 'completed'>('map');
+  const [activeTab, setActiveTab] = useState<'map' | 'active' | 'completed' | 'affiliate'>('map');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
+
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [affiliateStats, setAffiliateStats] = useState<{ total_referrals: number, total_earned: number }>({ total_referrals: 0, total_earned: 0 });
+
 
   const fetchData = useCallback(async () => {
     try {
@@ -100,6 +104,16 @@ function DashboardContent() {
         setActiveJobs(response.data.activeJobs || []);
         setCompletedJobs(response.data.completedJobs || []);
         setCreditBalance(response.data.creditBalance || 0);
+      }
+
+      const profileResponse = await api.get<any>(`/api/contractor/profile?_t=${Date.now()}`);
+      if (profileResponse.success && profileResponse.data) {
+        if (profileResponse.data.profile?.referral_code) {
+          setReferralCode(profileResponse.data.profile.referral_code);
+        }
+        if (profileResponse.data.affiliate_stats) {
+          setAffiliateStats(profileResponse.data.affiliate_stats);
+        }
       }
     } catch (err) {
       setError(handleApiError(err));
@@ -129,13 +143,13 @@ function DashboardContent() {
       return;
     }
 
-    if (!confirm(`Biztosan megvásárolod ezt a munkát ${leadPrice} Ft-ért?`)) return;
+    if (!confirm(`Biztosan feloldod ennek a munkának a kapcsolati adatait (lead) ${leadPrice} Ft értékű kreditért?`)) return;
 
     setActionLoading(jobId);
     try {
       const response = await api.post<any>(`/api/contractor/jobs/${jobId}/unlock`, {});
       if (response.success) {
-        setNotification({ message: '✨ Sikeres vásárlás! A munka adatai feloldva.', type: 'success' });
+        setNotification({ message: '✨ Sikeres tranzakció! A munka adatai feloldva.', type: 'success' });
         setSelectedJob(null);
         await fetchData(); // Full reload to get contact info and move to 'active'
         setActiveTab('active');
@@ -256,6 +270,14 @@ function DashboardContent() {
           >
             <CheckCircle className="w-4 h-4" />
             Befejezett ({completedJobs.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('affiliate')}
+            className={`px-5 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all flex items-center gap-2 ${activeTab === 'affiliate' ? 'bg-vvm-blue-600 text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100'
+              }`}
+          >
+            <Gift className="w-4 h-4" />
+            Ajánló Program
           </button>
         </div>
 
@@ -383,6 +405,67 @@ function DashboardContent() {
                     </div>
                   ))
                 )}
+              </div>
+            )}
+
+            {/* AFFILIATE TAB */}
+            {activeTab === 'affiliate' && (
+              <div className="space-y-6">
+                {/* Affiliate Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium uppercase tracking-wide">Meghívott szakik</p>
+                      <p className="text-3xl font-bold text-gray-900 mt-1">{affiliateStats.total_referrals} <span className="text-base font-normal text-gray-500">fő</span></p>
+                    </div>
+                    <div className="w-12 h-12 bg-blue-50 text-vvm-blue-600 rounded-full flex items-center justify-center">
+                      <User className="w-6 h-6" />
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium uppercase tracking-wide">Eddigi jóváírás</p>
+                      <p className="text-3xl font-bold text-green-600 mt-1">+{affiliateStats.total_earned.toLocaleString('hu-HU')} Ft</p>
+                    </div>
+                    <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center">
+                      <Gift className="w-6 h-6" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Affiliate Info & Link */}
+                <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                    <LinkIcon className="w-5 h-5 text-vvm-blue-600" />
+                    Saját meghívó linked
+                  </h3>
+                  <p className="text-gray-600 mb-6 max-w-2xl">
+                    Oszd meg a lenti linket ismerős szakemberekkel! Miután regisztrálnak a emailed/linkeden keresztül, és sikeresen megvásárolják (feloldják) az <strong>első munkájukat</strong>, automatikusan <strong>+10.000 Ft jóváírást</strong> kapnak a rendszerből, amit szabadon felhasználhatnak újabb leadek szerzésére.
+                  </p>
+
+                  {referralCode ? (
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                      <code className="text-vvm-blue-700 font-mono text-sm sm:text-base break-all select-all">
+                        https://vizvillanyfutes.hu/ajanlo-program?ref={referralCode}
+                      </code>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(`https://vizvillanyfutes.hu/ajanlo-program?ref=${referralCode}`);
+                          setNotification({ type: 'success', message: 'Link másolva a vágólapra!' });
+                        }}
+                        className="w-full sm:w-auto px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex items-center justify-center gap-2 font-medium text-gray-700 transition-colors"
+                      >
+                        <Copy className="w-4 h-4" />
+                        Másolás
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-yellow-50 text-yellow-800 rounded-xl border border-yellow-200">
+                      Jelenleg nem található meghívó kód. Kérjük frissítsd az oldalt vagy próbálkozz később!
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

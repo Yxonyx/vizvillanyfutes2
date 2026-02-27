@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: 'VízVillanyFűtés - Vízszerelő és Villanyszerelő Budapest | SOS 0-24',
     template: '%s | VízVillanyFűtés',
   },
-  description: 'Professzionális vízszerelő, villanyszerelő és fűtésszerelő Budapest és Pest megye területén. ✓ SOS 2 órán belül ✓ 1 év garancia ✓ Fix árak ✓ Online időpontfoglalás. Hívjon most!',
+  description: 'Professzionális vízszerelő, villanyszerelő és fűtésszerelő Budapest és Pest megye területén. ✓ SOS 2 órán belül ✓ Megbízható mesterek ✓ Fix árak ✓ Online időpontfoglalás. Hívjon most!',
   keywords: [
     'vízszerelő budapest',
     'villanyszerelő budapest',
@@ -30,6 +30,8 @@ export const metadata: Metadata = {
     'radiátor szerelés',
     'otthonfelújítási program',
     'pályázat fűtéskorszerűsítés',
+    'szakember kereső budapest',
+    'vízszerelő pest megye',
   ],
   authors: [{ name: 'VízVillanyFűtés', url: 'https://www.vizvillanyfutes.hu' }],
   creator: 'VízVillanyFűtés',
@@ -41,7 +43,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'VízVillanyFűtés - Vízszerelő, Villanyszerelő, Fűtésszerelő Budapest',
-    description: 'Megbízható szakemberek Budapesten és Pest megyében. SOS 2 órán belül, 1 év garancia, fix árak. Foglaljon online!',
+    description: 'Megbízható szakemberek Budapesten és Pest megyében. SOS 2 órán belül, gyors és okos kiajánlás, fix árak. Foglaljon online!',
     url: 'https://www.vizvillanyfutes.hu',
     siteName: 'VízVillanyFűtés',
     locale: 'hu_HU',
@@ -50,7 +52,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'VízVillanyFűtés - Vízszerelő, Villanyszerelő Budapest',
-    description: 'Megbízható szakemberek Budapesten. SOS 2 órán belül, 1 év garancia, fix árak.',
+    description: 'Megbízható szakemberek Budapesten. SOS 2 órán belül, ellenőrzött mesterek, fix árak.',
     creator: '@vizvillanyfutes',
   },
   robots: {
@@ -66,9 +68,6 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: 'https://www.vizvillanyfutes.hu',
-  },
-  verification: {
-    google: 'your-google-verification-code', // Add your Google Search Console verification
   },
   category: 'business',
   icons: {
@@ -114,6 +113,34 @@ const jsonLd = {
           name: 'Pest megye',
         },
       ],
+      knowsAbout: [
+        "Vízszerelés",
+        "Villanyszerelés",
+        "Fűtéskorszerűsítés",
+        "Duguláselhárítás SOS 0-24",
+        "Csőtörés elhárítás",
+        "Biztosítéktábla szerelés",
+        "Kazáncsere",
+        "Hőszivattyú beszerelés",
+        "Szakember közvetítés",
+      ],
+      slogan: "Megbízható szakemberek, gyors és okos kiajánlás Budapesten és Pest megyében.",
+      potentialAction: {
+        "@type": "ReserveAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.vizvillanyfutes.hu/login?role=customer",
+          "inLanguage": "hu",
+          "actionPlatform": [
+            "http://schema.org/DesktopWebPlatform",
+            "http://schema.org/MobileWebPlatform"
+          ]
+        },
+        "result": {
+          "@type": "Reservation",
+          "name": "Szakember foglalása"
+        }
+      },
       priceRange: '$$',
       openingHoursSpecification: [
         {

@@ -90,7 +90,7 @@ const faqs = [
   },
   {
     q: 'Kapok garanciát a munkára?',
-    a: 'Igen! Minden elvégzett munkára minimum 1 év garanciát vállalunk. Anyaggal végzett munkák esetén az anyag gyártói garanciája is érvényes (általában 2-5 év).'
+    a: 'A rendszerünkben regisztrált szakemberek vállalják az elvégzett munkák garanciális hátterét. Anyaggal végzett munkák esetén az anyag gyártói garanciája is érvényes.'
   },
 ];
 
@@ -244,8 +244,8 @@ export default function ArakPage() {
                   'Munkadíj',
                   'Segédanyagok (tömítések, csavarok stb.)',
                   'Takarítás a munka után',
-                  'Minimum 1 év garancia',
-                  'Hivatalos számla',
+                  'Kizárólag megbízható mesterek',
+                  'Számlaképes szakemberek',
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-2 text-green-700">
                     <CheckCircle className="w-4 h-4" />

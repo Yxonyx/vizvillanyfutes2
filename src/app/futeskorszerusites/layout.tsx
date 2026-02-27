@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Fűtéskorszerűsítés Budapest - Kazáncsere, Hőszivattyú | Pályázattal',
-  description: 'Fűtéskorszerűsítés Budapesten és Pest megyében. ✓ Kazáncsere ✓ Hőszivattyú telepítés ✓ Radiátor csere ✓ Padlófűtés ✓ Pályázati támogatás ✓ 1 év garancia. Kérjen ajánlatot!',
+  description: 'Fűtéskorszerűsítés Budapesten és Pest megyében. ✓ Kazáncsere ✓ Hőszivattyú telepítés ✓ Radiátor csere ✓ Padlófűtés ✓ Pályázati támogatás ✓ Ellenőrzött mesterek. Kérjen ajánlatot!',
   keywords: [
     'fűtéskorszerűsítés',
     'kazáncsere budapest',
@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     'fűtésszerelő budapest',
     'otthonfelújítási program',
     'energetikai korszerűsítés',
+    'fűtésszerelő pest megye',
   ],
   alternates: {
     canonical: 'https://www.vizvillanyfutes.hu/futeskorszerusites',

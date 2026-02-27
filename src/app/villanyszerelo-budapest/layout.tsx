@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Villanyszerelő Budapest - SOS Áramszünet, Biztosítéktábla | 0-24',
-  description: 'Megbízható villanyszerelő Budapest területén. ✓ SOS áramkimaradás ✓ Fi-relé beépítés ✓ Biztosítéktábla csere ✓ EV töltő telepítés ✓ 1 év garancia ✓ Fix árak. Hívjon most!',
+  description: 'Megbízható villanyszerelő Budapest területén. ✓ SOS áramkimaradás ✓ Fi-relé beépítés ✓ Biztosítéktábla csere ✓ EV töltő telepítés ✓ Minősített mesterek ✓ Fix árak. Hívjon most!',
   keywords: [
     'villanyszerelő budapest',
     'villanyszerelő sos',
@@ -12,6 +12,8 @@ export const metadata: Metadata = {
     'konnektor csere',
     'lámpa szerelés',
     'ev töltő telepítés',
+    'villanyszerelő pest megye',
+    'villanyszerelés agglomeráció',
   ],
   alternates: {
     canonical: 'https://www.vizvillanyfutes.hu/villanyszerelo-budapest',
@@ -35,10 +37,16 @@ const serviceSchema = {
     name: 'VízVillanyFűtés',
     url: 'https://www.vizvillanyfutes.hu',
   },
-  areaServed: {
-    '@type': 'City',
-    name: 'Budapest',
-  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Budapest',
+    },
+    {
+      '@type': 'State',
+      name: 'Pest megye',
+    },
+  ],
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Villanyszerelési szolgáltatások',

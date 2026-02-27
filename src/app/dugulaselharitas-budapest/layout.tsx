@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     'csőtisztítás',
     'kameradiagnosztika',
     'azonnali duguláselhárítás',
+    'duguláselhárítás pest megye',
   ],
   alternates: {
     canonical: 'https://www.vizvillanyfutes.hu/dugulaselharitas-budapest',
@@ -35,10 +36,16 @@ const serviceSchema = {
     name: 'VízVillanyFűtés',
     url: 'https://www.vizvillanyfutes.hu',
   },
-  areaServed: {
-    '@type': 'City',
-    name: 'Budapest',
-  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Budapest',
+    },
+    {
+      '@type': 'State',
+      name: 'Pest megye',
+    },
+  ],
   availableChannel: {
     '@type': 'ServiceChannel',
     serviceType: 'SOS szolgáltatás',

@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'GYIK - Árak, Garancia, Foglalás Kérdések | VízVillanyFűtés',
-  description: 'Válaszok a leggyakrabban felmerülő kérdésekre vízszerelés, villanyszerelés és fűtésszerelés témában. Árak, garancia, foglalás, fizetési módok.',
+  title: 'GYIK - Árak, Kiállás, Foglalás Kérdések | VízVillanyFűtés',
+  description: 'Válaszok a leggyakrabban felmerülő kérdésekre vízszerelés, villanyszerelés és fűtésszerelés témában. Árak, kiállás, foglalás, fizetési módok.',
   alternates: {
     canonical: 'https://www.vizvillanyfutes.hu/gyik',
   },
@@ -26,7 +26,7 @@ const faqSchema = {
       name: 'Kapok garanciát a munkára?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Igen! Minden elvégzett munkára minimum 12 hónap garanciát vállalunk. A beépített anyagokra a gyártói garancia érvényes (általában 2-5 év).',
+        text: 'A platformunkon lévő szakemberek vállalják, hogy az általuk elvégzett munkára ésszerű garanciát nyújtanak. A pontos garanciális feltételeket a kivitelezővel kötött megállapodás tartalmazza. A beépített anyagokra a gyártói garancia érvényes.',
       },
     },
     {

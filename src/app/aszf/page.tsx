@@ -145,15 +145,15 @@ export default function ASZFPage() {
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>Minden elvégzett munkára minimum <strong>12 hónap garancia</strong></span>
+                    <span>Az elvégzett munkákra <strong>a munkát végző Szakember</strong> vállal garanciát, a jogszabályokban előírtak szerint.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>Beépített anyagokra a gyártói garancia érvényes (általában 2-5 év)</span>
+                    <span>A beépített anyagokra a gyártói garancia érvényes (általában 2-5 év).</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span><strong>Garanciális munkavégzés</strong> minden munkára</span>
+                    <span>A Szolgáltató a szakembereket ellenőrzi, panasz esetén közvetíthet a felek között, azonban <strong>közvetlen garanciális kötelezettsége nincs.</strong></span>
                   </li>
                 </ul>
               </section>
@@ -173,9 +173,7 @@ export default function ASZFPage() {
               <section id="felelosseg" className="mb-10">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Felelősségkorlátozás</h2>
                 <p className="text-gray-600 mb-4">
-                  A Szolgáltató felelőssége a munkavégzés során okozott közvetlen károkra terjed ki,
-                  a garancia keretein belül. Közvetett károkért, elmaradt haszonért a
-                  Szolgáltató nem vállal felelősséget.
+                  A Szolgáltató, mint platform üzemeltetője, kizárólag a közvetítői és kiajánlási szolgáltatásáért vállal felelősséget. A munkavégzés során okozott károkért, garanciális és szavatossági igényekért a kivitelezési szerződés és a kiállított számla alapján <strong>közvetlenül a Szakember tartozik felelősséggel.</strong> Közvetett károkért, elmaradt haszonért a Szolgáltató nem vállal felelősséget.
                 </p>
               </section>
 

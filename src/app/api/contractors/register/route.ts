@@ -17,17 +17,17 @@ function mapTrades(trades: string[]): Trade[] {
     'combined': 'combined',
     'kombinált': 'combined',
   };
-  
+
   return trades.map(t => tradeMap[t.toLowerCase()] || t as Trade);
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Support both structured API format and partner form format
     let registrationData: ContractorRegistrationRequest;
-    
+
     if (body.email && body.password && body.display_name) {
       // Structured API format
       registrationData = body as ContractorRegistrationRequest;
@@ -42,15 +42,15 @@ export async function POST(request: NextRequest) {
         legal_name: body.cegnev || body.legal_name,
         tax_number: body.adoszam || body.tax_number,
         trades: mapTrades(
-          Array.isArray(body.szakma) 
-            ? body.szakma 
+          Array.isArray(body.szakma)
+            ? body.szakma
             : body.trades || [body.szakma || 'viz']
         ),
-        service_areas: Array.isArray(body.munkaterulet) 
-          ? body.munkaterulet 
+        service_areas: Array.isArray(body.munkaterulet)
+          ? body.munkaterulet
           : body.service_areas || [body.munkaterulet || 'Budapest'],
-        years_experience: body.tapasztalat 
-          ? parseInt(body.tapasztalat) 
+        years_experience: body.tapasztalat
+          ? parseInt(body.tapasztalat)
           : body.years_experience,
       };
     }
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     if (authError) {
       console.error('Auth signup error:', authError);
-      
+
       // Handle specific auth errors
       if (authError.message.includes('already registered')) {
         return NextResponse.json(
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-      
+
       return NextResponse.json(
         { success: false, error: authError.message },
         { status: 500 }
@@ -130,7 +130,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 2: Create user_meta and contractor_profile using the database function
+    // Step 2.5: Handle optional referral code
+    let referredByUuid = null;
+    const incomingReferralCode = body.referralCode || body.ref;
+
+    if (incomingReferralCode && typeof incomingReferralCode === 'string' && incomingReferralCode.trim() !== '') {
+      try {
+        // We use the admin client here because a new unauthenticated user might not have read access
+        // to other people's referral codes based on current RLS policies
+        const { createAdminClient } = await import('@/lib/supabase/server');
+        const adminClient = createAdminClient();
+
+        const { data: referrerData } = await adminClient
+          .from('contractor_profiles')
+          .select('id')
+          .eq('referral_code', incomingReferralCode.trim().toUpperCase())
+          .single();
+
+        if (referrerData && referrerData.id) {
+          referredByUuid = referrerData.id;
+        }
+      } catch (err) {
+        // If referral code is invalid or missing, we just ignore it and proceed
+        console.warn('Invalid referral code provided:', incomingReferralCode, err);
+      }
+    }
+
+    // Step 3: Create user_meta and contractor_profile using the database function
     const { data: profileData, error: profileError } = await supabase.rpc('register_contractor', {
       p_user_id: authData.user.id,
       p_display_name: registrationData.display_name,
@@ -142,14 +168,15 @@ export async function POST(request: NextRequest) {
       p_trades: registrationData.trades,
       p_service_areas: registrationData.service_areas || ['Budapest'],
       p_years_experience: registrationData.years_experience || null,
+      p_referred_by: referredByUuid,
     });
 
     if (profileError) {
       console.error('Profile creation error:', profileError);
-      
+
       // Try to clean up the auth user if profile creation failed
       // Note: This requires admin client with service role key
-      
+
       return NextResponse.json(
         { success: false, error: profileError.message },
         { status: 500 }
