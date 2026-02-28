@@ -71,8 +71,8 @@ export const metadata: Metadata = {
   },
   category: 'business',
   icons: {
-    icon: '/icon.svg',
-    apple: '/icon.svg',
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
   },
 };
 
@@ -268,7 +268,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-slate-900">
+      <body className="min-h-screen flex flex-col bg-slate-900" suppressHydrationWarning>
         <AuthProvider>
           {/* Skip to main content for accessibility */}
           <a

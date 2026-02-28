@@ -205,19 +205,21 @@ export default function TeaserMap() {
             {/* Top floating controls */}
             <div className="absolute top-4 inset-x-2 sm:inset-x-4 z-20 flex justify-between items-start pointer-events-none">
 
-                {/* Left side decorators (Stacked on very small screens, row on larger) */}
-                <div className="flex flex-col md:flex-row gap-1.5 sm:gap-3 pointer-events-none">
-                    <div className="bg-white/70 text-slate-800 backdrop-blur-md rounded-full px-2.5 py-1 sm:px-4 sm:py-2.5 shadow-sm flex items-center gap-1.5 sm:gap-2 border border-white/40 pointer-events-auto self-start transition-all hover:-translate-y-1">
-                        <div className="relative flex h-1.5 w-1.5 sm:h-2.5 sm:w-2.5">
+                {/* Left side decorators (Transparent) */}
+                <div className="text-white flex items-center gap-4 sm:gap-6 pointer-events-auto self-start">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                        <div className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2.5 sm:w-2.5 bg-red-500"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-red-500"></span>
                         </div>
-                        <span className="text-[9px] sm:text-[12px] font-bold whitespace-nowrap tracking-wide uppercase">Élő Munkák: 643</span>
+                        <span className="text-[10px] sm:text-[13px] font-bold whitespace-nowrap tracking-wide uppercase drop-shadow-md">Élő Munkák: 643</span>
                     </div>
 
-                    <div className="bg-white/70 text-slate-800 backdrop-blur-md rounded-full px-2.5 py-1 sm:px-4 sm:py-2.5 shadow-sm flex items-center gap-1.5 sm:gap-2 border border-white/40 pointer-events-auto self-start transition-all hover:-translate-y-1">
-                        <div className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                        <span className="text-[9px] sm:text-[12px] font-bold whitespace-nowrap tracking-wide uppercase">Aktív szakik: 312</span>
+                    <div className="w-px h-3 sm:h-4 bg-white/20"></div>
+
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                        <span className="text-[10px] sm:text-[13px] font-bold whitespace-nowrap tracking-wide uppercase drop-shadow-md">Aktív szakik: 312</span>
                     </div>
                 </div>
 

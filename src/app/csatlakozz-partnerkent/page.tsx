@@ -49,7 +49,7 @@ const benefits = [
   {
     icon: DollarSign,
     title: 'Egy kávé ára egy ügyfélért',
-    description: 'Nincs százalékos sikerdíj! Minden kiajánlott összekötés (lead) fix összegbe, nagyjából 2.000 Ft kreditbe kerül. A munkadíjat te magad alkudod ki az ügyféllel és 100%-ban nálad marad.',
+    description: 'Nincs százalékos sikerdíj! Minden kiajánlott összekötés (lead) fix összegbe, nagyjából 2.000 Ft kreditbe kerül. A munkadíjban te egyezel meg az ügyféllel, és az 100%-ban nálad marad.',
   },
   {
     icon: Headphones,
@@ -727,6 +727,7 @@ function PartnerOnboardingContent() {
                     <input
                       type="text"
                       required
+                      autoComplete="name"
                       className="input-field"
                       placeholder="Kovács János"
                       value={formData.teljesNev}
@@ -741,6 +742,7 @@ function PartnerOnboardingContent() {
                     <input
                       type="email"
                       required
+                      autoComplete="email"
                       className="input-field"
                       placeholder="pelda@email.hu"
                       value={formData.email}
@@ -764,6 +766,7 @@ function PartnerOnboardingContent() {
                     <input
                       type="password"
                       required
+                      autoComplete="new-password"
                       className={`input-field ${formData.password && !isPasswordValid ? 'border-red-500 ring-1 ring-red-500' : ''}`}
                       placeholder="Minimum 8 karakter"
                       value={formData.password}
@@ -781,6 +784,7 @@ function PartnerOnboardingContent() {
                     <input
                       type="password"
                       required
+                      autoComplete="new-password"
                       className={`input-field ${formData.passwordConfirm && !doPasswordsMatch ? 'border-red-500 ring-1 ring-red-500' : ''}`}
                       placeholder="Jelszó újra"
                       value={formData.passwordConfirm}
@@ -809,6 +813,7 @@ function PartnerOnboardingContent() {
                       <input
                         type="tel"
                         required
+                        autoComplete="tel"
                         className={`input-field pl-12 ${!isPhoneValid ? 'border-red-500 ring-1 ring-red-500' : ''}`}
                         placeholder="+36 30 123 4567"
                         value={formData.telefon}
