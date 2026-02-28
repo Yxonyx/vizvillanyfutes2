@@ -294,7 +294,7 @@ export default function RootLayout({
                 var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
                 v.onload = function() {
                   window.voiceflow.chat.load({
-                    verify: { projectID: '69a34553ddc4cd94cafc0856' },
+                    verify: { projectID: '69a34d17a52e1c0fcc16f23e' },
                     url: 'https://general-runtime.voiceflow.com',
                     versionID: 'production',
                     voice: {
