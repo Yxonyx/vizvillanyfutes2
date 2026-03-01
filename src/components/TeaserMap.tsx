@@ -17,7 +17,7 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 const DEFAULT_VIEWPORT = {
     latitude: 47.4979,
     longitude: 19.0402,
-    zoom: 10.8
+    zoom: 11.5
 };
 
 // Interface for database rows
@@ -34,23 +34,23 @@ interface Lead {
     created_at: string;
 }
 
-// Fake active leads for unauthenticated users
+// Fake active leads for unauthenticated users, carefully spread out across Budapest to prevent overlapping
 const mockLeads: any[] = [
-    { id: 'm1', user_id: 'fake', lat: 47.515, lng: 19.025, type: 'viz', title: 'Csőtörés a fürdőben', status: 'waiting', description: 'Ömlik a víz a mosdó alól, elzártam a főcsapot de sürgős lenne!', district: 'II. kerület' },
-    { id: 'm2', user_id: 'fake', lat: 47.478, lng: 19.065, type: 'villany', title: 'Nincs áram a lakásban', status: 'waiting', description: 'Reggel óta sehol nincs áram, a biztosítékot nem tudom visszakapcsolni.', district: 'IX. kerület' },
-    { id: 'm3', user_id: 'fake', lat: 47.532, lng: 19.078, type: 'futes', title: 'Radiátor nem fűt', status: 'waiting', description: 'A gyerekszobában jéghideg a radiátor, pedig a kazán megy.', district: 'XIII. kerület' },
-    { id: 'm4', user_id: 'fake', lat: 47.462, lng: 19.015, type: 'viz', title: 'Duguláselhárítás', status: 'waiting', description: 'Eldugult a WC, már mindent próbáltunk, de nem folyik le.', district: 'XI. kerület' },
-    { id: 'm5', user_id: 'fake', lat: 47.502, lng: 19.122, type: 'villany', title: 'Sérült vezeték', status: 'waiting', description: 'Fúrás közben eltaláltam egy vezetéket, szikrázott egyet és elment az áram abban a szobában.', district: 'X. kerület' },
-    { id: 'm6', user_id: 'fake', lat: 47.555, lng: 19.042, type: 'viz', title: 'Csöpögő csap', status: 'waiting', description: 'Folyamatosan csöpög a konyhai csaptelep, kérik a cseréjét.', district: 'III. kerület' },
-    { id: 'm7', user_id: 'fake', lat: 47.445, lng: 19.145, type: 'futes', title: 'Kazán hiba (F28)', status: 'waiting', description: 'A gázkazán kiállt F28-as hibára és nincs melegvíz.', district: 'XIX. kerület' },
-    { id: 'm8', user_id: 'fake', lat: 47.472, lng: 19.048, type: 'villany', title: 'Sercegő konnektor', status: 'waiting', description: 'A nappaliban az egyik konnektor sercegő hangot ad és túlmelegszik.', district: 'XI. kerület' },
-    { id: 'm9', user_id: 'fake', lat: 47.495, lng: 18.995, type: 'futes', title: 'Padlófűtés szivárog', status: 'waiting', description: 'Vizesedik a padló a fürdőszoba előtt, nyomásesés a rendszerben.', district: 'XII. kerület' },
-    { id: 'm10', user_id: 'fake', lat: 47.525, lng: 19.062, type: 'viz', title: 'Bojler nem melegít', status: 'waiting', description: 'A villanybojler be van kapcsolva, de jéghideg a víz tegnap óta.', district: 'XIII. kerület' },
-    { id: 'm11', user_id: 'fake', lat: 47.455, lng: 19.108, type: 'villany', title: 'Sütő bekötés', status: 'waiting', description: 'Új kerámialapos sütőt vettünk, szakember kell a szakszerű bekötéshez.', district: 'XX. kerület' },
-    { id: 'm12', user_id: 'fake', lat: 47.545, lng: 18.985, type: 'viz', title: 'Ázott fal', status: 'waiting', description: 'A szomszéd felől nedvesedik a fal, sürgős bejárás szükséges.', district: 'II. kerület' },
-    { id: 'm13', user_id: 'fake', lat: 47.515, lng: 19.095, type: 'futes', title: 'Termosztát csere', status: 'waiting', description: 'Okostermosztát beszerelése és beállítása a meglévő kazánhoz.', district: 'XIV. kerület' },
-    { id: 'm14', user_id: 'fake', lat: 47.492, lng: 19.035, type: 'viz', title: 'Zuhany szivárgás', status: 'waiting', description: 'Megrepedt a zuhanytálca és alatta folyik a víz a födémbe.', district: 'I. kerület' },
-    { id: 'm15', user_id: 'fake', lat: 47.485, lng: 19.132, type: 'villany', title: 'FI relé lecsap', status: 'waiting', description: 'Amint bekapcsolom a mosógépet, rögtön lecsap a FI relé a lakásban.', district: 'X. kerület' },
+    { id: 'm1', user_id: 'fake', lat: 47.510, lng: 19.035, type: 'viz', title: 'Csőtörés a fürdőben', status: 'waiting', description: 'Ömlik a víz a mosdó alól, elzártam a főcsapot de sürgős lenne!', district: 'II. kerület' },
+    { id: 'm2', user_id: 'fake', lat: 47.485, lng: 19.060, type: 'villany', title: 'VBO Érintésvédelem', status: 'waiting', description: 'Villamos biztonsági felülvizsgálat lakásfelújítás után (ÉVÉ)', district: 'IX. kerület' },
+    { id: 'm3', user_id: 'fake', lat: 47.505, lng: 19.065, type: 'futes', title: 'Radiátor csere', status: 'waiting', description: 'A gyerekszobában vizesedik a radiátor szelepe, cserélni kéne.', district: 'VII. kerület' },
+    { id: 'm4', user_id: 'fake', lat: 47.475, lng: 19.040, type: 'viz', title: 'Duguláselhárítás', status: 'waiting', description: 'Eldugult a WC, már mindent próbáltunk, de nem folyik le.', district: 'XI. kerület' },
+    { id: 'm5', user_id: 'fake', lat: 47.520, lng: 19.055, type: 'villany', title: 'Szabványosítás EON', status: 'waiting', description: 'Mérőhely szabványosítás és villamos biztonságtechnikai felülvizsgálat', district: 'XIII. kerület' },
+    { id: 'm6', user_id: 'fake', lat: 47.495, lng: 19.020, type: 'viz', title: 'Csöpögő csap', status: 'waiting', description: 'Folyamatosan csöpög a konyhai csaptelep, kérik a cseréjét.', district: 'I. kerület' },
+    { id: 'm7', user_id: 'fake', lat: 47.490, lng: 19.080, type: 'futes', title: 'Kazán hiba (F28)', status: 'waiting', description: 'A gázkazán kiállt F28-as hibára és nincs melegvíz.', district: 'VIII. kerület' },
+    { id: 'm8', user_id: 'fake', lat: 47.530, lng: 19.030, type: 'villany', title: 'EPH Kiépítés', status: 'waiting', description: 'EPH hálózat kiépítése és villamos biztonsági felülvizsgálat jegyzőkönyvvel', district: 'III. kerület' },
+    { id: 'm9', user_id: 'fake', lat: 47.460, lng: 19.025, type: 'futes', title: 'Padlófűtés szivárog', status: 'waiting', description: 'Vizesedik a padló a fürdőszoba előtt, nyomásesés a rendszerben.', district: 'XI. kerület' },
+    { id: 'm10', user_id: 'fake', lat: 47.480, lng: 19.010, type: 'villany', title: 'Hálózatbővítés', status: 'waiting', description: 'Hálózatbővítéshez szükséges villamos biztonsági felülvizsgálat (EON/MVM)', district: 'XI. kerület' },
+    { id: 'm11', user_id: 'fake', lat: 47.515, lng: 19.085, type: 'viz', title: 'Bojler nem melegít', status: 'waiting', description: 'A villanybojler be van kapcsolva, de jéghideg a víz tegnap óta.', district: 'XIV. kerület' },
+    { id: 'm12', user_id: 'fake', lat: 47.500, lng: 19.005, type: 'futes', title: 'Termosztát csere', status: 'waiting', description: 'Okostermosztát beszerelése és beállítása a meglévő kazánhoz.', district: 'XII. kerület' },
+    { id: 'm13', user_id: 'fake', lat: 47.465, lng: 19.065, type: 'villany', title: 'Sütő bekötés', status: 'waiting', description: 'Új kerámialapos sütőt vettünk, szakember kell a szakszerű bekötéshez.', district: 'IX. kerület' },
+    { id: 'm14', user_id: 'fake', lat: 47.540, lng: 19.065, type: 'viz', title: 'Ázott fal', status: 'waiting', description: 'A szomszéd felől nedvesedik a fal, sürgős bejárás szükséges.', district: 'XIII. kerület' },
+    { id: 'm15', user_id: 'fake', lat: 47.498, lng: 19.050, type: 'villany', title: 'FI relé teszt', status: 'waiting', description: 'Érintésvédelmi felülvizsgálat és FI relé (ÁVK) tesztelése irodában', district: 'VI. kerület' },
 ];
 
 export default function TeaserMap() {
@@ -344,7 +344,14 @@ export default function TeaserMap() {
                         latitude={selectedLead.lat}
                         anchor="bottom"
                         offset={45} // Offset to clear the glowing marker
-                        onClose={() => setSelectedLead(null)}
+                        onClose={() => {
+                            setSelectedLead(null);
+                            mapRef.current?.flyTo({
+                                center: [DEFAULT_VIEWPORT.longitude, DEFAULT_VIEWPORT.latitude],
+                                zoom: DEFAULT_VIEWPORT.zoom,
+                                duration: 800
+                            });
+                        }}
                         closeOnClick={false}
                         className="z-50 min-w-[300px]"
                         maxWidth="340px"

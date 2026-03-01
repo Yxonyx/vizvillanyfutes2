@@ -263,18 +263,20 @@ export default function HomePage() {
                 </div>
 
                 {/* Features as compact 2x2 grid */}
-                <div className="grid grid-cols-2 gap-x-6 gap-y-2 lg:flex lg:gap-6">
-                  {[
-                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Ellenőrzött mesterek' },
-                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Gyorsabb kereső' },
-                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Számlaképes szakember' },
-                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: '24/7 Elérhető' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-1.5 text-sm text-blue-100 font-medium">
-                      {item.icon}
-                      <span>{item.text}</span>
-                    </div>
-                  ))}
+                <div className="flex flex-col items-center gap-y-2 lg:flex-row lg:gap-6 w-full lg:w-auto">
+                  <div className="grid grid-cols-[max-content_max-content] gap-x-4 sm:gap-x-6 gap-y-2 lg:flex lg:gap-6 w-fit justify-center">
+                    {[
+                      { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Ellenőrzött mesterek' },
+                      { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Gyorsabb kereső' },
+                      { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Számlaképes szakember' },
+                      { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: '24/7 Elérhető' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-1.5 text-sm text-blue-100 font-medium">
+                        {item.icon}
+                        <span>{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
               </div>
@@ -317,8 +319,8 @@ export default function HomePage() {
       <section className="pt-16 md:pt-24 pb-8 bg-gradient-to-b from-blue-100 via-blue-50 to-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <HowItWorksAnimation />
-          <p className="text-center text-xs sm:text-sm text-vvm-yellow-500 font-bold tracking-wider mt-6 px-4 py-2 opacity-80">
-            —&nbsp;Magyarország leginnovatívabb szakember kereső rendszere&nbsp;—
+          <p className="text-center text-xs sm:text-sm text-gray-900 font-bold tracking-wider mt-6 px-4 py-2 opacity-80">
+            Magyarország leginnovatívabb szakember kereső rendszere
           </p>
         </div>
       </section>
@@ -405,9 +407,9 @@ export default function HomePage() {
                 {[
                   { icon: <MapPin className="w-4 h-4" />, color: 'bg-sky-500', text: 'Folyamatos ügyfélkapcsolatok Budapest és Pest megyében' },
                   { icon: <Award className="w-4 h-4" />, color: 'bg-emerald-500', text: '10.000 Ft kezdő kredit az induláshoz' },
-                  { icon: <Receipt className="w-4 h-4" />, color: 'bg-amber-500', text: 'Nincs százalékos jutalék — te egyezel meg az ügyféllel' },
+                  { icon: <Receipt className="w-4 h-4" />, color: 'bg-amber-500', text: 'Nincs százalékos jutalék, te egyezel meg az ügyféllel' },
                   { icon: <Briefcase className="w-4 h-4" />, color: 'bg-indigo-500', text: 'Egy ügyfél közvetítése kb. egy kávé ára (~2.000 Ft)' },
-                  { icon: <Clock className="w-4 h-4" />, color: 'bg-orange-500', text: 'Rugalmas időbeosztás — maradsz a saját főnököd' },
+                  { icon: <Clock className="w-4 h-4" />, color: 'bg-orange-500', text: 'Rugalmas időbeosztás, maradsz a saját főnököd' },
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-3 text-blue-50 font-medium">
                     <span className={`${item.color} w-8 h-8 rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-lg`}>

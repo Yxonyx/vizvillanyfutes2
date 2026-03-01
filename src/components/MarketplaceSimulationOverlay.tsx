@@ -275,7 +275,6 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
 
     return (
         <div className={`fixed inset-0 z-[100] flex animate-in fade-in duration-300 ${isAuthenticated ? 'bg-slate-100' : 'bg-slate-900'}`}>
-
             {/* Sidebar / Menu — persistent bottom sheet on mobile, left panel on desktop */}
             <div
                 ref={sidebarRef}
