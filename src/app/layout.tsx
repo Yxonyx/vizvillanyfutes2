@@ -29,8 +29,6 @@ export const metadata: Metadata = {
     'fűtéskorszerűsítés',
     'kazán csere',
     'radiátor szerelés',
-    'otthonfelújítási program',
-    'pályázat fűtéskorszerűsítés',
     'szakember kereső budapest',
     'vízszerelő pest megye',
   ],

@@ -129,10 +129,24 @@ export default function TeaserMap() {
         window.addEventListener('closeMarketplaceSimulation', handleCloseSimulation);
         window.addEventListener('openPortal', handleOpenPortal);
 
+        const updatePadding = () => {
+            if (mapRef.current && window.innerWidth >= 1024) {
+                // If the screen is completely resized to desktop, snap the default viewport over to the right.
+                mapRef.current.flyTo({
+                    center: [DEFAULT_VIEWPORT.longitude - 0.14, DEFAULT_VIEWPORT.latitude],
+                    duration: 0
+                });
+            }
+        };
+
+        updatePadding();
+        window.addEventListener('resize', updatePadding);
+
         return () => {
             supabase.removeChannel(subscription);
             window.removeEventListener('closeMarketplaceSimulation', handleCloseSimulation);
             window.removeEventListener('openPortal', handleOpenPortal);
+            window.removeEventListener('resize', updatePadding);
         };
     }, [role]);
 
@@ -195,48 +209,16 @@ export default function TeaserMap() {
         }
     };
 
+    const mapPadding = typeof window !== 'undefined' && window.innerWidth >= 1024
+        ? { top: 0, bottom: 0, left: window.innerWidth * 0.30, right: 0 }
+        : { top: 0, bottom: 0, left: 0, right: 0 };
+
     return (
-        <div className="w-full h-full min-h-[450px] lg:min-h-[550px] rounded-2xl overflow-hidden relative shadow-2xl border-4 border-white/10 group">
+        <div className="absolute inset-0 w-full h-full lg:rounded-none group overflow-hidden bg-slate-900 pointer-events-auto">
 
             {/* Hint overlay that disappears on hover/interaction */}
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-slate-900/60 to-transparent z-10 pointer-events-none transition-opacity duration-500 group-hover:opacity-0"></div>
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-vvm-blue-900/80 to-transparent z-10 pointer-events-none transition-opacity duration-500"></div>
-
-            {/* Top floating controls */}
-            <div className="absolute top-4 inset-x-2 sm:inset-x-4 z-20 flex justify-between items-start pointer-events-none">
-
-                {/* Left side decorators (Transparent) */}
-                <div className="text-white flex items-center gap-4 sm:gap-6 pointer-events-auto self-start">
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                        <div className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-red-500"></span>
-                        </div>
-                        <span className="text-[10px] sm:text-[13px] font-bold whitespace-nowrap tracking-wide uppercase drop-shadow-md">Élő Munkák: 643</span>
-                    </div>
-
-                    <div className="w-px h-3 sm:h-4 bg-white/20"></div>
-
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                        <span className="text-[10px] sm:text-[13px] font-bold whitespace-nowrap tracking-wide uppercase drop-shadow-md">Aktív szakik: 312</span>
-                    </div>
-                </div>
-
-                {/* Right side Enlarge Button */}
-                <button
-                    onClick={() => {
-                        setPendingViewMode(role === 'contractor' ? 'contractor' : 'customer');
-                        setIsSimulationOpen(true);
-                    }}
-                    className="bg-gradient-to-r from-vvm-blue-600 to-vvm-blue-700 hover:from-vvm-blue-700 hover:to-vvm-blue-800 text-white font-bold py-2 px-3 sm:py-2.5 sm:px-5 lg:px-6 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-blue-500/20 flex items-center gap-1.5 sm:gap-2 transition-all transform hover:scale-105 pointer-events-auto shrink-0"
-                >
-                    <Maximize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-100" />
-                    <span className="text-[10px] sm:text-[13px] lg:text-[14px] whitespace-nowrap">Térkép Kinagyítása</span>
-                </button>
-
-                {/* Emptied Right label as it's merged above */}
-            </div>
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-vvm-blue-900/80 to-transparent z-10 pointer-events-none transition-opacity duration-500 lg:hidden"></div>
 
             {/* Instruction Badge - Full width bottom bar */}
             <div className="absolute bottom-0 left-0 w-full z-20">
@@ -273,11 +255,17 @@ export default function TeaserMap() {
                     background-color: transparent !important;
                     color: #0f172a !important;
                 }
+                @media (max-width: 1023px) {
+                    .mapboxgl-ctrl-bottom-right {
+                        display: none !important;
+                    }
+                }
             `}</style>
 
             <Map
                 ref={mapRef}
                 initialViewState={DEFAULT_VIEWPORT}
+                padding={mapPadding}
                 mapStyle="mapbox://styles/mapbox/dark-v11"
                 mapboxAccessToken={MAPBOX_TOKEN}
                 interactive={true}
@@ -286,8 +274,6 @@ export default function TeaserMap() {
                 onClick={handleMapClick}
                 cursor="crosshair"
             >
-                <NavigationControl position="bottom-right" />
-
                 {/* Render Leads */}
                 {displayLeads.map((lead: any) => {
                     const isOwnLead = user && user.id === lead.user_id;
@@ -302,7 +288,7 @@ export default function TeaserMap() {
                                 e.originalEvent.stopPropagation();
                                 setSelectedLead(lead);
                                 mapRef.current?.flyTo({
-                                    center: [lead.lng, lead.lat + 0.025], // Offset latitude to center the popup
+                                    center: [lead.lng, lead.lat + 0.025], // Offset latitude to center the popup vertically
                                     zoom: 12.5,
                                     duration: 800
                                 });

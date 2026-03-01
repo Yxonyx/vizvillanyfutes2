@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
+import {
   Search, Calendar, Clock, User, ArrowRight, Tag,
   Droplets, Zap, Flame, Award, TrendingUp, BookOpen
 } from 'lucide-react';
@@ -41,18 +41,6 @@ const blogPosts = [
     author: 'Nagy Péter',
     date: '2025. január 8.',
     readTime: '4 perc',
-    featured: true,
-    image: null,
-  },
-  {
-    id: 3,
-    title: 'Otthonfelújítási Program 2025: Amit tudni kell',
-    excerpt: 'Összefoglaltuk a legfontosabb tudnivalókat a 2025-ös pályázati lehetőségekről és a jogosultsági feltételekről.',
-    category: 'palyazat',
-    categoryLabel: 'Pályázatok',
-    author: 'Szabó Anna',
-    date: '2025. január 5.',
-    readTime: '8 perc',
     featured: true,
     image: null,
   },
@@ -135,7 +123,7 @@ export default function BlogPage() {
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newsletterEmail) return;
-    
+
     setNewsletterStatus('loading');
     try {
       await fetch('/api/send-email', {
@@ -156,7 +144,7 @@ export default function BlogPage() {
   const filteredPosts = blogPosts.filter(post => {
     const matchesCategory = activeCategory === 'all' || post.category === activeCategory;
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -173,10 +161,10 @@ export default function BlogPage() {
               Tudástár
             </h1>
             <p className="text-xl text-blue-100 mb-8">
-              Hasznos cikkek, tippek és útmutatók víz–villany–fűtés témában. 
+              Hasznos cikkek, tippek és útmutatók víz–villany–fűtés témában.
               Segítünk megelőzni a problémákat és spórolni az energián.
             </p>
-            
+
             {/* Search */}
             <div className="relative max-w-xl mx-auto">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -200,11 +188,10 @@ export default function BlogPage() {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
-                  activeCategory === cat.id
+                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-colors ${activeCategory === cat.id
                     ? 'bg-vvm-blue-600 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 <cat.icon className="w-4 h-4" />
                 <span className="font-medium">{cat.name}</span>
@@ -219,7 +206,7 @@ export default function BlogPage() {
         <section className="py-12 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-8">Kiemelt cikkek</h2>
-            
+
             <div className="grid md:grid-cols-3 gap-6">
               {featuredPosts.map((post) => (
                 <Link
@@ -260,7 +247,7 @@ export default function BlogPage() {
             {activeCategory === 'all' ? 'Összes cikk' : categories.find(c => c.id === activeCategory)?.name}
             {searchQuery && ` – Keresés: "${searchQuery}"`}
           </h2>
-          
+
           {filteredPosts.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredPosts.map((post) => (
@@ -302,7 +289,7 @@ export default function BlogPage() {
             <div className="text-center py-12">
               <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">Nincs találat a keresésre.</p>
-              <button 
+              <button
                 onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
                 className="mt-4 text-vvm-blue-600 font-medium hover:underline"
               >
@@ -320,10 +307,10 @@ export default function BlogPage() {
             Ne maradjon le a hasznos tippekről!
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Iratkozzon fel hírlevelünkre és kapjon értesítést az új cikkekről, 
-            energiatakarékossági tippekről és pályázati lehetőségekről.
+            Iratkozzon fel hírlevelünkre és kapjon értesítést az új cikkekről és
+            energiatakarékossági tippekről.
           </p>
-          
+
           {newsletterStatus === 'success' ? (
             <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6 max-w-lg mx-auto">
               <p className="text-xl font-semibold">✅ Köszönjük a feliratkozást!</p>
@@ -339,8 +326,8 @@ export default function BlogPage() {
                 className="flex-1 px-4 py-3 rounded-xl text-gray-800 focus:ring-2 focus:ring-vvm-yellow-400 outline-none"
                 required
               />
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={newsletterStatus === 'loading'}
                 className="btn-primary whitespace-nowrap disabled:opacity-50"
               >

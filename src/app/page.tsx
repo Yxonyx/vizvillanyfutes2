@@ -95,11 +95,7 @@ const stats = [
   { value: '100%', label: 'Minőség és Megbízhatóság' },
 ];
 
-interface GrantFormState {
-  buildingYear: string;
-  heatingSystem: string;
-  workType: string;
-}
+
 
 // Mobile App Dashboard for authenticated users
 // Renders MarketplaceSimulationOverlay directly — NO demo TeaserMap
@@ -155,161 +151,205 @@ function MobileAppDashboard({ isContractor }: { isContractor: boolean }) {
 export default function HomePage() {
   const router = useRouter();
   const { isAuthenticated, user, role, isLoading } = useAuth();
-  const [grantForm, setGrantForm] = useState<GrantFormState>({
-    buildingYear: '',
-    heatingSystem: '',
-    workType: '',
-  });
-
-  // Note: isMobile was used for mobile app dashboard, no longer needed
-  // All users (mobile + desktop) now see the normal homepage with real map
-
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-vvm-blue-800 via-vvm-blue-700 to-vvm-blue-900 overflow-hidden pt-16 pb-6 lg:pt-20 lg:pb-10 border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-t from-vvm-blue-950/60 via-transparent to-transparent"></div>
+      {/* Uber-Style Hero Section */}
+      <section className="relative w-full h-[100dvh] lg:h-auto lg:min-h-[85vh] bg-zinc-950 overflow-hidden flex flex-col lg:justify-center pt-0 lg:pt-28 lg:pb-20 border-b border-white/5">
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 lg:py-3">
-          <div className="grid lg:grid-cols-[1fr_1.15fr] gap-8 lg:gap-12 items-center">
+        {/* Desktop Gradient Overlay - Dark Gray on the left (softer), fading quickly to transparent on the right */}
+        <div className="hidden lg:block absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-zinc-950/95 via-zinc-950/20 to-transparent z-10 pointer-events-none"></div>
 
-            {/* LEFT - Landing Text */}
-            <div className="text-white space-y-5 z-20 relative text-center lg:text-left items-center lg:items-start flex flex-col">
-              {/* Subtle radial glow on mobile */}
-              <div className="absolute -top-20 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:-top-10 lg:-left-10 w-[300px] h-[300px] bg-vvm-blue-400/20 rounded-full blur-[100px] -z-10 lg:hidden"></div>
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm border border-white/20 shadow-lg mb-4">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <span className="font-medium text-white font-bold tracking-wide">Rendelj szakit, mint egy taxit!</span>
-              </div>
+        {/* BACKGROUND - Map Visualization */}
+        <div className="absolute top-0 left-0 w-full h-[65dvh] lg:h-full z-0">
+          <TeaserMap />
+          {/* Mobile fade down into the bottom sheet */}
+          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-vvm-blue-950 to-transparent lg:hidden pointer-events-none z-10"></div>
+        </div>
 
-              <h1 className="text-[2.25rem] md:text-5xl lg:text-[4rem] font-bold font-heading leading-[1.1] tracking-tight text-center lg:text-left">
-                Találd meg a<br />
-                <span className="whitespace-nowrap">tökéletes <span className="text-vvm-yellow-400">szakembert</span></span><br />
-                percek alatt!
+        {/* LEFT/BOTTOM - Floating Bottom Sheet (Mobile) & Landing Text (Desktop) */}
+        <div className="relative z-20 flex-1 flex flex-col justify-end lg:justify-center w-full max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pointer-events-none h-full">
+          <div className="bg-vvm-blue-950/95 backdrop-blur-2xl lg:bg-transparent lg:backdrop-blur-none rounded-t-[2.5rem] lg:rounded-none px-5 pt-6 pb-8 sm:p-8 lg:p-0 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] lg:shadow-none border-t border-white/15 lg:border-0 pointer-events-auto w-full lg:w-[60%] xl:w-[55%] flex flex-col lg:justify-center">
+
+            {/* Mobile drag handle indicator */}
+            <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-5 lg:hidden opacity-80"></div>
+
+            {/* MOBILE HERO (Uber bottom sheet style) */}
+            <div className="text-white space-y-4 text-center flex flex-col items-center lg:hidden">
+              <h1 className="text-[2rem] leading-[1.1] sm:text-4xl font-black font-heading tracking-tight text-center">
+                Kérj <span className="text-vvm-yellow-400">segítséget</span> azonnal!
               </h1>
 
-              <p className="text-xl md:text-xl text-blue-50 max-w-lg leading-relaxed font-light mx-auto lg:mx-0">
-                A VízVillanyFűtés az új generációs platform, ami azonnal összeköt téged a közeledben lévő, ellenőrzött víz-, villany- és fűtésszerelőkkel.
+              <p className="text-sm sm:text-base text-blue-50/90 max-w-lg leading-relaxed font-light mx-auto">
+                <strong className="text-white font-semibold">Rendelj szakit, mint egy taxit!</strong><br />
+                A platform, ami azonnal összeköt a közeledben lévő ellenőrzött szerelőkkel.
               </p>
 
-              {/* Main CTA */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              {/* Main CTA - Compact "Wolt" Style Action Row */}
+              <div className="w-full flex gap-3 pt-2">
                 {isAuthenticated ? (
                   role === 'contractor' ? (
                     <>
                       <button
                         onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'contractor' } }))}
-                        className="bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(250,204,21,0.3)]"
+                        className="flex-1 bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold text-sm py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-all transform active:scale-95 shadow-[0_4px_20px_rgba(250,204,21,0.3)]"
                       >
-                        <Search className="w-6 h-6" />
-                        <span>Elérhető munkák</span>
+                        <Search className="w-5 h-5" />
+                        <span className="whitespace-nowrap">Munkák</span>
                       </button>
-                      <Link href="/fiok" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-colors">
-                        <Award className="w-6 h-6" />
-                        <span>Kredit & Statisztikám</span>
+                      <Link href="/fiok" className="flex-1 bg-white/15 hover:bg-white/25 active:bg-white/30 backdrop-blur-lg border border-white/20 text-white font-bold text-sm py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-colors active:scale-95">
+                        <Award className="w-5 h-5" />
+                        <span className="whitespace-nowrap">Kredit</span>
                       </Link>
                     </>
                   ) : (
                     <>
                       <button
                         onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer', autoAdd: true } }))}
-                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(239,68,68,0.3)]"
+                        className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold text-sm py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-all transform active:scale-95 shadow-[0_4px_20px_rgba(239,68,68,0.4)]"
                       >
-                        <AlertTriangle className="w-6 h-6" />
-                        <span>Hibát jelzek!</span>
+                        <AlertTriangle className="w-5 h-5" />
+                        <span className="whitespace-nowrap">Hiba!</span>
                       </button>
                       <button
                         onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer', initialTab: 'own' } }))}
-                        className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-colors"
+                        className="flex-1 bg-white/15 hover:bg-white/25 backdrop-blur-lg border border-white/20 text-white font-bold text-sm py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-colors active:scale-95"
                       >
-                        <FileCheck className="w-6 h-6" />
-                        <span>Bejelentéseim</span>
+                        <FileCheck className="w-5 h-5" />
+                        <span className="whitespace-nowrap">Hibáim</span>
                       </button>
                     </>
                   )
                 ) : (
                   <>
-                    <Link href="/login?role=customer" className="bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(250,204,21,0.3)]">
-                      <User className="w-6 h-6" />
-                      <span>Ügyfél vagyok</span>
+                    <Link href="/login?role=customer" className="flex-1 bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold text-[15px] py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-all transform active:scale-95 shadow-[0_4px_20px_rgba(250,204,21,0.3)]">
+                      <User className="w-5 h-5 flex-shrink-0" />
+                      <span>Ügyfél</span>
                     </Link>
-                    <Link href="/login" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-3 transition-colors">
-                      <Wrench className="w-6 h-6" />
-                      <span>Szakember vagyok</span>
+                    <Link href="/login" className="flex-1 bg-white/15 hover:bg-white/25 active:bg-white/30 backdrop-blur-lg border border-white/20 text-white font-bold text-[15px] py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-colors active:scale-95">
+                      <Wrench className="w-5 h-5 flex-shrink-0" />
+                      <span>Szakember</span>
                     </Link>
                   </>
                 )}
               </div>
 
-              {/* Trust indicators & Rating */}
-              <div className="pt-6 border-t border-white/10 space-y-4">
-
-                {/* Google Rating Badge - visible on all screens */}
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/15 w-fit mx-auto lg:mx-0 lg:bg-transparent lg:backdrop-blur-none lg:rounded-none lg:px-0 lg:py-0 lg:border-0">
-                  <div className="flex items-center gap-1">
-                    <span className="text-2xl sm:text-3xl font-bold text-white leading-none">4.9</span>
-                    <div className="flex gap-0.5 ml-1">
-                      {[...Array(5)].map((_, i) => (
-                        <svg key={i} className="w-4 h-4 sm:w-5 sm:h-5 text-vvm-yellow-400 fill-current" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
+              <div className="w-full pt-4 border-t border-white/10 mt-2 flex justify-center">
+                <div className="grid grid-cols-2 gap-y-3 gap-x-6 sm:gap-x-12 w-fit">
+                  {[
+                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Ellenőrzött' },
+                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Azonnali' },
+                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Garanciális' },
+                    { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: '0-24 Elérhető' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-2 text-[13px] sm:text-sm text-blue-100/90 font-medium justify-start">
+                      {item.icon}
+                      <span className="whitespace-nowrap">{item.text}</span>
                     </div>
-                  </div>
-                  <div className="border-l border-white/20 pl-3 lg:border-l-0 lg:pl-0 lg:ml-1 flex items-center gap-2">
-                    <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" className="w-5 h-5 bg-white/90 rounded-full p-0.5" />
-                    <span className="text-blue-100 text-sm font-medium">Google értékelés</span>
-                  </div>
+                  ))}
                 </div>
-
-                {/* Features as compact 2x2 grid */}
-                <div className="flex flex-col items-center gap-y-2 lg:flex-row lg:gap-6 w-full lg:w-auto">
-                  <div className="grid grid-cols-[max-content_max-content] gap-x-4 sm:gap-x-6 gap-y-2 lg:flex lg:gap-6 w-fit justify-center">
-                    {[
-                      { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Ellenőrzött mesterek' },
-                      { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Gyorsabb kereső' },
-                      { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Számlaképes szakember' },
-                      { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: '24/7 Elérhető' },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-1.5 text-sm text-blue-100 font-medium">
-                        {item.icon}
-                        <span>{item.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
               </div>
             </div>
 
-            {/* RIGHT - Dynamic Map Visualization */}
-            <div className="relative w-full h-full lg:min-h-[420px] z-20">
-              <TeaserMap />
-            </div>
+            {/* DESKTOP HERO (Original Layout) */}
+            <div className="hidden lg:flex flex-col items-start space-y-6 text-left pr-8 w-full max-w-[700px]">
+              <h1 className="text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] font-bold font-heading tracking-tight leading-[1.1] text-white">
+                Találd meg a <br />
+                tökéletes <span className="text-vvm-yellow-400">szakembert</span><br />
+                percek alatt!
+              </h1>
 
-          </div>
-        </div >
-      </section >
+              <p className="text-lg text-blue-100/90 max-w-lg leading-relaxed font-light">
+                <strong className="text-white font-semibold tracking-wide">Rendelj szakit, mint egy taxit!</strong><br />
+                A VízVillanyFűtés az új generációs platform, ami azonnal
+                összeköt téged a közeledben lévő, ellenőrzött víz-, villany- és
+                fűtésszerelőkkel.
+              </p>
 
-      {/* Trust Bar */}
-      < section className="bg-white border-b border-gray-100" >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-            <div className="trust-badge">
-              <CheckCircle className="w-8 h-8 text-green-500" />
-              <span className="font-medium text-gray-800">Ellenőrzött szakemberek</span>
-            </div>
-            <div className="trust-badge">
-              <Zap className="w-8 h-8 text-vvm-yellow-500" />
-              <span className="font-medium text-gray-800">Gyors és okos kiajánlás</span>
-            </div>
-            <div className="trust-badge">
-              <MapPin className="w-8 h-8 text-vvm-blue-500" />
-              <span className="font-medium text-gray-800">Helyi mesterek a közeledben</span>
-            </div>
-            <div className="trust-badge">
-              <Shield className="w-8 h-8 text-slate-500" />
-              <span className="font-medium text-gray-800">Közvetlen kapcsolatfelvétel</span>
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full">
+                {isAuthenticated ? (
+                  role === 'contractor' ? (
+                    <>
+                      <button
+                        onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'contractor' } }))}
+                        className="bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105 shadow-[0_4px_20px_rgba(250,204,21,0.3)]"
+                      >
+                        <Search className="w-6 h-6" />
+                        <span>Munkák böngészése</span>
+                      </button>
+                      <Link href="/fiok" className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105">
+                        <Award className="w-6 h-6" />
+                        <span>Kreditégyenlegem</span>
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer', autoAdd: true } }))}
+                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105 shadow-[0_4px_20px_rgba(239,68,68,0.4)]"
+                      >
+                        <AlertTriangle className="w-6 h-6" />
+                        <span>Hiba bejelentése!</span>
+                      </button>
+                      <button
+                        onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer', initialTab: 'own' } }))}
+                        className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105"
+                      >
+                        <FileCheck className="w-6 h-6" />
+                        <span>Folyamatban lévő hibáim</span>
+                      </button>
+                    </>
+                  )
+                ) : (
+                  <>
+                    <Link href="/login?role=customer" className="flex-1 bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold text-lg py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105 shadow-[0_4px_20px_rgba(250,204,21,0.3)]">
+                      <User className="w-6 h-6 flex-shrink-0" />
+                      <span className="whitespace-nowrap">Ügyfél vagyok</span>
+                    </Link>
+                    <Link href="/login" className="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-lg py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105">
+                      <Wrench className="w-6 h-6 flex-shrink-0" />
+                      <span className="whitespace-nowrap">Szakember vagyok</span>
+                    </Link>
+                  </>
+                )}
+              </div>
+
+              <div className="pt-8 w-full mt-auto">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="text-[2rem] font-black text-white leading-none">4.9</div>
+                  <div className="flex text-vvm-yellow-400">
+                    <Star className="w-5 h-5 fill-current" />
+                    <Star className="w-5 h-5 fill-current" />
+                    <Star className="w-5 h-5 fill-current" />
+                    <Star className="w-5 h-5 fill-current" />
+                    <Star className="w-5 h-5 fill-current" />
+                  </div>
+                  <div className="flex items-center gap-2 text-white/90 font-medium ml-2">
+                    <div className="bg-white p-0.5 rounded-full flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" className="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                      </svg>
+                    </div>
+                    Google értékelés
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                  {[
+                    { icon: <CheckCircle className="w-5 h-5 text-emerald-400" />, text: 'Ellenőrzött mesterek' },
+                    { icon: <CheckCircle className="w-5 h-5 text-emerald-400" />, text: 'Gyorsabb kereső' },
+                    { icon: <CheckCircle className="w-5 h-5 text-emerald-400" />, text: 'Számlaképes szakember' },
+                    { icon: <CheckCircle className="w-5 h-5 text-emerald-400" />, text: '24/7 Elérhető' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-2 text-[15px] text-blue-100/90 font-medium whitespace-nowrap">
+                      {item.icon}
+                      <span>{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -325,47 +365,48 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Services Grid */}
-      <section className="relative pt-12 md:pt-16 pb-16 md:pb-24 bg-gray-50 overflow-hidden border-t border-gray-100">
-        {/* Map Background Pattern (Light) */}
-        <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='800' height='800' viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h800v800H0z' fill='none'/%3E%3Cpath d='M100 0v800M200 0v800M300 0v800M400 0v800M500 0v800M600 0v800M700 0v800M0 100h800M0 200h800M0 300h800M0 400h800M0 500h800M0 600h800M0 700h800' stroke='%23000' stroke-width='0.5' stroke-opacity='0.2'/%3E%3Cpath d='M150 0c50 100 200 150 250 300s100 400 300 500M600 0c-100 200-50 400-200 600s-300 100-400 200' stroke='%23000' stroke-width='1.5' stroke-opacity='0.3' fill='none'/%3E%3C/svg%3E")`,
-          backgroundSize: '800px 800px'
-        }}></div>
-
+      {/* Services Grid (Wolt-style compact categories) */}
+      <section className="relative py-8 lg:py-16 bg-white overflow-hidden border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-vvm-blue-800 mb-4">Miben tudunk segíteni?</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Platformunk összeköti azokat, akiknek víz-, villany- vagy fűtésproblémájuk van, azokkal a szakemberekkel, akik azonnal meg tudják oldani. Gyorsan, egyszerűen, megbízhatóan.
-            </p>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 lg:mb-10 gap-2 sm:gap-4">
+            <div>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 lg:mb-2">Szolgáltatások</h2>
+              <p className="text-xs sm:text-sm lg:text-base text-gray-500 max-w-xl">
+                Válassz kategóriát, és találd meg a megfelelő szakembert azonnal.
+              </p>
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
             {services.map((service, index) => (
               <Link
                 key={index}
                 href={service.link}
-                className="service-card group"
+                className="group relative flex flex-col items-center sm:items-start bg-gray-50/50 hover:bg-white p-4 sm:p-5 lg:p-6 rounded-2xl lg:rounded-3xl border border-gray-100 hover:border-vvm-blue-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-xl hover:shadow-vvm-blue-900/5 transition-all duration-300 overflow-hidden active:scale-95"
               >
-                <div className={`service-icon ${service.color}`}>
-                  <service.icon className="w-8 h-8" />
+                {/* Decorative background glow on hover */}
+                <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-10 transition-opacity ${service.color}`}></div>
+
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl ${service.color} flex items-center justify-center text-white shadow-lg lg:shadow-xl mb-3 sm:mb-4 lg:mb-5 group-hover:scale-110 lg:group-hover:-translate-y-1 transition-transform`}>
+                  <service.icon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-vvm-blue-600 transition-colors">
+
+                <h3 className="text-[14px] sm:text-lg lg:text-xl font-bold text-gray-900 text-center sm:text-left leading-tight group-hover:text-vvm-blue-600 transition-colors">
                   {service.title}
                 </h3>
-                <p className="text-gray-600 mb-4">{service.description}</p>
-                <ul className="space-y-2 mb-4">
-                  {service.features.map((feature, fIndex) => (
-                    <li key={fIndex} className="flex items-center gap-2 text-sm text-gray-500">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center text-vvm-blue-600 font-semibold group-hover:gap-2 transition-all">
+
+                <p className="hidden sm:block text-xs lg:text-sm text-gray-500 mt-2 mb-4 line-clamp-2">
+                  {service.description}
+                </p>
+
+                {/* Mobile text (smaller, one line feature) */}
+                <p className="sm:hidden text-[10px] text-gray-500 mt-1 text-center leading-[1.3] opacity-80">
+                  {service.features[1]}
+                </p>
+
+                <div className="hidden sm:flex items-center text-xs lg:text-sm text-vvm-blue-600 font-semibold group-hover:gap-1.5 transition-all mt-auto pt-2">
                   <span>Részletek</span>
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4" />
                 </div>
               </Link>
             ))}
@@ -533,124 +574,7 @@ export default function HomePage() {
       </section >
 
 
-      {/* Grant Calculator Lead Magnet */}
-      < section className="py-16 md:py-24 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 relative overflow-hidden" >
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzR2LTRoLTJ2NGgtNHYyGjR2NGgydi00aDR2LTJoLTR6bTAtMzBWMGgtMnY0aC00djJoNHY0aDJWNmg0VjRoLTR6TTYgMzR2LTRINHY0SDB2Mmg0djRoMnYtNGg0di0ySDZ6TTYgNFYwSDR2NEgwdjJoNHY0aDJWNmg0VjRINnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-white">
-              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-sm mb-6">
-                <Award className="w-4 h-4" />
-                <span>Otthonfelújítási Program 2025</span>
-              </div>
-
-              <h2 className="text-3xl md:text-4xl font-bold font-heading mb-6">
-                Tudja meg 1 perc alatt, <br />
-                jogosult-e akár <span className="text-amber-300">6 millió Ft</span> <br />
-                támogatásra!
-              </h2>
-
-              <p className="text-lg text-emerald-100 mb-8">
-                Víz–villany–fűtés korszerűsítésre pályázati támogatás igényelhető.
-                A regisztrált kivitelezők segítséget nyújtanak a teljes ügyintézésben – a papírmunkától a kivitelezésig.
-              </p>
-
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center gap-3 text-emerald-100">
-                  <CheckCircle className="w-5 h-5 text-emerald-300" />
-                  <span>Ingyenes jogosultság ellenőrzés</span>
-                </div>
-                <div className="flex items-center gap-3 text-emerald-100">
-                  <CheckCircle className="w-5 h-5 text-emerald-300" />
-                  <span>Teljes pályázati dokumentáció készítése</span>
-                </div>
-                <div className="flex items-center gap-3 text-emerald-100">
-                  <CheckCircle className="w-5 h-5 text-emerald-300" />
-                  <span>Sikerdíjas konstrukció – csak ha nyer</span>
-                </div>
-              </div>
-
-              <Link href="/palyazat-kalkulator" className="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold py-4 px-8 rounded-xl hover:bg-emerald-50 transition-colors shadow-xl">
-                <span>Ingyenes jogosultság ellenőrzés</span>
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-
-              <p className="text-sm text-emerald-200 mt-4">
-                Nem kötelez szerződéskötésre, csak tájékoztató.
-              </p>
-            </div>
-
-            <div className="relative">
-              <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-8">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 sm:mb-6">Gyors előszűrés</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Mikor épült az ingatlan?
-                    </label>
-                    <select
-                      className="input-field"
-                      value={grantForm.buildingYear}
-                      onChange={(e) => setGrantForm(prev => ({ ...prev, buildingYear: e.target.value }))}
-                    >
-                      <option value="">Válasszon...</option>
-                      <option value="1970-elott">1970 előtt</option>
-                      <option value="1970-1990">1970-1990 között</option>
-                      <option value="1990-utan">1990 után</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Milyen fűtési rendszer van?
-                    </label>
-                    <select
-                      className="input-field"
-                      value={grantForm.heatingSystem}
-                      onChange={(e) => setGrantForm(prev => ({ ...prev, heatingSystem: e.target.value }))}
-                    >
-                      <option value="">Válasszon...</option>
-                      <option value="gazkazan">Gázkazán</option>
-                      <option value="tavfutes">Távfűtés</option>
-                      <option value="elektromos">Elektromos</option>
-                      <option value="vegyes">Vegyes</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Mit szeretne korszerűsíteni?
-                    </label>
-                    <select
-                      className="input-field"
-                      value={grantForm.workType}
-                      onChange={(e) => setGrantForm(prev => ({ ...prev, workType: e.target.value }))}
-                    >
-                      <option value="">Válasszon...</option>
-                      <option value="futes">Fűtésrendszer</option>
-                      <option value="villany">Villamos hálózat</option>
-                      <option value="viz">Vízvezeték rendszer</option>
-                      <option value="kombinalt">Kombinált felújítás</option>
-                    </select>
-                  </div>
-                  <button
-                    onClick={() => {
-                      const params = new URLSearchParams();
-                      if (grantForm.buildingYear) params.set('eppitkoz', grantForm.buildingYear);
-                      if (grantForm.heatingSystem) params.set('futes', grantForm.heatingSystem);
-                      if (grantForm.workType) params.set('munka', grantForm.workType);
-                      router.push(`/palyazat-kalkulator${params.toString() ? '?' + params.toString() : ''}`);
-                    }}
-                    className="btn-secondary w-full py-4 text-lg mt-4"
-                  >
-                    Jogosultság ellenőrzése
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section >
 
       {/* Testimonials */}
       < section className="py-16 md:py-24 bg-gray-50" >
