@@ -32,15 +32,13 @@ export async function GET(request: NextRequest) {
             .select('*')
             .order('created_at', { ascending: false });
 
-        // 2. Fetch Purchased/Unlocked Jobs (My Jobs)
-        // The RLS policy on 'jobs' allows contractors to SELECT jobs they have purchased.
-        // We will query lead_purchases and join jobs.
-        const { data: leadPurchases, error: leadsError } = await supabase
-            .from('lead_purchases')
+        // 2. Fetch Job Interests (My Jobs based on Escrow model)
+        const { data: leadInterests, error: interestsError } = await supabase
+            .from('job_interests')
             .select(`
         id,
-        price_paid,
-        purchased_at,
+        status,
+        created_at,
         job:jobs(
           id, title, description, trade, category, status, priority, 
           preferred_time_from, preferred_time_to, created_at, updated_at,
@@ -50,15 +48,29 @@ export async function GET(request: NextRequest) {
         )
       `)
             .eq('contractor_id', profile.id)
-            .order('purchased_at', { ascending: false });
+            .order('created_at', { ascending: false });
 
         if (openError) console.error('Error fetching open jobs:', openError);
-        if (leadsError) console.error('Error fetching purchased leads:', leadsError);
+        if (interestsError) console.error('Error fetching purchased leads:', interestsError);
 
-        // Group the purchased jobs
-        const purchasedJobs = (leadPurchases || []).map(lp => Array.isArray(lp.job) ? lp.job[0] : lp.job).filter(Boolean) as any[];
-        const activeJobs = purchasedJobs.filter(j => j !== null && j.status !== 'completed' && j.status !== 'cancelled_by_customer');
-        const completedJobs = purchasedJobs.filter(j => j !== null && (j.status === 'completed' || j.status === 'cancelled_by_customer'));
+        // Map and Group the interested jobs
+        const myInterests = leadInterests || [];
+
+        // Attach the interest status context to each job so the frontend knows if it's pending, accepted, rejected
+        const purchasedJobs = myInterests.map(i => {
+            const j = Array.isArray(i.job) ? i.job[0] : i.job;
+            if (!j) return null;
+            return {
+                ...j,
+                assignment: {
+                    id: i.id,
+                    status: i.status
+                }
+            };
+        }).filter(Boolean) as any[];
+
+        const activeJobs = purchasedJobs.filter(j => j !== null && (j.assignment.status === 'pending' || j.assignment.status === 'accepted') && j.status !== 'completed' && j.status !== 'cancelled_by_customer');
+        const completedJobs = purchasedJobs.filter(j => j !== null && (j.status === 'completed' || j.status === 'cancelled_by_customer' || j.assignment.status === 'rejected' || j.assignment.status === 'withdrawn'));
 
         return NextResponse.json({
             success: true,

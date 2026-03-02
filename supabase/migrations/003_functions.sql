@@ -122,9 +122,12 @@ DECLARE
     v_user_meta_id UUID;
     v_contractor_profile_id UUID;
 BEGIN
-    -- Insert user_meta
+    -- Insert or update user_meta
     INSERT INTO public.user_meta (user_id, role, status)
     VALUES (p_user_id, 'contractor', 'pending_approval')
+    ON CONFLICT (user_id) DO UPDATE SET 
+        role = 'contractor',
+        status = 'pending_approval'
     RETURNING id INTO v_user_meta_id;
     
     -- Insert contractor profile

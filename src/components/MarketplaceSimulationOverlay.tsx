@@ -142,26 +142,60 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
             });
     }, [user, viewMode]);
 
+    // Real Jobs state for contractor
+    const [realJobs, setRealJobs] = useState<any[]>([]);
+
     // Fetch my interests (contractor) or interest counts (customer)
     useEffect(() => {
         if (!user) return;
         if (viewMode === 'contractor') {
-            // Fetch leads I've shown interest in
-            supabase.from('lead_interests').select('*').eq('contractor_id', user.id)
-                .then(({ data }) => {
-                    if (data) {
-                        setMyInterests(data);
-                        // For accepted ones, fetch the lead details
-                        const accepted = data.filter(i => i.status === 'accepted');
-                        if (accepted.length > 0) {
-                            const leadIds = accepted.map(i => i.lead_id);
-                            supabase.from('leads').select('*').in('id', leadIds)
-                                .then(({ data: leads }) => {
-                                    if (leads) setAcceptedLeads(leads);
-                                });
-                        }
+            // First, load available open jobs
+            const loadRealJobs = async () => {
+                const res = await fetch('/api/contractor/jobs?status=open');
+                const p = await res.json();
+                if (p.success && p.data?.assignments) {
+                    // Extract the jobs from assignments or directly query available jobs
+                    // Wait, the existing /api/contractor/jobs endpoint returns assignment for the *current* contractor. 
+                    // To see *all* open jobs, we need an endpoint or to fetch directly.
+                    // Let's fetch open jobs directly from Supabase (read access is allowed for open jobs)
+                    const { data: openJobs } = await supabase.from('jobs').select('*, address:addresses(*)').eq('status', 'open');
+                    if (openJobs) {
+                        // Map them to match expected lead structure for Map/List
+                        const mappedJobs = openJobs.map(j => ({
+                            ...j,
+                            // Fallback coords if address not loaded
+                            lat: j.address?.lat || 47.4979,
+                            lng: j.address?.lng || 19.0402,
+                            district: j.address?.district || 'Ismeretlen kerület',
+                            // For UI consistency
+                            type: j.category || 'viz', // Temporary fallback
+                        }));
+                        setRealJobs(mappedJobs);
                     }
-                });
+                }
+            };
+
+            // Then, load my pending/accepted interests
+            const loadInterests = async () => {
+                const res = await fetch('/api/contractor/interests');
+                const p = await res.json();
+                if (p.success && p.data?.interests) {
+                    // Mapped to look like the old interests array
+                    const interests = p.data.interests.map((i: any) => ({
+                        ...i,
+                        lead_id: i.job_id // Map job_id to lead_id for legacy UI code
+                    }));
+                    setMyInterests(interests);
+
+                    const accepted = interests.filter((i: any) => i.status === 'accepted');
+                    if (accepted.length > 0) {
+                        setAcceptedLeads(accepted.map((i: any) => i.job));
+                    }
+                }
+            };
+
+            loadRealJobs();
+            loadInterests();
         } else {
             // Customer: fetch interest counts for my leads
             const myLeadIds = mockLeads.filter(l => l.user_id === user.id).map(l => l.id);
@@ -191,23 +225,21 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
         if (!user || interestSubmitting) return;
         setInterestSubmitting(true);
         try {
-            const { error } = await supabase.from('lead_interests').insert({
-                lead_id: leadId,
-                contractor_id: user.id,
-                contractor_name: user.email?.split('@')[0] || 'Szakember',
-                price_at_interest: 2000,
+            // Call our new API route for real jobs
+            const res = await fetch(`/api/contractor/jobs/${leadId}/interest`, {
+                method: 'POST'
             });
-            if (error) {
-                if (error.code === '23505') {
-                    alert('Már jeleztél érdeklődést ennél a bejelentésnél!');
-                } else {
-                    alert('Hiba: ' + error.message);
-                }
+            const p = await res.json();
+
+            if (!p.success) {
+                alert('Hiba: ' + p.error);
             } else {
                 setInterestSuccess(leadId);
                 setMyInterests(prev => [...prev, { lead_id: leadId, contractor_id: user.id, status: 'pending' }]);
                 setTimeout(() => setInterestSuccess(null), 3000);
             }
+        } catch (err: any) {
+            alert('Hiba történt a kommunikáció során.');
         } finally {
             setInterestSubmitting(false);
         }
@@ -217,7 +249,7 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
     const handleAcceptInterest = useCallback(async (interestId: string, leadId: string) => {
         if (!user) return;
         try {
-            const { data, error } = await supabase.rpc('accept_contractor_interest', {
+            const { data, error } = await supabase.rpc('accept_job_interest', {
                 p_interest_id: interestId
             });
             if (error) {
@@ -243,21 +275,30 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
     // Handle customer rejecting a contractor interest
     const handleRejectInterest = useCallback(async (interestId: string, leadId: string) => {
         if (!user) return;
-        const { error } = await supabase.from('lead_interests').update({ status: 'rejected' }).eq('id', interestId);
-        if (!error) {
-            setLeadInterestDetails(prev => {
-                const updated = { ...prev };
-                if (updated[leadId]) {
-                    updated[leadId] = updated[leadId].map(i =>
-                        i.id === interestId ? { ...i, status: 'rejected' } : i
-                    );
+        if (window.confirm("Biztosan elutasítod ezt a jelentkezőt? A szakember visszakapja a zárolt 2.000 Ft-ot, és a bejelentésed újra megjelenik a feladatok között.")) {
+            if (window.confirm("Megerősítés: Valóban elutasítod?")) {
+                const { error, data } = await supabase.rpc('reject_job_interest', { p_interest_id: interestId });
+                if (!error) {
+                    setLeadInterestDetails(prev => {
+                        const updated = { ...prev };
+                        if (updated[leadId]) {
+                            updated[leadId] = updated[leadId].map(i =>
+                                i.id === interestId ? { ...i, status: 'rejected' } : i
+                            );
+                        }
+                        return updated;
+                    });
+                    alert("Szakember elutasítva. A munka ismét aktív a térképen.");
+                } else {
+                    alert('Hiba történ az elutasítás során: ' + error.message);
                 }
-                return updated;
-            });
+            }
         }
     }, [user]);
 
-    const displayLeads = activeTab === 'own' && user ? mockLeads.filter(l => l.user_id === user.id) : mockLeads;
+    const displayLeads = viewMode === 'contractor'
+        ? (activeTab === 'own' && user ? realJobs.filter(j => alreadyInterested(j.id)) : realJobs)
+        : (activeTab === 'own' && user ? mockLeads.filter(l => l.user_id === user.id) : mockLeads);
     const alreadyInterested = (leadId: string) => myInterests.some(i => i.lead_id === leadId);
     const getInterestStatus = (leadId: string) => myInterests.find(i => i.lead_id === leadId)?.status;
 
@@ -529,7 +570,7 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                                             <div className="w-10 h-10 rounded-full bg-blue-50 text-vvm-blue-600 flex items-center justify-center">
                                                 <Briefcase className="w-5 h-5" />
                                             </div>
-                                            <div className="text-2xl font-black text-slate-800 leading-none">{mockLeads.length}</div>
+                                            <div className="text-2xl font-black text-slate-800 leading-none">{realJobs.length}</div>
                                             <div className="text-xs text-slate-500 font-medium">Elérhető munka</div>
                                         </div>
                                         <div className="bg-white p-4 rounded-2xl border border-slate-200 text-center flex flex-col items-center justify-center gap-2 shadow-sm">
@@ -672,7 +713,7 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                 >
                     <NavigationControl position="top-right" style={{ marginTop: '140px', marginRight: '16px' }} />
 
-                    {mockLeads.map((lead) => (
+                    {displayLeads.map((lead) => (
                         <Marker
                             key={'map-' + lead.id}
                             longitude={lead.lng}
@@ -766,7 +807,7 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                                                 className="w-full bg-gradient-to-r from-vvm-blue-600 to-vvm-blue-700 hover:from-vvm-blue-700 hover:to-vvm-blue-800 text-white font-bold py-3.5 px-6 rounded-xl text-base flex items-center justify-center gap-2 transition-transform transform hover:scale-[1.02] shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <Shield className="w-5 h-5" />
-                                                {interestSubmitting ? 'Küldés...' : 'Érdeklődés jelzése'}
+                                                {interestSubmitting ? 'Küldés...' : 'Elvállalom (-2.000 Kredit)'}
                                                 <ArrowRight className="w-5 h-5 ml-1" />
                                             </button>
                                         )}

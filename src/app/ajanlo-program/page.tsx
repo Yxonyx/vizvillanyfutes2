@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { Gift, ArrowRight, CheckCircle, Users, Copy, Award, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-    title: 'Ajánló Program | VízVillanyFűtés - Szerezz 10.000 Ft bónuszt',
-    description: 'Hívj meg egy szakembert a platformra és szerezz te is 10.000 Ft lebeszélhető extra kredit bónuszt!',
+    title: 'Ajánló Program | VízVillanyFűtés - Szerezz 5.000 Ft bónuszt',
+    description: 'Hívj meg egy szakembert a platformra és szerezz te is 5.000 Ft lebeszélhető extra kredit bónuszt!',
 };
 
 export default function ReferralProgramPage() {
@@ -36,12 +36,12 @@ export default function ReferralProgramPage() {
                     </div>
 
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white font-heading mb-6 tracking-tight">
-                        Szerezz Plusz <span className="text-transparent bg-clip-text bg-gradient-to-r from-vvm-yellow-400 to-amber-500">10.000 Ft*</span> Kreditet
+                        Szerezz Plusz <span className="text-transparent bg-clip-text bg-gradient-to-r from-vvm-yellow-400 to-amber-500">5.000 Ft*</span> Kreditet
                     </h1>
 
                     <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
                         Tudsz egy jó szakembert, aki még nem regisztrált be hozzánk?
-                        Ajánld neki a platformot, és a sikeres csatlakozása, majd adminisztrátori jóváhagyása után te <span className="text-vvm-yellow-400 font-bold">10.000 Ft*</span> lebeszélhető promóciós kredit bónuszt kapsz! Ő is megkapja a szokásos 10.000 Ft-os indulási jóváírását, tehát kicsit mindenki jól jár!
+                        Ajánld neki a platformot, és miután regisztrált, aktiváltuk a profilját, és **megvásárolja élete legelső munkáját**, te <span className="text-vvm-yellow-400 font-bold">5.000 Ft*</span> lebeszélhető promóciós kredit bónuszt kapsz! Ő is megkapja a szokásos 10.000 Ft-os indulási jóváírását, tehát kicsit mindenki jól jár!
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -95,7 +95,7 @@ export default function ReferralProgramPage() {
                             {
                                 step: '3',
                                 title: 'Megkapod a bónuszt',
-                                description: 'A meghívott kolléga fiókjának adminisztrátori aktiválása után a te egyenlegeden azonnal jóváíródik a sikeres ajánláshoz járó 10.000 Ft* promóciós kredit.',
+                                description: 'Miután a kolléga bejutott és megvásárolja élete első leadjét a platformon (akár a kapott ingyen kreditéből), a te egyenlegeden azonnal jóváíródik az 5.000 Ft* promóciós bónusz.',
                                 icon: <Gift className="w-6 h-6 text-vvm-yellow-600" />
                             }
                         ].map((item, index) => (
@@ -131,15 +131,15 @@ export default function ReferralProgramPage() {
                         {[
                             {
                                 q: "Hány embert hívhatok meg a program keretében?",
-                                a: "Nincs felső korlát! Akármennyi kollégát, ismerőst meghívhatsz, minden egyes újonnan, sikeresen csatlakozott és aktivált szakember után megkapod a 10.000 Ft kredit bónuszt."
+                                a: "Nincs felső korlát! Akármennyi kollégát, ismerőst meghívhatsz, minden egyes újonnan, sikeresen csatlakozott és aktivált szakember után megkapod az 5.000 Ft kredit bónuszt."
                             },
                             {
                                 q: "Mikor írják jóvá az egyenlegemen a bónuszt?",
-                                a: "A bónusz akkor kerül automatikusan jóváírásra, amikor a meghívott szakember fiókja átesik a minőségbiztosítási ellenőrzésen és véglegesen aktiválásra kerül az adminisztrátorok által."
+                                a: "A bónusz akkor kerül automatikusan jóváírásra, amikor a meghívott szakember fiókját aktiváljuk feltölti vagy felhasználja az induló kreditjét, és megvásárolja élete legelső leadjét (munkáját) a platformon. Ezzel szűrjük ki a visszaéléseket, hogy csak aktív szakemberek után fiessen a rendszer."
                             },
                             {
                                 q: "A meghívott szakember is kap bónuszt?",
-                                a: "Igen! Ő automatikusan megkapja a platformunkra belépő új szakembereknek a jóváhagyás után amúgy is járó 10.000 Ft-os kezdő kreditet (így motiváltabb is a csatlakozásra), te pedig az újabb 10.000 Ft* extra bónuszt kapod a sikeres ajánlásért."
+                                a: "Igen! Ő automatikusan megkapja a platformunkra belépő új szakembereknek a jóváhagyás után amúgy is járó 10.000 Ft-os kezdő kreditet (így motiváltabb is a csatlakozásra), te pedig az újabb 5.000 Ft* extra bónuszt kapod a sikeres ajánlásért."
                             },
                             {
                                 q: "Hol találom meg a saját ajánlói linkemet?",
@@ -160,7 +160,7 @@ export default function ReferralProgramPage() {
 
                     <div className="mt-8 text-center border-t border-slate-200 py-6">
                         <p className="text-xs text-slate-500 max-w-2xl mx-auto mb-8">
-                            *A 10.000 Ft promóciós (affiliate) kredit készpénzre vagy azonnali átutalásra nem váltható, kizárólag a platformon történő kapcsolatfelvételi adatok vásárlására (lead-feloldásra) használható fel az újonnan meghívott és csatlakozott szakember fiókjának sikeres adminisztrátori jóváhagyását követően. A szolgáltatás nyújtója a <Link href="/aszf" className="underline">Szabályzatban</Link> leírtak szerint fenntartja a promóció visszavonásának jogát visszaélés, fiktív adatok, regisztrációs duplikáció, vagy ügyfélpanaszok okán történt kizárás esetén.
+                            *Az 5.000 Ft promóciós (affiliate) kredit készpénzre vagy azonnali átutalásra nem váltható, kizárólag a platformon történő kapcsolatfelvételi adatok vásárlására (lead-feloldásra) használható fel az újonnan meghívott és csatlakozott szakember fiókjának sikeres adminisztrátori jóváhagyását követően. A szolgáltatás nyújtója a <Link href="/aszf" className="underline">Szabályzatban</Link> leírtak szerint fenntartja a promóció visszavonásának jogát visszaélés, fiktív adatok, regisztrációs duplikáció, vagy ügyfélpanaszok okán történt kizárás esetén.
                         </p>
                         <Link href="/csatlakozz-partnerkent" className="text-vvm-blue-600 hover:text-vvm-blue-800 font-semibold underline underline-offset-4">
                             További kérdésed van? Alapvető szakember belépési információk

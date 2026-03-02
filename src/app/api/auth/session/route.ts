@@ -27,6 +27,19 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
+    // Check if the client requested to preserve a specific role (e.g. contractor acting as customer)
+    const currentRoleHeader = request.headers.get('x-current-role');
+    let effectiveRole = userMeta?.role;
+
+    if (userMeta?.role === 'admin' || userMeta?.role === 'dispatcher') {
+      effectiveRole = userMeta.role; // Admins are always admins
+    } else if (currentRoleHeader === 'customer' && userMeta?.role === 'contractor') {
+      effectiveRole = 'customer'; // Allow contractor to stay in customer view
+    } else if (currentRoleHeader === 'contractor' && userMeta?.role === 'customer') {
+      // Cannot elevate customer to contractor if not in user_meta
+      effectiveRole = 'customer';
+    }
+
     // Get contractor profile if applicable
     let contractorProfile = null;
     if (userMeta?.role === 'contractor') {
@@ -35,7 +48,7 @@ export async function GET(request: NextRequest) {
         .select('id, display_name, phone, trades, service_areas, status')
         .eq('user_id', user.id)
         .single();
-      
+
       contractorProfile = profile;
     }
 
@@ -49,7 +62,7 @@ export async function GET(request: NextRequest) {
         user: {
           id: user.id,
           email: user.email,
-          role: userMeta?.role || null,
+          role: effectiveRole || null,
           status: userMeta?.status || null,
         },
         session: token ? {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Map, { Marker, Popup, NavigationControl, MapRef } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { LogIn, Maximize2, Clock, Search } from 'lucide-react';
@@ -16,6 +16,18 @@ interface UnauthMapLibreMapProps {
 export default function UnauthMapLibreMap({ onLoginClick, leads, getIcon, getColor }: UnauthMapLibreMapProps) {
     const [popupInfo, setPopupInfo] = useState<any>(null);
     const mapRef = useRef<MapRef>(null);
+    const [padding, setPadding] = useState({ bottom: 0 });
+
+    useEffect(() => {
+        const updatePadding = () => {
+            const isMobile = window.innerWidth < 1024;
+            // Provide 60% bottom padding on mobile so the map's logical center is shifted UP, above the bottom sheet overlay
+            setPadding({ bottom: isMobile ? window.innerHeight * 0.6 : 0 });
+        };
+        updatePadding();
+        window.addEventListener('resize', updatePadding);
+        return () => window.removeEventListener('resize', updatePadding);
+    }, []);
 
     // Initial view centered on the dense cluster of VBF jobs
     const initialViewState = {
@@ -29,10 +41,11 @@ export default function UnauthMapLibreMap({ onLoginClick, leads, getIcon, getCol
 
     return (
         <div className="w-full h-full relative cursor-pointer group">
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0" style={{ touchAction: 'none' }}>
                 <Map
                     ref={mapRef}
                     initialViewState={initialViewState}
+                    padding={padding}
                     mapStyle={mapStyle}
                     style={{ width: '100%', height: '100%' }}
                     reuseMaps
@@ -49,8 +62,9 @@ export default function UnauthMapLibreMap({ onLoginClick, leads, getIcon, getCol
                                 e.originalEvent.stopPropagation();
                                 setPopupInfo(lead);
                                 mapRef.current?.flyTo({
-                                    center: [lead.lng, lead.lat + 0.008],
+                                    center: [lead.lng, lead.lat],
                                     zoom: 13.5,
+                                    padding,
                                     duration: 800
                                 });
                             }}
@@ -64,14 +78,14 @@ export default function UnauthMapLibreMap({ onLoginClick, leads, getIcon, getCol
                                     {getIcon(lead.type)}
                                 </div>
 
-                                {/* Hover Label - Replicating original design */}
-                                <div className="absolute top-1/2 -translate-y-1/2 left-full ml-3 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity bg-white px-3 py-1.5 rounded-lg shadow-xl w-max pointer-events-none z-50 border border-slate-100">
-                                    <div className="font-bold text-slate-800 text-sm whitespace-nowrap">{lead.title}</div>
+                                {/* Hover Label - Replicating original design but DARK */}
+                                <div className="absolute top-1/2 -translate-y-1/2 left-full ml-3 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 px-3 py-1.5 rounded-lg shadow-xl w-max pointer-events-none z-50 border border-slate-700">
+                                    <div className="font-bold text-white text-sm whitespace-nowrap">{lead.title}</div>
                                     <div className="flex items-center gap-1.5 mt-0.5">
-                                        <div className="text-[10px] text-red-600 font-semibold uppercase tracking-wider">Sürgős (SOS)</div>
+                                        <div className="text-[10px] text-red-400 font-semibold uppercase tracking-wider">Sürgős (SOS)</div>
                                     </div>
                                     {/* Triangle pointer */}
-                                    <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-white border-l border-b border-slate-100 rotate-45 transform"></div>
+                                    <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-slate-800 border-l border-b border-slate-700 rotate-45 transform"></div>
                                 </div>
                             </div>
                         </Marker>
@@ -88,6 +102,7 @@ export default function UnauthMapLibreMap({ onLoginClick, leads, getIcon, getCol
                                 mapRef.current?.flyTo({
                                     center: [initialViewState.longitude, initialViewState.latitude],
                                     zoom: initialViewState.zoom,
+                                    padding,
                                     duration: 800
                                 });
                             }}
@@ -96,31 +111,31 @@ export default function UnauthMapLibreMap({ onLoginClick, leads, getIcon, getCol
                             maxWidth="340px"
                         >
                             <div className="p-1">
-                                <div className="flex items-center gap-3 mb-3 border-b border-slate-100 pb-3">
+                                <div className="flex items-center gap-3 mb-3 border-b border-slate-700 pb-3">
                                     <div className={`w-10 h-10 rounded-full ${getColor(popupInfo.type)} flex flex-shrink-0 items-center justify-center text-white shadow-md`}>
                                         {getIcon(popupInfo.type)}
                                     </div>
                                     <div className="flex-1 pr-4">
-                                        <h3 className="font-bold text-slate-800 text-base leading-tight mb-0.5">{popupInfo.title}</h3>
-                                        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                                        <h3 className="font-bold text-white text-base leading-tight mb-0.5">{popupInfo.title}</h3>
+                                        <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
                                             {popupInfo.district || 'Budapest'}
                                         </div>
                                     </div>
                                 </div>
 
                                 {popupInfo.description && (
-                                    <div className="bg-slate-50/80 rounded-lg p-3 mb-4 text-sm text-slate-600 border border-slate-100 leading-relaxed italic shadow-inner">
+                                    <div className="bg-slate-700/50 rounded-lg p-3 mb-4 text-sm text-slate-300 border border-slate-600 leading-relaxed italic shadow-inner">
                                         &quot;{popupInfo.description}&quot;
                                     </div>
                                 )}
 
                                 <div className="flex items-center justify-between text-xs mb-4 px-1">
-                                    <div className="flex items-center gap-1.5 text-red-600 font-bold bg-red-50 px-2.5 py-1 rounded-full border border-red-100">
+                                    <div className="flex items-center gap-1.5 text-red-400 font-bold bg-red-950/40 px-2.5 py-1 rounded-full border border-red-500/30">
                                         <Clock className="w-3.5 h-3.5" />
                                         Azonnali SOS
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-blue-600 font-bold bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
+                                    <div className="flex items-center gap-1.5 text-blue-400 font-bold bg-blue-950/40 px-2.5 py-1 rounded-full border border-blue-500/30">
                                         <Search className="w-3.5 h-3.5" />
                                         Szakit keres
                                     </div>
@@ -131,7 +146,7 @@ export default function UnauthMapLibreMap({ onLoginClick, leads, getIcon, getCol
                                         e.stopPropagation();
                                         onLoginClick();
                                     }}
-                                    className="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md"
+                                    className="w-full bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-slate-900 font-bold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md"
                                 >
                                     <LogIn className="w-4 h-4" />
                                     Jelentkezz be a részletekért
@@ -202,18 +217,27 @@ export default function UnauthMapLibreMap({ onLoginClick, leads, getIcon, getCol
             <style jsx global>{`
                 .maplibregl-canvas {
                     filter: none !important;
+                    touch-action: none !important;
+                }
+                .maplibregl-map {
+                    touch-action: none !important;
+                }
+                .maplibregl-popup, .maplibregl-marker {
+                    touch-action: none !important;
                 }
                 .maplibregl-popup-content {
+                    touch-action: none !important;
                     padding: 12px !important;
                     border-radius: 16px !important;
                     overflow: hidden !important;
-                    box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.15) !important;
-                    background: white !important;
+                    box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3) !important;
+                    background: #1e293b !important;
+                    color: white !important;
                 }
                 .maplibregl-popup-close-button {
                     font-size: 24px !important;
                     padding: 8px 12px !important;
-                    color: #64748b !important;
+                    color: #94a3b8 !important;
                     outline: none !important;
                     right: 4px !important;
                     top: 4px !important;
@@ -221,10 +245,10 @@ export default function UnauthMapLibreMap({ onLoginClick, leads, getIcon, getCol
                 }
                 .maplibregl-popup-close-button:hover {
                     background-color: transparent !important;
-                    color: #0f172a !important;
+                    color: white !important;
                 }
                 .maplibregl-popup-tip {
-                    border-top-color: white !important;
+                    border-top-color: #1e293b !important;
                 }
                 .maplibregl-ctrl-top-right {
                     margin-top: 48px !important;

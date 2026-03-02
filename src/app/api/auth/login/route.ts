@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json();
+    const { email, password, requestedRole } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -80,7 +80,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get contractor profile if user is a contractor
+    // Determine the effective role for the session
+    // If they have admin/dispatcher, ALWAYS keep it. 
+    // If they are a contractor but requested customer, let them be customer.
+    let effectiveRole = userMeta?.role;
+
+    // Protect admin/dispatcher from being downgraded by a simple UI selection
+    if (userMeta?.role === 'admin' || userMeta?.role === 'dispatcher') {
+      effectiveRole = userMeta.role;
+    } else if (requestedRole === 'customer') {
+      // Allowed to downgrade from contractor to customer for the session
+      effectiveRole = 'customer';
+    } else if (requestedRole === 'contractor' && userMeta?.role === 'contractor') {
+      // Allowed to log in as contractor if they are one
+      effectiveRole = 'contractor';
+    } else if (requestedRole === 'contractor' && userMeta?.role === 'customer') {
+      // Cannot log in as contractor if they only have customer in user_meta legally
+      return NextResponse.json(
+        { success: false, error: 'Nincs partner fiókja regisztrálva ehhez az email címhez. Kérjük váltson Ügyfél nézetre vagy regisztráljon Partnerként.' },
+        { status: 403 }
+      );
+    }
+
+    // Get contractor profile if user wants to be a contractor or IS a contractor inherently
     let contractorProfile = null;
     if (userMeta?.role === 'contractor') {
       const { data: profile } = await adminClient
@@ -91,19 +113,21 @@ export async function POST(request: NextRequest) {
 
       contractorProfile = profile;
 
-      // Check contractor approval status
-      if (profile?.status === 'pending_approval') {
-        return NextResponse.json(
-          { success: false, error: 'Partner fiókja jóváhagyásra vár.' },
-          { status: 403 }
-        );
-      }
+      // Check contractor approval status ONLY if they are actively trying to use the contractor portal
+      if (requestedRole === 'contractor') {
+        if (profile?.status === 'pending_approval') {
+          return NextResponse.json(
+            { success: false, error: 'Partner fiókja jóváhagyásra vár.' },
+            { status: 403 }
+          );
+        }
 
-      if (profile?.status === 'rejected') {
-        return NextResponse.json(
-          { success: false, error: 'Partner jelentkezése el lett utasítva.' },
-          { status: 403 }
-        );
+        if (profile?.status === 'rejected') {
+          return NextResponse.json(
+            { success: false, error: 'Partner jelentkezése el lett utasítva.' },
+            { status: 403 }
+          );
+        }
       }
     }
 
@@ -114,7 +138,7 @@ export async function POST(request: NextRequest) {
         user: {
           id: authData.user.id,
           email: authData.user.email,
-          role: userMeta?.role || null,
+          role: effectiveRole || null,
           status: userMeta?.status || null,
         },
         session: {

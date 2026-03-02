@@ -23,7 +23,7 @@ interface AuthContextType {
   isAdminOrDispatcher: boolean;
   isContractor: boolean;
   isCustomer: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string, role?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
 }
@@ -79,13 +79,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   // Login function
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string, requestedRole?: string) => {
     try {
       const response = await api.post<{
         user: UserSession['user'];
         session: UserSession['session'];
         contractor_profile?: UserSession['contractor_profile'];
-      }>('/api/auth/login', { email, password });
+      }>('/api/auth/login', { email, password, requestedRole });
 
       if (response.success && response.data) {
         const sessionData: UserSession = {

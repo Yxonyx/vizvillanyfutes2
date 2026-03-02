@@ -143,13 +143,13 @@ function DashboardContent() {
       return;
     }
 
-    if (!confirm(`Biztosan feloldod ennek a munkának a kapcsolati adatait (lead) ${leadPrice} Ft értékű kreditért?`)) return;
+    if (!confirm(`Biztosan kijelzed az érdeklődésed, és zárolni szeretnél 2.000 Ft értékű kreditet?`)) return;
 
     setActionLoading(jobId);
     try {
-      const response = await api.post<any>(`/api/contractor/jobs/${jobId}/unlock`, {});
+      const response = await api.post<any>(`/api/contractor/jobs/${jobId}/interest`, {});
       if (response.success) {
-        setNotification({ message: '✨ Sikeres tranzakció! A munka adatai feloldva.', type: 'success' });
+        setNotification({ message: '✨ Sikeres érdeklődés! 2.000 Ft zárolásra került. Várunk az ügyfél döntésére.', type: 'success' });
         setSelectedJob(null);
         await fetchData(); // Full reload to get contact info and move to 'active'
         setActiveTab('active');
@@ -441,17 +441,17 @@ function DashboardContent() {
                     Saját meghívó linked
                   </h3>
                   <p className="text-gray-600 mb-6 max-w-2xl">
-                    Oszd meg a lenti linket ismerős szakemberekkel! Miután regisztrálnak a emailed/linkeden keresztül, és sikeresen megvásárolják (feloldják) az <strong>első munkájukat</strong>, automatikusan <strong>+10.000 Ft jóváírást</strong> kapnak a rendszerből, amit szabadon felhasználhatnak újabb leadek szerzésére.
+                    Oszd meg a lenti linket ismerős szakemberekkel! Miután regisztrálnak a linkeden keresztül, és az adminisztrátor jóváhagyja a fiókjukat, automatikusan <strong>+5.000 Ft jóváírást</strong> kapsz te a rendszertől. Az új szakember is megkapja a szokásos 10.000 Ft indulási kreditet.
                   </p>
 
                   {referralCode ? (
                     <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row gap-4 items-center justify-between">
                       <code className="text-vvm-blue-700 font-mono text-sm sm:text-base break-all select-all">
-                        https://vizvillanyfutes.hu/ajanlo-program?ref={referralCode}
+                        https://vizvillanyfutes.hu/csatlakozz-partnerkent?ref={referralCode}
                       </code>
                       <button
                         onClick={() => {
-                          navigator.clipboard.writeText(`https://vizvillanyfutes.hu/ajanlo-program?ref=${referralCode}`);
+                          navigator.clipboard.writeText(`https://vizvillanyfutes.hu/csatlakozz-partnerkent?ref=${referralCode}`);
                           setNotification({ type: 'success', message: 'Link másolva a vágólapra!' });
                         }}
                         className="w-full sm:w-auto px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex items-center justify-center gap-2 font-medium text-gray-700 transition-colors"

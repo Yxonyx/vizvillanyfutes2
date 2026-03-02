@@ -160,32 +160,29 @@ export default function HomePage() {
         <div className="hidden lg:block absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-zinc-950/95 via-zinc-950/20 to-transparent z-10 pointer-events-none"></div>
 
         {/* BACKGROUND - Map Visualization */}
-        <div className="absolute top-0 left-0 w-full h-[65dvh] lg:h-full z-0">
+        <div className="absolute top-0 left-0 w-full h-full z-0">
           <TeaserMap />
-          {/* Mobile fade down into the bottom sheet */}
-          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-vvm-blue-950 to-transparent lg:hidden pointer-events-none z-10"></div>
         </div>
 
         {/* LEFT/BOTTOM - Floating Bottom Sheet (Mobile) & Landing Text (Desktop) */}
         <div className="relative z-20 flex-1 flex flex-col justify-end lg:justify-center w-full max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pointer-events-none h-full">
-          <div className="bg-vvm-blue-950/95 backdrop-blur-2xl lg:bg-transparent lg:backdrop-blur-none rounded-t-[2.5rem] lg:rounded-none px-5 pt-6 pb-8 sm:p-8 lg:p-0 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] lg:shadow-none border-t border-white/15 lg:border-0 pointer-events-auto w-full lg:w-[60%] xl:w-[55%] flex flex-col lg:justify-center">
+          <div className="bg-vvm-blue-950/95 backdrop-blur-2xl lg:bg-transparent lg:backdrop-blur-none rounded-t-[2.5rem] lg:rounded-none px-4 pt-3 pb-4 sm:p-8 lg:p-0 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] lg:shadow-none border-t border-white/15 lg:border-0 pointer-events-auto w-full lg:w-[60%] xl:w-[55%] flex flex-col lg:justify-center">
 
             {/* Mobile drag handle indicator */}
-            <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-5 lg:hidden opacity-80"></div>
+            <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-3 lg:hidden opacity-80"></div>
 
             {/* MOBILE HERO (Uber bottom sheet style) */}
-            <div className="text-white space-y-4 text-center flex flex-col items-center lg:hidden">
-              <h1 className="text-[2rem] leading-[1.1] sm:text-4xl font-black font-heading tracking-tight text-center">
+            <div className="text-white space-y-2 text-center flex flex-col items-center lg:hidden">
+              <h1 className="text-3xl leading-[1.1] sm:text-4xl font-black font-heading tracking-tight text-center">
                 Kérj <span className="text-vvm-yellow-400">segítséget</span> azonnal!
               </h1>
 
-              <p className="text-sm sm:text-base text-blue-50/90 max-w-lg leading-relaxed font-light mx-auto">
-                <strong className="text-white font-semibold">Rendelj szakit, mint egy taxit!</strong><br />
-                A platform, ami azonnal összeköt a közeledben lévő ellenőrzött szerelőkkel.
+              <p className="text-xs sm:text-base text-blue-50/90 max-w-lg leading-relaxed font-light mx-auto">
+                <strong className="text-white font-semibold">Rendelj szakit, mint egy taxit!</strong> A platform, ami azonnal összeköt az ellenőrzött szerelőkkel.
               </p>
 
               {/* Main CTA - Compact "Wolt" Style Action Row */}
-              <div className="w-full flex gap-3 pt-2">
+              <div className="w-full flex gap-3">
                 {isAuthenticated ? (
                   role === 'contractor' ? (
                     <>
@@ -233,7 +230,7 @@ export default function HomePage() {
                 )}
               </div>
 
-              <div className="w-full pt-4 border-t border-white/10 mt-2 flex justify-center">
+              <div className="w-full pt-3 border-t border-white/10 mt-1 flex justify-center">
                 <div className="grid grid-cols-2 gap-y-3 gap-x-6 sm:gap-x-12 w-fit">
                   {[
                     { icon: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />, text: 'Ellenőrzött' },
@@ -295,7 +292,7 @@ export default function HomePage() {
                         className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105"
                       >
                         <FileCheck className="w-6 h-6" />
-                        <span>Folyamatban lévő hibáim</span>
+                        <span>Folyamatban</span>
                       </button>
                     </>
                   )
@@ -314,17 +311,20 @@ export default function HomePage() {
               </div>
 
               <div className="pt-8 w-full mt-auto">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="text-[2rem] font-black text-white leading-none">4.9</div>
-                  <div className="flex text-vvm-yellow-400">
-                    <Star className="w-5 h-5 fill-current" />
-                    <Star className="w-5 h-5 fill-current" />
-                    <Star className="w-5 h-5 fill-current" />
-                    <Star className="w-5 h-5 fill-current" />
-                    <Star className="w-5 h-5 fill-current" />
+                <div className="flex items-center gap-3 mb-6 flex-wrap sm:flex-nowrap">
+                  <div className="flex items-center gap-2">
+                    <div className="text-[2rem] font-black text-white leading-none whitespace-nowrap">4.9 / 5</div>
+                    <div className="w-px h-8 bg-white/20 mx-2 hidden sm:block"></div>
+                    <div className="flex text-vvm-yellow-400">
+                      <Star className="w-5 h-5 fill-current" />
+                      <Star className="w-5 h-5 fill-current" />
+                      <Star className="w-5 h-5 fill-current" />
+                      <Star className="w-5 h-5 fill-current" />
+                      <Star className="w-5 h-5 fill-current" />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-white/90 font-medium ml-2">
-                    <div className="bg-white p-0.5 rounded-full flex items-center justify-center">
+                  <div className="flex items-center gap-2 text-white/90 font-medium whitespace-nowrap">
+                    <div className="bg-white p-0.5 rounded-full flex items-center justify-center shrink-0">
                       <svg viewBox="0 0 24 24" className="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -356,7 +356,7 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="pt-16 md:pt-24 pb-8 bg-gradient-to-b from-blue-100 via-blue-50 to-white overflow-hidden">
+      <section className="pt-12 md:pt-16 pb-8 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <HowItWorksAnimation />
           <p className="text-center text-xs sm:text-sm text-gray-900 font-bold tracking-wider mt-6 px-4 py-2 opacity-80">
@@ -365,48 +365,81 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Why Choose Us Section - Image Matched Style */}
+      <section className="relative py-12 lg:py-20 bg-gradient-to-br from-vvm-blue-800 via-vvm-blue-700 to-vvm-blue-900 overflow-hidden">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+          {/* Badge-less Layout */}
+          <div className="py-8 md:py-12 lg:py-16 relative">
+            <div className="relative z-10 flex flex-col">
+
+              {/* Centered Massive Title */}
+              <div className="flex flex-col items-center text-center mb-10 md:mb-14">
+                <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] leading-[1.05] font-bold font-heading tracking-tight text-white mb-3 lg:mb-4 px-2">
+                  Miért a <br className="sm:hidden" />VízVillanyFűtés?
+                </h2>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-vvm-yellow-500 tracking-tight">
+                  Mert az időd drága.
+                </p>
+              </div>
+
+              {/* Clean Text Blocks restores original text */}
+              <div className="grid md:grid-cols-2 gap-8 lg:gap-16">
+
+                {/* Paragraph 1 */}
+                <div>
+                  <p className="text-base lg:text-lg text-gray-300 leading-relaxed font-light">
+                    <strong className="text-white font-bold">Tudjuk, milyen frusztráló tucatnyi weboldalt végighívni</strong>, csak hogy kiderüljön: mindenki hetekre előre be van táblázva. Ráadásul a legjobb szakiknak gyakran nincs is weboldala, így esélyed sincs rájuk találni. <strong className="text-vvm-yellow-500 font-bold">Mi ezt a keresgélést spóroljuk meg neked.</strong>
+                  </p>
+                </div>
+
+                {/* Paragraph 2 */}
+                <div>
+                  <p className="text-base lg:text-lg text-gray-300 leading-relaxed font-light">
+                    Félsz, kit engedsz be a lakásba? Erre a garancia a <strong className="text-white font-bold">független értékelési rendszerünk</strong>. A munkavégzés után adott valós ügyfélvélemények szűrik a szakikat. Ha egy mesterember megbízható és tisztességes munkát végez, nálunk a jó értékeléseknek köszönhetően <strong className="text-vvm-yellow-500 font-bold">egyre több munkát vihet el</strong>. Win-win szituáció!
+                  </p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Services Grid (Wolt-style compact categories) */}
       <section className="relative py-8 lg:py-16 bg-white overflow-hidden border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 lg:mb-10 gap-2 sm:gap-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 lg:mb-2">Szolgáltatások</h2>
-              <p className="text-xs sm:text-sm lg:text-base text-gray-500 max-w-xl">
-                Válassz kategóriát, és találd meg a megfelelő szakembert azonnal.
-              </p>
-            </div>
+          <div className="flex flex-col items-center justify-center mb-10 lg:mb-14 text-center">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading text-vvm-blue-900 mb-3 lg:mb-4">Szolgáltatások</h2>
+            <p className="text-sm sm:text-base lg:text-lg font-medium text-slate-500 max-w-xl mx-auto">
+              Válassz kategóriát, és találd meg a megfelelő szakembert azonnal.
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
             {services.map((service, index) => (
               <Link
                 key={index}
                 href={service.link}
-                className="group relative flex flex-col items-center sm:items-start bg-gray-50/50 hover:bg-white p-4 sm:p-5 lg:p-6 rounded-2xl lg:rounded-3xl border border-gray-100 hover:border-vvm-blue-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-xl hover:shadow-vvm-blue-900/5 transition-all duration-300 overflow-hidden active:scale-95"
+                className="group relative flex flex-col bg-white p-6 sm:p-8 rounded-2xl lg:rounded-3xl border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.06)] transition-all duration-300 overflow-hidden active:scale-[0.98]"
               >
-                {/* Decorative background glow on hover */}
-                <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-10 transition-opacity ${service.color}`}></div>
-
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl ${service.color} flex items-center justify-center text-white shadow-lg lg:shadow-xl mb-3 sm:mb-4 lg:mb-5 group-hover:scale-110 lg:group-hover:-translate-y-1 transition-transform`}>
-                  <service.icon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7" />
+                {/* Icon Container */}
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${service.color} flex items-center justify-center text-white mb-5 sm:mb-6`}>
+                  <service.icon className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
 
-                <h3 className="text-[14px] sm:text-lg lg:text-xl font-bold text-gray-900 text-center sm:text-left leading-tight group-hover:text-vvm-blue-600 transition-colors">
+                <h3 className="text-lg sm:text-xl font-bold font-heading text-vvm-blue-900 leading-tight mb-3">
                   {service.title}
                 </h3>
 
-                <p className="hidden sm:block text-xs lg:text-sm text-gray-500 mt-2 mb-4 line-clamp-2">
+                <p className="text-sm text-slate-500 leading-relaxed mb-8 flex-grow">
                   {service.description}
                 </p>
 
-                {/* Mobile text (smaller, one line feature) */}
-                <p className="sm:hidden text-[10px] text-gray-500 mt-1 text-center leading-[1.3] opacity-80">
-                  {service.features[1]}
-                </p>
-
-                <div className="hidden sm:flex items-center text-xs lg:text-sm text-vvm-blue-600 font-semibold group-hover:gap-1.5 transition-all mt-auto pt-2">
+                {/* Link at the bottom */}
+                <div className="flex items-center text-[13px] sm:text-sm text-vvm-blue-600 font-bold group-hover:gap-1.5 transition-all mt-auto pt-4 border-t border-slate-50">
                   <span>Részletek</span>
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-4 h-4 ml-1" />
                 </div>
               </Link>
             ))}
@@ -431,12 +464,7 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left - Text content */}
             <div className="relative z-20">
-              <div className="inline-flex items-center gap-2 bg-emerald-500/20 rounded-full px-4 py-2 text-sm text-emerald-300 mb-6 border border-emerald-500/30">
-                <Briefcase className="w-4 h-4" />
-                <span className="font-semibold tracking-wide uppercase text-[11px]">Szakember Regisztráció</span>
-              </div>
-
-              <h2 className="text-4xl md:text-5xl lg:text-[3.25rem] font-bold font-heading mb-6 leading-[1.1] tracking-tight text-white">
+              <h2 className="text-3xl md:text-4xl lg:text-[2.9rem] font-bold font-heading mb-6 leading-[1.1] tracking-tight text-white mt-4 sm:mt-0">
                 Legyél te is a <span className="text-vvm-yellow-400">szakemberünk!</span>
               </h2>
 
@@ -461,36 +489,36 @@ export default function HomePage() {
                 ))}
               </ul>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 pt-2">
                 <Link
                   href="/csatlakozz-partnerkent#szakember_regisztracio"
-                  className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-vvm-yellow-400 to-vvm-yellow-500 hover:from-vvm-yellow-300 to-vvm-yellow-400 text-gray-900 font-black text-sm sm:text-base py-3.5 px-3 sm:px-8 rounded-xl gap-2 transition-all transform hover:scale-[1.03] shadow-[0_0_30px_rgba(250,204,21,0.3)]"
+                  className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-vvm-yellow-400 to-vvm-yellow-500 hover:from-vvm-yellow-300 to-vvm-yellow-400 text-gray-900 font-black text-[13px] sm:text-base py-2.5 sm:py-3.5 px-3 sm:px-8 rounded-xl gap-1.5 sm:gap-2 transition-all transform hover:scale-[1.03] shadow-[0_0_30px_rgba(250,204,21,0.3)]"
                 >
-                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Send className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                   <span>Regisztrálok szakemberként</span>
                 </Link>
                 <Link
                   href="/csatlakozz-partnerkent"
-                  className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold flex-1 py-3.5 px-4 sm:px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base"
+                  className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold flex-1 py-2.5 sm:py-3.5 px-3 sm:px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 sm:gap-2 text-[13px] sm:text-base"
                 >
                   <span>Tudj meg többet</span>
-                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <ArrowRight className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                 </Link>
               </div>
 
               {/* Mobile Affiliate Banner (Hidden on Desktop) */}
-              <div className="mt-8 lg:hidden animate-fade-in-up">
-                <Link href="/ajanlo-program" className="relative overflow-hidden block bg-white/5 border border-white/10 rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-md group transition-all active:scale-[0.98] hover:bg-white/10 hover:border-white/20">
-                  <div className="flex items-center gap-4 relative z-10">
-                    <div className="w-12 h-12 bg-gradient-to-br from-vvm-yellow-400 to-amber-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(250,204,21,0.4)] relative overflow-hidden">
-                      <Gift className="w-6 h-6 text-gray-900" />
+              <div className="mt-4 sm:mt-8 lg:hidden animate-fade-in-up">
+                <Link href="/ajanlo-program" className="relative overflow-hidden block bg-white/5 border border-white/10 rounded-2xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-md group transition-all active:scale-[0.98] hover:bg-white/10 hover:border-white/20">
+                  <div className="flex items-center gap-3 relative z-10">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-vvm-yellow-400 to-amber-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(250,204,21,0.4)] relative overflow-hidden">
+                      <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
                       {/* Shine effect on icon */}
                       <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent -translate-x-full animate-shine opacity-50" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-white font-bold leading-tight mb-1 text-[14px]">Érdekel, hogyan szerezhetsz még <span className="text-vvm-yellow-400">10.000 Ft</span> értékben kreditet?</h4>
-                      <div className="flex items-center gap-1.5 text-blue-200 text-[11px] font-semibold tracking-wide uppercase">
-                        Kreditgyűjtő program <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                      <h4 className="text-white font-bold leading-tight mb-0.5 text-[13px] sm:text-[14px]">Érdekel, hogyan szerezhetsz még <span className="text-vvm-yellow-400">10.000 Ft</span> értékben kreditet?</h4>
+                      <div className="flex items-center gap-1 text-blue-200 text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase">
+                        Kreditgyűjtő program <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
                   </div>
@@ -650,9 +678,9 @@ export default function HomePage() {
               <User className="w-6 h-6" />
               <span>Ügyfél vagyok</span>
             </Link>
-            <Link href="/visszahivas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-6 sm:px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-base sm:text-lg border border-white/20">
-              <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span>Visszahívást kérek</span>
+            <Link href="/csatlakozz-partnerkent" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-6 sm:px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-base sm:text-lg border border-white/20">
+              <Wrench className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span>Szakember vagyok</span>
             </Link>
           </div>
 

@@ -41,7 +41,7 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-slate-900 to-slate-950 text-white pb-20 lg:pb-0">
+    <footer className="bg-zinc-900 text-white pb-20 lg:pb-0">
       {/* Trust Badges */}
       <div className="border-b border-slate-800 relative">
         {/* Subtle top highlight logic if needed */}

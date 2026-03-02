@@ -380,8 +380,8 @@ function PartnerOnboardingContent() {
                 </div>
               ) : (
                 <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-vvm-blue-500/20 border border-vvm-blue-500/30 text-vvm-blue-300 backdrop-blur-md">
-                  <Trophy className="w-4 h-4" />
-                  <span className="text-sm font-semibold tracking-wide">Csatlakozz a legjobb szakikhoz Magyarországon</span>
+                  <Trophy className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-[11px] sm:text-sm font-semibold tracking-wide whitespace-nowrap">Csatlakozz a legjobb szakikhoz Magyarországon</span>
                 </div>
               )}
 
@@ -408,10 +408,10 @@ function PartnerOnboardingContent() {
                 </button>
               </div>
 
-              <div className="mt-10 flex items-center gap-6 text-sm text-slate-400 font-medium">
-                <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> Nincs hűségidő</div>
-                <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> Nincs %-os rablás</div>
-                <div className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-400" /> Ingyenes regisztráció</div>
+              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <div className="flex items-center gap-2 text-[15px] text-blue-100/90 font-medium"><CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" /> <span>Nincs hűségidő</span></div>
+                <div className="flex items-center gap-2 text-[15px] text-blue-100/90 font-medium"><CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" /> <span>Nincs %-os rablás</span></div>
+                <div className="flex items-center gap-2 text-[15px] text-blue-100/90 font-medium"><CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" /> <span>Ingyenes regisztráció</span></div>
               </div>
             </div>
 
@@ -487,6 +487,41 @@ function PartnerOnboardingContent() {
                 <p className="text-slate-600 leading-relaxed">{benefit.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Quality Matters Highlight */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-vvm-blue-600 via-vvm-blue-700 to-indigo-800 p-8 md:p-12 shadow-2xl shadow-vvm-blue-500/20">
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-64 h-64 bg-sky-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="relative flex flex-col md:flex-row items-center gap-8 md:gap-12 text-center md:text-left">
+              <div className="flex-shrink-0">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-xl rotate-3 hover:rotate-0 transition-transform duration-500">
+                  <Star className="w-10 h-10 md:w-12 md:h-12 text-amber-400 fill-amber-400/20" />
+                </div>
+              </div>
+
+              <div className="flex-1">
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-4 leading-tight">
+                  A minőségi munka nálunk hamar kamatozik!
+                </h3>
+                <p className="text-lg md:text-xl text-blue-50/90 leading-relaxed font-medium">
+                  Megbízható és tisztességes munkavégzés esetén az elégedett ügyfelek <span className="text-amber-400 font-bold">pozitív értékelései</span> garantálják, hogy folyamatosan és egyre több megbízáshoz juss a rendszerben. Nálunk tényleg a szakértelem a legjobb ajánlólevél.
+                </p>
+              </div>
+
+              <div className="flex-shrink-0 hidden lg:block">
+                <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-bold text-lg">
+                  <Trophy className="w-6 h-6 text-amber-500" />
+                  <span>Kiemelt státusz</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -633,7 +668,7 @@ function PartnerOnboardingContent() {
       </section>
 
       {/* Application Form */}
-      <section id="szakember_regisztracio" className="py-24 relative overflow-hidden">
+      <section id="szakember_regisztracio" className="py-16 relative overflow-hidden">
         {/* Blurred background image with sophisticated gradient overlay */}
         <div className="absolute inset-0 -z-10 bg-slate-900">
           <Image
@@ -647,9 +682,9 @@ function PartnerOnboardingContent() {
           <div className="absolute inset-0 bg-gradient-to-br from-vvm-blue-900/90 via-slate-900/95 to-slate-900/90 backdrop-blur-[2px]"></div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
-          <div className="text-center mb-10">
+          <div className="text-center mb-6">
             {referralCode && (
               <div className="inline-flex items-center gap-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl px-6 py-4 mb-8 shadow-lg shadow-emerald-500/10">
                 <div className="bg-emerald-500 p-2.5 rounded-xl text-white shadow-inner">
@@ -664,7 +699,7 @@ function PartnerOnboardingContent() {
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 font-heading mb-4 tracking-tight">
               Regisztrálj és növeld a bevételed
             </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
               Töltsd ki az alábbi felvételi űrlapot. Munkatársunk hamarosan felveszi veled a kapcsolatot a megadott elérhetőségeken.
             </p>
           </div>
@@ -700,7 +735,7 @@ function PartnerOnboardingContent() {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-4 sm:p-10 space-y-6 sm:space-y-8 shadow-2xl relative">
+            <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-4 sm:p-8 space-y-4 sm:space-y-6 shadow-2xl relative">
               {/* Dynamic glass effect at top */}
               <div className="absolute top-0 inset-x-0 h-4 bg-gradient-to-b from-white/40 to-transparent rounded-t-3xl pointer-events-none"></div>
 
@@ -715,13 +750,13 @@ function PartnerOnboardingContent() {
               )}
 
               {/* Basic Info */}
-              <div className="bg-slate-50 p-4 sm:p-8 rounded-2xl border border-slate-100">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2 border-b border-slate-200 pb-3 sm:pb-4">
+              <div className="bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-100">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4 flex items-center gap-2 border-b border-slate-200 pb-2 sm:pb-3">
                   <User className="w-5 h-5 text-vvm-blue-600" /> Alapvető adatok
                 </h3>
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                    <label className="block text-sm font-bold text-slate-700 mb-1.5">
                       Teljes név <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -798,12 +833,12 @@ function PartnerOnboardingContent() {
               </div>
 
               {/* Professional Details */}
-              <div className="bg-slate-50 p-4 sm:p-8 rounded-2xl border border-slate-100">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2 border-b border-slate-200 pb-3 sm:pb-4">
+              <div className="bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-100">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4 flex items-center gap-2 border-b border-slate-200 pb-2 sm:pb-3">
                   <Briefcase className="w-5 h-5 text-vvm-blue-600" /> Szakmai adatok
                 </h3>
 
-                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-2">
                       Telefonszám <span className="text-red-500">*</span>
@@ -940,8 +975,8 @@ function PartnerOnboardingContent() {
               </div>
 
               {/* Additional Details */}
-              <div className="bg-slate-50 p-4 sm:p-8 rounded-2xl border border-slate-100">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2 border-b border-slate-200 pb-3 sm:pb-4">
+              <div className="bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-100">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4 flex items-center gap-2 border-b border-slate-200 pb-2 sm:pb-3">
                   <FileText className="w-5 h-5 text-vvm-blue-600" /> Bemutatkozás és Portfólió
                 </h3>
 
@@ -995,10 +1030,10 @@ function PartnerOnboardingContent() {
 
               {/* Submit Area */}
               <div className="pt-4 border-t border-slate-100">
-                <div className="mb-8">
-                  <label className="flex items-start gap-4 cursor-pointer group">
-                    <div className={`mt-0.5 w-6 h-6 rounded-md flex-shrink-0 flex items-center justify-center border-2 transition-colors ${formData.adatkezelesElfogadva ? 'bg-vvm-blue-500 border-vvm-blue-500' : 'bg-white border-slate-300 group-hover:border-vvm-blue-400'}`}>
-                      {formData.adatkezelesElfogadva && <CheckCircle className="w-4 h-4 text-white" />}
+                <div className="mb-6">
+                  <label className="flex items-start gap-3 cursor-pointer group select-none">
+                    <div className={`mt-1 w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center border-2 transition-colors ${formData.adatkezelesElfogadva ? 'bg-vvm-blue-500 border-vvm-blue-500' : 'bg-white border-slate-300 group-hover:border-vvm-blue-400'}`}>
+                      {formData.adatkezelesElfogadva && <CheckCircle className="w-3.5 h-3.5 text-white" />}
                     </div>
                     <input
                       type="checkbox"
@@ -1007,7 +1042,7 @@ function PartnerOnboardingContent() {
                       checked={formData.adatkezelesElfogadva}
                       onChange={(e) => setFormData(prev => ({ ...prev, adatkezelesElfogadva: e.target.checked }))}
                     />
-                    <span className="text-slate-600 leading-relaxed font-medium">
+                    <span className="text-slate-500 text-[13.5px] leading-snug font-medium">
                       Kijelentem, hogy elolvastam és elfogadom az <Link href="/adatkezeles" className="text-vvm-blue-600 font-bold hover:underline" target="_blank" rel="noopener noreferrer">Adatkezelési Tájékoztatót</Link> valamint az <Link href="/aszf" className="text-vvm-blue-600 font-bold hover:underline" target="_blank" rel="noopener noreferrer">ÁSZF</Link>-et, és hozzájárulok, hogy a megadott adataim alapján felvegyék velem a kapcsolatot. <span className="text-red-500">*</span>
                     </span>
                   </label>
@@ -1016,7 +1051,7 @@ function PartnerOnboardingContent() {
                 <button
                   type="submit"
                   disabled={!canSubmit || isSubmitting}
-                  className={`w-full py-5 px-8 rounded-2xl text-lg font-bold text-white shadow-xl transition-all flex items-center justify-center gap-3 ${!canSubmit || isSubmitting
+                  className={`w-full py-4 px-8 rounded-2xl text-lg font-bold text-white shadow-xl transition-all flex items-center justify-center gap-3 ${!canSubmit || isSubmitting
                     ? 'bg-slate-300 cursor-not-allowed shadow-none'
                     : 'bg-gradient-to-r from-vvm-blue-600 to-sky-500 hover:from-vvm-blue-700 hover:to-sky-600 hover:-translate-y-1 hover:shadow-2xl shadow-vvm-blue-500/30'
                     }`}
@@ -1036,7 +1071,7 @@ function PartnerOnboardingContent() {
                 {!canSubmit && (
                   <p className="text-center text-sm text-slate-500 mt-4">A regisztrációhoz minden kötelező mezőt (*) ki kell tölteni, és el kell fogadni a feltételeket.</p>
                 )}
-                <p className="text-center text-xs text-slate-400 mt-6 max-w-2xl mx-auto">
+                <p className="text-center text-xs text-slate-400 mt-6 max-w-3xl mx-auto">
                   *A 10.000 Ft promóciós kredit készpénzre vagy azonnali átutalásra nem váltható, kizárólag a platformon történő kapcsolatfelvételi adatok vásárlására (lead-feloldásra) használható fel a fiók sikeres adminisztrátori jóváhagyását követően. A szolgáltatás nyújtója a <Link href="/aszf" className="underline">Szabályzatban</Link> leírtak szerint fenntartja a promóció visszavonásának jogát visszaélés gyanúja esetén.
                 </p>
               </div>

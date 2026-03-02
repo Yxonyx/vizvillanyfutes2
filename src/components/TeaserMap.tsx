@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import Map, { Marker, Popup, NavigationControl, MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -76,7 +76,24 @@ export default function TeaserMap() {
     const user = isAuthenticated && authUser ? { id: authUser.id, email: authUser.email } : null;
 
     // Determine which leads to display based on auth state
-    const displayLeads = user ? leads : mockLeads;
+    // Contractor: sees real open leads
+    // Customer: sees ONLY their own real leads, plus mock leads for simulation
+    // Guest: sees mock leads
+    const displayLeads = useMemo(() => {
+        if (!user) return mockLeads;
+        if (role === 'contractor') return leads;
+
+        // Customer: only their own leads + mock leads to make the map look busy
+        const ownRealLeads = leads.filter(l => l.user_id === user.id);
+        const ownMockLeads = mockLeads.filter(l => l.user_id === user.id);
+        const otherMockLeads = mockLeads.filter(l => l.user_id !== user.id); // keep some fake ones for visuals if desired, or remove them
+
+        // Let's only show their OWN leads and NO mock leads if they have real ones, 
+        // OR show their own real leads AND the general mock leads so the map isn't empty.
+        // User requested: "csak a sajat hibajat a megfejlolt hiba viszont minden felhasznaloé a szaki verzióba latszik"
+        // This means customers ONLY see their own leads.
+        return ownRealLeads.length > 0 ? ownRealLeads : [];
+    }, [user, role, leads]);
 
     // Initial load and subscriptions
     useEffect(() => {
@@ -193,10 +210,10 @@ export default function TeaserMap() {
 
     const getIcon = (type: string) => {
         switch (type) {
-            case 'viz': return <Droplets className="w-4 h-4 text-white" />;
-            case 'villany': return <Zap className="w-4 h-4 text-white" />;
-            case 'futes': return <Flame className="w-4 h-4 text-white" />;
-            default: return <Wrench className="w-4 h-4 text-white" />;
+            case 'viz': return <Droplets className="w-4 h-4 lg:w-6 lg:h-6 text-white" />;
+            case 'villany': return <Zap className="w-4 h-4 lg:w-6 lg:h-6 text-white" />;
+            case 'futes': return <Flame className="w-4 h-4 lg:w-6 lg:h-6 text-white" />;
+            default: return <Wrench className="w-4 h-4 lg:w-6 lg:h-6 text-white" />;
         }
     };
 
@@ -209,12 +226,14 @@ export default function TeaserMap() {
         }
     };
 
-    const mapPadding = typeof window !== 'undefined' && window.innerWidth >= 1024
-        ? { top: 0, bottom: 0, left: window.innerWidth * 0.30, right: 0 }
+    const mapPadding = typeof window !== 'undefined'
+        ? (window.innerWidth >= 1024
+            ? { top: 0, bottom: 0, left: window.innerWidth * 0.30, right: 0 }
+            : { top: 0, bottom: window.innerHeight * 0.6, left: 0, right: 0 })
         : { top: 0, bottom: 0, left: 0, right: 0 };
 
     return (
-        <div className="absolute inset-0 w-full h-full lg:rounded-none group overflow-hidden bg-slate-900 pointer-events-auto">
+        <div className="absolute inset-0 w-full h-full lg:rounded-none group overflow-hidden bg-slate-900 pointer-events-auto" style={{ touchAction: 'none' }}>
 
             {/* Hint overlay that disappears on hover/interaction */}
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-slate-900/60 to-transparent z-10 pointer-events-none transition-opacity duration-500 group-hover:opacity-0"></div>
@@ -242,10 +261,41 @@ export default function TeaserMap() {
             </div>
 
             <style>{`
+                .mapboxgl-canvas {
+                    touch-action: none !important;
+                }
+                .mapboxgl-map {
+                    touch-action: none !important;
+                }
+                .mapboxgl-popup, .mapboxgl-marker {
+                    touch-action: none !important;
+                }
+                .mapboxgl-popup {
+                    pointer-events: none !important;
+                }
+                .mapboxgl-popup-content {
+                    pointer-events: none !important;
+                    touch-action: none !important;
+                    padding: 8px 10px !important;
+                    border-radius: 12px !important;
+                    overflow: hidden !important;
+                    box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3) !important;
+                    background: #1e293b !important;
+                    color: white !important;
+                    width: 260px !important;
+                }
+                .mapboxgl-popup-content button,
+                .mapboxgl-popup-content a {
+                    pointer-events: auto !important;
+                }
+                .mapboxgl-popup-tip {
+                    border-top-color: #1e293b !important;
+                }
                 .mapboxgl-popup-close-button {
+                    pointer-events: auto !important;
                     font-size: 24px !important;
                     padding: 8px 12px !important;
-                    color: #64748b !important;
+                    color: #94a3b8 !important;
                     outline: none !important;
                     right: 4px !important;
                     top: 4px !important;
@@ -253,7 +303,7 @@ export default function TeaserMap() {
                 }
                 .mapboxgl-popup-close-button:hover {
                     background-color: transparent !important;
-                    color: #0f172a !important;
+                    color: white !important;
                 }
                 @media (max-width: 1023px) {
                     .mapboxgl-ctrl-bottom-right {
@@ -273,6 +323,10 @@ export default function TeaserMap() {
                 cooperativeGestures={false}
                 onClick={handleMapClick}
                 cursor="crosshair"
+                maxBounds={[
+                    [18.85, 47.35],  // Southwest corner
+                    [19.25, 47.65]   // Northeast corner
+                ]}
             >
                 {/* Render Leads */}
                 {displayLeads.map((lead: any) => {
@@ -296,9 +350,9 @@ export default function TeaserMap() {
                         >
                             <div className={`relative group cursor-pointer transition-transform duration-300 ${selectedLead?.id === lead.id ? 'scale-125 z-30' : 'hover:scale-110 z-10'} ${isOwnLead ? 'opacity-100' : 'opacity-90'}`}>
                                 {/* Outer pulsing ring */}
-                                <div className="absolute -inset-2 bg-slate-500/20 rounded-full animate-ping"></div>
+                                <div className="absolute -inset-2 lg:-inset-3 bg-slate-500/20 rounded-full animate-ping"></div>
                                 {/* Inner pin */}
-                                <div className={`relative w-10 h-10 rounded-full ${getColor(lead.type)} shadow-xl flex items-center justify-center border-2 ${isOwnLead ? 'border-amber-300' : 'border-white/20'} ${selectedLead?.id === lead.id ? 'ring-4 ring-white/40' : ''}`}>
+                                <div className={`relative w-10 h-10 lg:w-14 lg:h-14 rounded-full ${getColor(lead.type)} shadow-xl flex items-center justify-center border-2 ${isOwnLead ? 'border-amber-300' : 'border-white/20'} ${selectedLead?.id === lead.id ? 'ring-4 lg:ring-6 ring-white/40' : ''}`}>
                                     {getIcon(lead.type)}
                                 </div>
 
@@ -309,13 +363,13 @@ export default function TeaserMap() {
 
                                 {/* Simple Label (hidden when popup is open) */}
                                 {selectedLead?.id !== lead.id && (
-                                    <div className="absolute top-1/2 -translate-y-1/2 left-full ml-3 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity bg-white px-3 py-1.5 rounded-lg shadow-xl w-max pointer-events-none">
-                                        <div className="font-bold text-slate-800 text-sm whitespace-nowrap">{lead.title}</div>
+                                    <div className="absolute top-1/2 -translate-y-1/2 left-full ml-3 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity bg-white px-3 py-1.5 rounded-lg shadow-xl w-max pointer-events-none border border-gray-200 z-50">
+                                        <div className="font-bold text-slate-900 text-sm whitespace-nowrap">{lead.title}</div>
                                         <div className="flex items-center gap-1.5 mt-0.5">
-                                            <div className="text-[10px] text-red-600 font-semibold uppercase tracking-wider">Sürgős (SOS)</div>
-                                            {isOwnLead && <div className="text-[10px] text-amber-500 font-bold ml-1">(Saját bejelentés)</div>}
+                                            <div className="text-[10px] text-red-500 font-semibold uppercase tracking-wider">Sürgős (SOS)</div>
+                                            {isOwnLead && <div className="text-[10px] text-amber-600 font-bold ml-1">(Saját bejelentés)</div>}
                                         </div>
-                                        <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-white rotate-45 transform"></div>
+                                        <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-white border-l border-b border-gray-200 rotate-45 transform"></div>
                                     </div>
                                 )}
                             </div>
@@ -342,44 +396,44 @@ export default function TeaserMap() {
                         className="z-50 min-w-[300px]"
                         maxWidth="340px"
                     >
-                        <div className="p-1">
-                            <div className="flex items-center gap-3 mb-3 border-b border-slate-100 pb-3">
-                                <div className={`w-10 h-10 rounded-full ${getColor(selectedLead.type)} flex flex-shrink-0 items-center justify-center text-white shadow-md`}>
+                        <div className="p-0.5">
+                            <div className="flex items-center gap-2 mb-2 border-b border-slate-700 pb-2">
+                                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${getColor(selectedLead.type)} flex flex-shrink-0 items-center justify-center text-white shadow-md *:w-4 *:h-4 sm:*:w-5 sm:*:h-5`}>
                                     {getIcon(selectedLead.type)}
                                 </div>
-                                <div className="flex-1 pr-4">
-                                    <h3 className="font-bold text-slate-800 text-base leading-tight mb-0.5">{selectedLead.title}</h3>
-                                    <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                                <div className="flex-1 pr-1 border-gray-600">
+                                    <h3 className="font-bold text-white text-[13px] sm:text-base leading-tight mb-0.5">{selectedLead.title}</h3>
+                                    <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-400 font-medium">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
                                         {selectedLead.district}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-slate-50/80 rounded-lg p-3 mb-4 text-sm text-slate-600 border border-slate-100 leading-relaxed italic shadow-inner">
+                            <div className="bg-slate-700/50 rounded-lg p-2 sm:p-3 mb-2 sm:mb-4 text-[11px] sm:text-sm text-slate-300 border border-slate-600 leading-snug italic shadow-inner">
                                 &quot;{selectedLead.description}&quot;
                             </div>
 
-                            <div className="flex items-center justify-between text-xs mb-4 px-1">
-                                <div className="flex items-center gap-1.5 text-red-600 font-bold bg-red-50 px-2.5 py-1 rounded-full border border-red-100">
-                                    <Clock className="w-3.5 h-3.5" />
+                            <div className="flex items-center justify-between mb-2 sm:mb-4 px-0.5">
+                                <div className="flex items-center gap-1 sm:gap-1.5 text-red-400 font-bold bg-red-950/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-red-500/30 text-[10px] sm:text-xs">
+                                    <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                     Azonnali SOS
                                 </div>
-                                <div className="flex items-center gap-1.5 text-blue-600 font-bold bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
-                                    <Search className="w-3.5 h-3.5" />
+                                <div className="flex items-center gap-1 sm:gap-1.5 text-blue-400 font-bold bg-blue-950/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-500/30 text-[10px] sm:text-xs">
+                                    <Search className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                     Szakit keres
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-1.5 sm:gap-2">
                                 <button
                                     onClick={() => {
                                         setSelectedLead(null);
                                         setIsSimulationOpen(true);
                                     }}
-                                    className="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md"
+                                    className="w-full bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-slate-900 font-bold py-1.5 sm:py-2.5 rounded-xl text-[11px] sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all shadow-md"
                                 >
-                                    <Maximize2 className="w-4 h-4" />
+                                    <Maximize2 className="w-3 h-3 sm:w-4 sm:h-4" />
                                     {user ? 'Teljes Képernyős Nézet' : 'Részletek a Szaki Appban'}
                                 </button>
 

@@ -57,7 +57,7 @@ function LoginPageContent() {
     setError(null);
     setIsSubmitting(true);
 
-    const result = await login(email, password);
+    const result = await login(email, password, loginMode);
 
     if (!result.success) {
       setError(result.error || 'Bejelentkezés sikertelen');
@@ -170,7 +170,7 @@ function LoginPageContent() {
     setError(null);
     setIsSubmitting(true);
     try {
-      const result = await login(customerEmail, customerPassword);
+      const result = await login(customerEmail, customerPassword, loginMode);
       if (!result.success) {
         setError(result.error || 'Bejelentkezés sikertelen.');
       }

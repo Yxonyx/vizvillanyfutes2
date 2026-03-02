@@ -24,7 +24,9 @@ const statusConfig = {
   cancelled: { color: 'red', label: 'Törölve' },
   pending: { color: 'yellow', label: 'Függőben' },
   accepted: { color: 'green', label: 'Elfogadva' },
-  declined: { color: 'red', label: 'Elutasítva' },
+  declined: { color: 'red', label: 'Nem vállalta' },
+  rejected: { color: 'red', label: 'Elutasítva' },
+  withdrawn: { color: 'gray', label: 'Visszavonta' },
 };
 
 const priorityConfig = {
@@ -83,7 +85,7 @@ interface JobCardProps {
   };
   assignment?: {
     id: string;
-    status: 'pending' | 'accepted' | 'declined' | 'cancelled';
+    status: 'pending' | 'accepted' | 'declined' | 'rejected' | 'withdrawn' | 'cancelled';
     proposed_start_time?: string;
     confirmed_start_time?: string;
   };
@@ -285,31 +287,50 @@ export default function JobCard({
           {job.status === 'open' && (
             <button
               onClick={() => onUnlock?.(job.id, job.lead_price || 0)}
-              className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-vvm-yellow-400 hover:bg-vvm-yellow-500 text-vvm-blue-800 rounded-lg text-sm font-bold transition-colors shadow-md"
+              className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-vvm-blue-600 to-vvm-blue-700 hover:from-vvm-blue-700 hover:to-vvm-blue-800 text-white rounded-lg text-sm font-bold transition-transform transform hover:scale-[1.02] shadow-md shadow-blue-600/20"
             >
               <Zap className="w-4 h-4" />
-              Adatok feloldása ({job.lead_price || 0} Ft)
+              Elvállalom (-{job.lead_price || 0} Kredit)
             </button>
           )}
 
-          {/* Pending assignment - show accept/decline */}
-          {assignment?.status === 'pending' && (
+          {/* Pending assignment - show accept/decline ONLY if callbacks exist */}
+          {assignment?.status === 'pending' && (onAccept || onDecline) && (
             <>
-              <button
-                onClick={() => onAccept?.(assignment.id)}
-                className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
-              >
-                <CheckCircle className="w-4 h-4" />
-                Elfogadom
-              </button>
-              <button
-                onClick={() => onDecline?.(assignment.id)}
-                className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
-              >
-                <XCircle className="w-4 h-4" />
-                Elutasítom
-              </button>
+              {onAccept && (
+                <button
+                  onClick={() => onAccept?.(assignment.id)}
+                  className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  Elfogadom
+                </button>
+              )}
+              {onDecline && (
+                <button
+                  onClick={() => onDecline?.(assignment.id)}
+                  className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <XCircle className="w-4 h-4" />
+                  Elutasítom
+                </button>
+              )}
             </>
+          )}
+
+          {assignment?.status === 'pending' && (!onAccept && !onDecline) && (
+            <div className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-sm font-bold shadow-sm">
+              <Clock className="w-4 h-4" />
+              Várakozás az ügyfél döntésére...
+            </div>
+          )}
+
+          {/* Rejected/Withdrawn assignment */}
+          {(assignment?.status === 'rejected' || assignment?.status === 'withdrawn') && (
+            <div className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-bold shadow-sm">
+              <XCircle className="w-4 h-4" />
+              Az ügyfél nem választott ki. A kredit visszajárt.
+            </div>
           )}
 
           {/* Accepted assignment - show start (for scheduled or assigned jobs) */}

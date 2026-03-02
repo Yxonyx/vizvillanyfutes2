@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
         email: user.email,
         affiliate_stats: {
           total_referrals: totalReferrals,
-          total_earned: paidReferrals * 10000
+          total_earned: paidReferrals * 5000
         }
       },
     });
