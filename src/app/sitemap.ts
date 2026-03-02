@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
     const baseUrl = 'https://www.vizvillanyfutes.hu';
-    const lastModified = new Date('2025-01-01');
+    const lastModified = new Date();
 
     const routes = [
         '',
@@ -22,6 +22,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
         '/aszf',
         '/adatkezeles',
         '/cookie',
+        '/blog',
+        '/login',
+        '/elfelejtett-jelszo',
+        '/blog/1',
+        '/blog/2',
+        '/blog/4',
+        '/blog/5',
+        '/blog/6',
+        '/blog/7',
+        '/blog/8',
     ];
 
     return routes.map((route) => {
