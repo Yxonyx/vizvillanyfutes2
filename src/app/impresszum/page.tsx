@@ -71,13 +71,13 @@ export default function ImpresszumPage() {
               </h2>
 
               <div className="space-y-4">
-                <Link href="/visszahivas" className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-vvm-blue-50 transition-colors">
+                <a href="tel:+36302696406" className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-vvm-blue-50 transition-colors">
                   <Phone className="w-5 h-5 text-vvm-blue-600" />
                   <div>
-                    <p className="text-sm text-gray-500">Kapcsolat</p>
-                    <p className="font-semibold text-gray-900">Visszahívást kérek →</p>
+                    <p className="text-sm text-gray-500">Telefonszám</p>
+                    <p className="font-semibold text-gray-900">+36 30 269 6406</p>
                   </div>
-                </Link>
+                </a>
 
                 <a href="mailto:info@vizvillanyfutes.hu" className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-vvm-blue-50 transition-colors">
                   <Mail className="w-5 h-5 text-vvm-blue-600" />

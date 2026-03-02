@@ -8,7 +8,7 @@ import { Lock, CheckCircle, AlertCircle, Eye, EyeOff, KeyRound } from 'lucide-re
 function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -79,8 +79,8 @@ function ResetPasswordContent() {
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-gray-50 pt-24 lg:pt-28 pb-12">
-        <div className="max-w-md mx-auto px-4">
-          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+        <div className="max-w-md mx-auto px-3 sm:px-4">
+          <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-8 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
@@ -102,14 +102,14 @@ function ResetPasswordContent() {
   if (error && (!accessToken || type !== 'recovery')) {
     return (
       <div className="min-h-screen bg-gray-50 pt-24 lg:pt-28 pb-12">
-        <div className="max-w-md mx-auto px-4">
-          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+        <div className="max-w-md mx-auto px-3 sm:px-4">
+          <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-8 text-center">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertCircle className="w-8 h-8 text-red-600" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 font-heading mb-4">Érvénytelen link</h1>
             <p className="text-gray-600 mb-6">
-              Ez a jelszó-visszaállító link érvénytelen vagy lejárt. 
+              Ez a jelszó-visszaállító link érvénytelen vagy lejárt.
               Kérj új linket az elfelejtett jelszó oldalon.
             </p>
             <div className="space-y-3">
@@ -128,8 +128,8 @@ function ResetPasswordContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-24 lg:pt-28 pb-12">
-      <div className="max-w-md mx-auto px-4">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+      <div className="max-w-md mx-auto px-3 sm:px-4">
+        <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-8">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-vvm-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <KeyRound className="w-8 h-8 text-vvm-blue-600" />

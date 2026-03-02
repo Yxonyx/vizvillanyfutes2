@@ -63,15 +63,15 @@ export default function CookieConsent() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center p-4 pointer-events-none">
+    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:p-4 sm:items-center pointer-events-none">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/30 pointer-events-auto"
-        onClick={() => {}}
+      <div
+        className="absolute inset-0 bg-black/40 pointer-events-auto transition-opacity"
+        onClick={() => { }}
       />
-      
+
       {/* Cookie Banner */}
-      <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl pointer-events-auto animate-slide-up overflow-hidden">
+      <div className="relative w-full max-w-4xl bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl pointer-events-auto animate-slide-up overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="bg-gradient-to-r from-vvm-blue-600 to-vvm-blue-700 text-white p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -83,7 +83,7 @@ export default function CookieConsent() {
               <p className="text-sm text-blue-100">Tiszteletben tartjuk az adatvédelmet</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={handleRejectAll}
             className="p-2 hover:bg-white/10 rounded-lg transition-colors"
             aria-label="Bezárás"
@@ -92,13 +92,13 @@ export default function CookieConsent() {
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1">
           {!showSettings ? (
             <>
-              <p className="text-gray-600 mb-6">
-                Weboldalunk sütiket (cookie-kat) használ a felhasználói élmény javítása, 
-                a látogatottsági statisztikák elemzése és marketing célok érdekében. 
-                Az „Összes elfogadása" gombra kattintva hozzájárul az összes süti használatához, 
+              <p className="text-sm sm:text-base text-gray-600 mb-6 leading-relaxed">
+                Weboldalunk sütiket (cookie-kat) használ a felhasználói élmény javítása,
+                a látogatottsági statisztikák elemzése és marketing célok érdekében.
+                Az „Összes elfogadása" gombra kattintva hozzájárul az összes süti használatához,
                 vagy testreszabhatja a beállításokat.
               </p>
 
@@ -139,8 +139,8 @@ export default function CookieConsent() {
                     </div>
                     <span className="text-sm text-green-600 font-medium">Mindig aktív</span>
                   </div>
-                  <p className="text-sm text-gray-600 ml-11">
-                    Ezek a sütik elengedhetetlenek a weboldal működéséhez. Tartalmazzák a munkamenet-azonosítót, 
+                  <p className="text-xs sm:text-sm text-gray-600 sm:ml-11 mt-2 sm:mt-0">
+                    Ezek a sütik elengedhetetlenek a weboldal működéséhez. Tartalmazzák a munkamenet-azonosítót,
                     a cookie-beállításokat és az alapvető biztonsági funkciókat.
                   </p>
                 </div>
@@ -157,17 +157,17 @@ export default function CookieConsent() {
                       <span className="font-semibold text-gray-900">Analitikai sütik</span>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={settings.analytics}
                         onChange={(e) => setSettings(prev => ({ ...prev, analytics: e.target.checked }))}
-                        className="sr-only peer" 
+                        className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-vvm-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-vvm-blue-600"></div>
                     </label>
                   </div>
-                  <p className="text-sm text-gray-600 ml-11">
-                    Segítenek megérteni, hogyan használják a látogatók weboldalunkat. 
+                  <p className="text-xs sm:text-sm text-gray-600 sm:ml-11 mt-2 sm:mt-0">
+                    Segítenek megérteni, hogyan használják a látogatók weboldalunkat.
                     Az adatok névtelenítettek és statisztikai célokra használjuk (Google Analytics).
                   </p>
                 </div>
@@ -184,17 +184,17 @@ export default function CookieConsent() {
                       <span className="font-semibold text-gray-900">Marketing sütik</span>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={settings.marketing}
                         onChange={(e) => setSettings(prev => ({ ...prev, marketing: e.target.checked }))}
-                        className="sr-only peer" 
+                        className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-vvm-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-vvm-blue-600"></div>
                     </label>
                   </div>
-                  <p className="text-sm text-gray-600 ml-11">
-                    Személyre szabott hirdetéseket és tartalmakat jelenítenek meg 
+                  <p className="text-xs sm:text-sm text-gray-600 sm:ml-11 mt-2 sm:mt-0">
+                    Személyre szabott hirdetéseket és tartalmakat jelenítenek meg
                     (Facebook Pixel, Google Ads remarketing).
                   </p>
                 </div>

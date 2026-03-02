@@ -49,25 +49,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, sbSession) => {
-        if (event === 'SIGNED_IN' && sbSession?.user && !user) {
-          // A Supabase session appeared but we don't have a local user yet
-          // Create a local session from the Supabase session
-          const role = (sbSession.user.user_metadata?.role as UserSession['user']['role']) || 'customer';
-          const sessionData: UserSession = {
-            user: {
-              id: sbSession.user.id,
-              email: sbSession.user.email || '',
-              role: role,
-              status: 'active',
-            },
-            session: {
-              access_token: sbSession.access_token,
-              refresh_token: sbSession.refresh_token,
-              expires_at: sbSession.expires_at,
-            },
-          };
-          setSession(sessionData);
-          setUser(sessionData.user);
+        if (event === 'SIGNED_IN' && sbSession?.user) {
+          // Check if we ALREADY have a valid local session (e.g., from our custom login endpoint)
+          const currentLocalSession = getSession();
+          if (currentLocalSession && currentLocalSession.user.id === sbSession.user.id) {
+            // We already have a richer local session with the correct role from the DB.
+            // Just ensure React state is updated in case it missed it.
+            setUser(currentLocalSession.user);
+            setContractorProfile(currentLocalSession.contractor_profile || null);
+          } else {
+            // A Supabase session appeared but we don't have a valid matching local user
+            // Create a local session from the Supabase session
+            const role = (sbSession.user.user_metadata?.role as UserSession['user']['role']) || 'customer';
+            const sessionData: UserSession = {
+              user: {
+                id: sbSession.user.id,
+                email: sbSession.user.email || '',
+                role: role,
+                status: 'active',
+              },
+              session: {
+                access_token: sbSession.access_token,
+                refresh_token: sbSession.refresh_token,
+                expires_at: sbSession.expires_at,
+              },
+            };
+            setSession(sessionData);
+            setUser(sessionData.user);
+          }
         } else if (event === 'SIGNED_OUT') {
           clearSession();
           setUser(null);

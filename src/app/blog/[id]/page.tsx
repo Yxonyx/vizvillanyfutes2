@@ -100,7 +100,7 @@ const blogPosts: Record<string, {
       '- Kivitelezés pályázat-kompatibilis számlázással',
       '- Sikerdíjas konstrukció - csak sikeres pályázat esetén fizetendő',
       '## Hogyan kezdje el?',
-      'Töltse ki online kalkulátorunkat, és 15 percen belül visszahívjuk!',
+      'Keressen minket platformunkon, és kezdje el a felújítást biztos kezekben!',
     ],
     category: 'palyazat',
     categoryLabel: 'Pályázatok',

@@ -16,7 +16,7 @@ const priceList = [
   { name: 'Szifon csere', price: '8 500 Ft-tól', includes: 'Munkadíj + standard szifon' },
   { name: 'Bojler vízkőtelenítés', price: '19 500 Ft-tól', includes: 'Teljes körű karbantartás' },
   { name: 'Bojler csere (80L)', price: '32 000 Ft-tól', includes: 'Munkadíj, bojler külön' },
-  { name: 'Csőtörés elhárítás', price: '25 000 Ft-tól', includes: 'Sürgősségi felár egyeztetés szerint' },
+  { name: 'Csőtörés elhárítás', price: '25 000 Ft-tól', includes: 'Sürgősségi díjszabás egyeztetés szerint' },
   { name: 'Duguláselhárítás (kézi)', price: '15 000 Ft-tól', includes: 'Standard dugulás' },
   { name: 'Duguláselhárítás (gépi)', price: '28 000 Ft-tól', includes: 'Súlyosabb dugulás' },
 ];
@@ -292,7 +292,7 @@ export default function VizszereloPage() {
             <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-amber-800">
               <strong>Megjegyzés:</strong> Az árak tájékoztató jellegűek, az anyagárat nem tartalmazzák.
-              A pontos árat a helyszíni felmérés után adjuk meg. SOS (éjszaka, hétvége, ünnepnap) +50% felár.
+              A pontos árat a helyszíni felmérés után adjuk meg. SOS (éjszaka, hétvége, ünnepnap) esetén a szakemberek egyedi díjszabást alkalmazhatnak.
             </p>
           </div>
 

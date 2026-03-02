@@ -25,7 +25,7 @@ const priceCategories = [
       { name: 'Szifon csere', price: '8 500 Ft-tól', includes: 'Munkadíj + standard szifon' },
       { name: 'Bojler vízkőtelenítés', price: '19 500 Ft-tól', includes: 'Teljes körű karbantartás' },
       { name: 'Bojler csere (80L)', price: '32 000 Ft-tól', includes: 'Munkadíj, bojler külön' },
-      { name: 'Csőtörés elhárítás', price: '25 000 Ft-tól', includes: 'SOS felár nélkül' },
+      { name: 'Csőtörés elhárítás', price: '25 000 Ft-tól', includes: 'Sürgősségi díjszabás egyeztetés szerint' },
       { name: 'Duguláselhárítás (kézi)', price: '15 000 Ft-tól', includes: 'Standard dugulás' },
       { name: 'Duguláselhárítás (gépi)', price: '28 000 Ft-tól', includes: 'Súlyosabb dugulás' },
     ],
@@ -81,8 +81,8 @@ const faqs = [
     a: 'Az árak általában a munkadíjat és a segédanyagokat (tömítések, csavarok stb.) tartalmazzák. A nagyobb anyagok (csaptelep, bojler, radiátor stb.) ára külön kerül felszámolásra. Ezeket a helyszíni felméréskor pontosan megadjuk.'
   },
   {
-    q: 'Mikor kell SOS felárat fizetni?',
-    a: 'Sürgősségi SOS felár fizetendő lehet éjszakai (20:00-08:00), hétvégi és ünnepnapi kiszállás esetén, valamint sürgős SOS kiszállás esetén. Ezt a kiválasztott szakember a foglalásnál/egyeztetésnél mindig előre jelzi.'
+    q: 'Léteznek sürgősségi extra díjak?',
+    a: 'A szakemberek egyéni árazást alkalmazhatnak éjszakai (20:00-08:00), hétvégi vagy azonnali SOS kiszállás esetén. Ezeket a feltételeket a szakember az ajánlattétel során előre, átláthatóan közli, mielőtt Ön elfogadná a munkát.'
   },
   {
     q: 'Hogyan fizethetek?',
@@ -187,8 +187,8 @@ export default function ArakPage() {
             <div className="p-4 bg-amber-50 rounded-xl flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-amber-800">
-                <strong>SOS felár:</strong> Éjszakai (20:00-08:00), hétvégi, ünnepnapi és sürgős kiszállás
-                esetén a szakember sürgősségi felárat számíthat fel.
+                <strong>Sürgősségi díjszabás:</strong> Éjszakai (20:00-08:00), hétvégi, ünnepnapi és SOS feladatok
+                esetén a szakemberek eltérő díjszabást alkalmazhatnak, amelyet az ajánlatukban előre jeleznek.
               </div>
             </div>
 
@@ -259,7 +259,7 @@ export default function ArakPage() {
               <ul className="space-y-3">
                 {[
                   'Nagyobb anyagok (csaptelep, bojler stb.)',
-                  'SOS felár (éjszaka, hétvége)',
+                  'Sürgősségi díjszabás (éjszaka, hétvége)',
                   'Pest megyei kiszállás (távolságtól függően)',
                   'Speciális anyagok, alkatrészek',
                   'Nagyobb bontási munkák',

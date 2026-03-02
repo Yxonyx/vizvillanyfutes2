@@ -47,21 +47,6 @@ Küldve: ${new Date().toLocaleString('hu-HU')}
   `.trim();
 }
 
-// Format callback email
-function formatCallbackEmail(data: Record<string, unknown>): string {
-  return `
-ÚJ VISSZAHÍVÁS KÉRÉS
-
-Név: ${data.name || '-'}
-Telefon: ${data.phone || '-'}
-Mikor hívjuk: ${data.callTime || '-'}
-Üzenet: ${data.message || '-'}
-
----
-Küldve: ${new Date().toLocaleString('hu-HU')}
-  `.trim();
-}
-
 // Format contact email
 function formatContactEmail(data: Record<string, unknown>): string {
   return `
@@ -442,10 +427,7 @@ export async function POST(request: NextRequest) {
         subject = `🔧 Új időpontfoglalás: ${data.problem || 'Általános'}`;
         emailBody = formatBookingEmail(data);
         break;
-      case 'callback':
-        subject = `📞 Visszahívás kérés: ${data.name || 'Ismeretlen'}`;
-        emailBody = formatCallbackEmail(data);
-        break;
+
       case 'contact':
         subject = `✉️ Kapcsolat: ${data.subject || 'Általános'}`;
         emailBody = formatContactEmail(data);

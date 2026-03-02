@@ -10,7 +10,6 @@ const pageNames: Record<string, string> = {
   'villanyszerelo-budapest': 'Villanyszerelés',
   'dugulaselharitas-budapest': 'Duguláselhárítás',
   'futeskorszerusites': 'Fűtéskorszerűsítés',
-  'visszahivas': 'Visszahívás',
   'arak': 'Árak',
   'blog': 'Tudástár',
   'gyik': 'GYIK',

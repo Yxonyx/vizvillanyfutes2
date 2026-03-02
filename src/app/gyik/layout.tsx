@@ -31,10 +31,10 @@ const faqSchema = {
     },
     {
       '@type': 'Question',
-      name: 'Hogyan tudok időpontot foglalni?',
+      name: 'Hogyan tudok feladatot meghirdetni?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Időpontot foglalhat online a weboldalunkon vagy visszahívást kérhet. Online foglalásnál azonnal látja az elérhető időpontokat és a becsült árat.',
+        text: 'A weboldalunkon található űrlap kitöltésével egyszerűen megadhatja a probléma részleteit. A rendszer értesíti a környékén lévő szabad szakembereket, akik ezt követően felveszik Önnel a kapcsolatot.',
       },
     },
     {
@@ -58,7 +58,7 @@ const faqSchema = {
       name: 'Dolgoznak hétvégén és ünnepnapokon is?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Igen, SOS hibaelhárítást 0-24 órában, az év minden napján vállalunk. Hétvégi és ünnepnapi kiszállás esetén a munkadíjra +50% felár kerül felszámolásra.',
+        text: 'Igen, rendszerünk 0-24 órában elérhető, beleértve a hétvégéket és ünnepeket is. Sürgősségi esetben a szakemberek egyedi díjszabást alkalmazhatnak, amelyet az ajánlatban előre egyeztetnek Önnel.',
       },
     },
   ],

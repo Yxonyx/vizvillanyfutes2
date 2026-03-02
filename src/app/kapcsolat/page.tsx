@@ -82,16 +82,16 @@ export default function KapcsolatPage() {
                     <Phone className="w-6 h-6 text-vvm-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">Visszahívás</h3>
-                    <Link href="/visszahivas" className="text-vvm-blue-600 font-semibold hover:underline">
-                      Visszahívást kérek →
-                    </Link>
+                    <h3 className="font-bold text-gray-900">Telefonszám</h3>
+                    <a href="tel:+36302696406" className="text-vvm-blue-600 font-semibold hover:underline">
+                      +36 30 269 6406
+                    </a>
                   </div>
                 </div>
                 <p className="text-gray-600 text-sm">
-                  Hétfő-Péntek: 8:00-20:00<br />
+                  Ügyfélszolgálat: H-P 8:00-20:00<br />
                   Szombat: 9:00-14:00<br />
-                  <span className="text-amber-600 font-medium">SOS: 0-24</span>
+                  <span className="text-amber-600 font-medium">Szakembereink: 0-24</span>
                 </p>
               </div>
 

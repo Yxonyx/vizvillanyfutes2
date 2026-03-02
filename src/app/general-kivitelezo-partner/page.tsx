@@ -181,10 +181,10 @@ export default function B2BPage() {
                   <Briefcase className="w-5 h-5" />
                   <span>B2B ajánlatkérés</span>
                 </a>
-                <Link href="/visszahivas" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
+                <a href="tel:+36302696406" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
                   <Phone className="w-5 h-5" />
-                  <span>Visszahívást kérek</span>
-                </Link>
+                  <span>Hívás most</span>
+                </a>
               </div>
             </div>
 

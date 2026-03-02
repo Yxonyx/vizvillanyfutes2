@@ -131,8 +131,7 @@ export default function ASZFPage() {
                   Az árak bruttó árak, az ÁFÁ-t tartalmazzák. A kiszállási díjak és a szolgáltatás árai szakemberenként eltérőek lehetnek.
                 </p>
                 <p className="text-gray-600 mb-4">
-                  <strong>SOS felár:</strong> Éjszakai (20:00-08:00), hétvégi, ünnepnapi és sürgős (azonnali)
-                  kiszállás esetén a szakember sürgősségi felárat számíthat fel.
+                  <strong>Sürgősségi díjszabás:</strong> A szakemberek egyedi árazást alkalmazhatnak éjszakai (20:00-08:00), hétvégi, ünnepnapi és sürgős (azonnali) munkák esetén. Ezt az adott szakember az ajánlattétel során határozza meg, így Ön előre látja a feltételeket.
                 </p>
                 <p className="text-gray-600">
                   <strong>Fizetési módok:</strong> Készpénz vagy bankkártya a helyszínen,
@@ -184,7 +183,6 @@ export default function ASZFPage() {
                 </p>
                 <ul className="space-y-2 text-gray-600 mb-4">
                   <li>• E-mail: info@vizvillanyfutes.hu</li>
-                  <li>• Visszahívás kérése: <a href="/visszahivas" className="text-vvm-blue-600 hover:underline">weboldalunkon</a></li>
                 </ul>
                 <p className="text-gray-600">
                   A panaszokat 30 napon belül kivizsgáljuk és írásban válaszolunk.

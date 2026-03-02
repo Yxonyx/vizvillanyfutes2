@@ -214,10 +214,10 @@ function LoginPageContent() {
         />
       </div>
 
-      <div className="max-w-md md:max-w-lg lg:max-w-xl mx-auto px-4 relative z-10 w-full">
+      <div className="max-w-md md:max-w-lg lg:max-w-xl mx-auto px-3 sm:px-4 relative z-10 w-full">
         <Breadcrumbs className="mb-2 sm:mb-4" />
 
-        <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-6">
+        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
           <div className="text-center mb-4 sm:mb-5">
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
               <LogIn className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
@@ -229,22 +229,22 @@ function LoginPageContent() {
           <div className="flex bg-gray-50/80 border border-gray-200 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl mb-4 sm:mb-5 w-full">
             <button
               onClick={() => setLoginMode('contractor')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl text-sm sm:text-[15px] transition-all font-semibold ${loginMode === 'contractor'
+              className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-3 px-1 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-[15px] transition-all font-semibold ${loginMode === 'contractor'
                 ? 'bg-white text-vvm-blue-700 shadow-sm border border-gray-200'
                 : 'text-gray-500 hover:text-vvm-blue-600 hover:bg-gray-100/80 border border-transparent'
                 }`}
             >
-              <Wrench className="w-4 h-4" />
+              <Wrench className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>Szakember</span>
             </button>
             <button
               onClick={() => setLoginMode('customer')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl text-sm sm:text-[15px] transition-all font-semibold ${loginMode === 'customer'
+              className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-3 px-1 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-[15px] transition-all font-semibold ${loginMode === 'customer'
                 ? 'bg-white text-vvm-blue-700 shadow-sm border border-gray-200'
                 : 'text-gray-500 hover:text-vvm-blue-600 hover:bg-gray-100/80 border border-transparent'
                 }`}
             >
-              <User className="w-4 h-4" />
+              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>Ügyfél</span>
             </button>
           </div>
@@ -328,6 +328,11 @@ function LoginPageContent() {
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
+                </div>
+                <div className="flex justify-end mt-1">
+                  <a href="/elfelejtett-jelszo" className="text-sm font-medium text-vvm-blue-600 hover:text-vvm-blue-800 transition-colors">
+                    Elfelejtette a jelszavát?
+                  </a>
                 </div>
               </div>
 
@@ -434,6 +439,13 @@ function LoginPageContent() {
                       {showCustomerPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
+                  {!isCustomerRegister && (
+                    <div className="flex justify-end mt-1">
+                      <a href="/elfelejtett-jelszo" className="text-sm font-medium text-vvm-blue-600 hover:text-vvm-blue-800 transition-colors">
+                        Elfelejtette a jelszavát?
+                      </a>
+                    </div>
+                  )}
                 </div>
                 <button type="submit" disabled={isSubmitting || !customerEmail || !customerPassword} className="btn-primary w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed">
                   {isSubmitting ? (
