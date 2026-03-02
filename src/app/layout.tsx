@@ -31,6 +31,12 @@ export const metadata: Metadata = {
     'radiátor szerelés',
     'szakember kereső budapest',
     'vízszerelő pest megye',
+    'villanyszerelő munka budapest',
+    'vízszerelő állás',
+    'fűtésszerelő alvállalkozó',
+    'szakember regisztráció',
+    'kiszámítható mestermunka',
+    'épületgépész állás',
   ],
   authors: [{ name: 'VízVillanyFűtés', url: 'https://www.vizvillanyfutes.hu' }],
   creator: 'VízVillanyFűtés',
@@ -72,6 +78,12 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.svg',
     apple: '/favicon.svg',
+  },
+  other: {
+    'geo.region': 'HU-BU',
+    'geo.placename': 'Budapest',
+    'geo.position': '47.4979;19.0402',
+    'ICBM': '47.4979, 19.0402',
   },
 };
 

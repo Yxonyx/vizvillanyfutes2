@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Szakember regisztráció – Vízszerelő, Villanyszerelő, Fűtésszerelő | VízVillanyFűtés',
   description: 'Vízszerelő, villanyszerelő vagy fűtésszerelő vagy? Regisztrálj szakemberként és kapj folyamatos megbízásokat Budapest és Pest megye területén. Stabil munkák, átlátható kifizetés.',
-  keywords: 'szakember regisztráció, vízszerelő munka, villanyszerelő munka, fűtésszerelő munka, szerelő regisztráció budapest',
+  keywords: ['szakember regisztráció', 'vízszerelő munka', 'villanyszerelő munka', 'fűtésszerelő munka', 'szerelő regisztráció budapest', 'vízszerelő alvállalkozó', 'villanyszerelő alvállalkozó', 'fűtésszerelő állás', 'épületgépész munka'],
   openGraph: {
     title: 'Szakember regisztráció – Legyél a csapatunk tagja! | VízVillanyFűtés',
     description: 'Regisztrálj szakemberként és kapj folyamatos megbízásokat. Mi hozzuk az ügyfelet, te végezd el a munkát!',
@@ -23,6 +23,12 @@ export const metadata: Metadata = {
     title: 'Szakember regisztráció – Legyél a csapatunk tagja! | VízVillanyFűtés',
     description: 'Regisztrálj szakemberként és kapj folyamatos megbízásokat. Mi hozzuk az ügyfelet, te végezd el a munkát!',
     images: ['https://www.vizvillanyfutes.hu/opengraph-image.jpg'],
+  },
+  other: {
+    'geo.region': 'HU-BU',
+    'geo.placename': 'Budapest',
+    'geo.position': '47.4979;19.0402',
+    'ICBM': '47.4979, 19.0402',
   },
 };
 
