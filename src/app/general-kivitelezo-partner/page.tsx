@@ -149,41 +149,37 @@ export default function B2BPage() {
                 <span>B2B Partnerprogram</span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold font-heading mb-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-heading mb-6 tracking-tight">
                 Víz–villany–fűtés <br />
                 <span className="text-vvm-yellow-400">szakági partner</span> <br />
-                generálkivitelezőknek
+                generál<wbr />kivitelezőknek
               </h1>
 
-              <p className="text-xl text-slate-300 mb-8">
+              <p className="text-lg sm:text-xl text-slate-300 mb-8">
                 Egy szerződés, egy kapcsolattartó, egy minőség.
                 Komplett víz–villany–fűtés szakági brigádok bérlése
                 E-napló adminisztrációval és SLA-val.
               </p>
 
-              <div className="flex flex-wrap gap-4 mb-8">
-                <div className="flex items-center gap-2 text-slate-300">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+              <div className="flex flex-wrap gap-3 sm:gap-4 mb-8">
+                <div className="flex items-center gap-2 text-slate-300 text-sm sm:text-base">
+                  <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
                   <span>Egy szerződés</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                <div className="flex items-center gap-2 text-slate-300 text-sm sm:text-base">
+                  <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
                   <span>E-napló kezelve</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                <div className="flex items-center gap-2 text-slate-300 text-sm sm:text-base">
+                  <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
                   <span>Megbízható szakemberek</span>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <a href="#ajanlatkeres" className="btn-primary py-4 px-8 text-lg">
+                <a href="#ajanlatkeres" className="btn-primary py-4 px-8 text-lg w-full sm:w-auto justify-center">
                   <Briefcase className="w-5 h-5" />
                   <span>B2B ajánlatkérés</span>
-                </a>
-                <a href="tel:+36302696406" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2 border border-white/20">
-                  <Phone className="w-5 h-5" />
-                  <span>Hívás most</span>
                 </a>
               </div>
             </div>
@@ -444,11 +440,7 @@ export default function B2BPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+36302696406" className="btn-primary py-4 px-10 text-lg">
-              <Phone className="w-6 h-6" />
-              <span>+36 30 269 6406</span>
-            </a>
-            <a href="mailto:info@vizvillanyfutes.hu" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg border border-white/20">
+            <a href="mailto:info@vizvillanyfutes.hu" className="btn-primary bg-white text-slate-900 hover:bg-slate-100 font-semibold py-4 px-10 rounded-xl transition-colors inline-flex items-center justify-center gap-2 text-lg">
               <Send className="w-6 h-6" />
               <span>info@vizvillanyfutes.hu</span>
             </a>

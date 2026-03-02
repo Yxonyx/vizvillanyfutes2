@@ -492,17 +492,17 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 pt-2">
                 <Link
                   href="/csatlakozz-partnerkent#szakember_regisztracio"
-                  className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-vvm-yellow-400 to-vvm-yellow-500 hover:from-vvm-yellow-300 to-vvm-yellow-400 text-gray-900 font-black text-[13px] sm:text-base py-2.5 sm:py-3.5 px-3 sm:px-8 rounded-xl gap-1.5 sm:gap-2 transition-all transform hover:scale-[1.03] shadow-[0_0_30px_rgba(250,204,21,0.3)]"
+                  className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-vvm-yellow-400 to-vvm-yellow-500 hover:from-vvm-yellow-300 to-vvm-yellow-400 text-gray-900 font-black text-[13px] sm:text-base py-3.5 sm:py-4 px-3 sm:px-8 rounded-xl gap-1.5 sm:gap-2 transition-all transform hover:scale-[1.03] shadow-[0_0_30px_rgba(250,204,21,0.3)]"
                 >
-                  <Send className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Regisztrálok szakemberként</span>
                 </Link>
                 <Link
                   href="/csatlakozz-partnerkent"
-                  className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold flex-1 py-2.5 sm:py-3.5 px-3 sm:px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 sm:gap-2 text-[13px] sm:text-base"
+                  className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold flex-1 py-3.5 sm:py-4 px-3 sm:px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 sm:gap-2 text-[13px] sm:text-base"
                 >
                   <span>Tudj meg többet</span>
-                  <ArrowRight className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Link>
               </div>
 
