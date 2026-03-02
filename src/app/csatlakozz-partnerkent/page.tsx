@@ -49,7 +49,7 @@ const benefits = [
   {
     icon: DollarSign,
     title: 'Egy kávé ára egy ügyfélért',
-    description: 'Nincs százalékos sikerdíj! Minden kiajánlott összekötés (lead) fix összegbe, nagyjából 2.000 Ft kreditbe kerül. A munkadíjban te egyezel meg az ügyféllel, és az 100%-ban nálad marad.',
+    description: 'Nincs zsákbamacska, és nincs százalékos sikerdíj sem! A kredit csak akkor vonódik le, ha az ügyfél elfogadott szakemberként kiválaszt.',
   },
   {
     icon: Headphones,
@@ -134,7 +134,7 @@ const faqs = [
   },
   {
     question: 'Hogyan történik az elszámolás és kifizetés?',
-    answer: 'A rendszerünk kredites alapon működik. Mi lényegében összehozunk az ügyféllel. Minden ügyfélkapcsolat (lead) feloldása fix, alacsony összegbe kerül (kb. egy kávé ára, ~2.000 Ft). Nincs jutalék, a munkadíjban ti állapodtok meg az ügyféllel, és az mind a tiéd. Induláskor ráadásul 10.000 Ft kezdő kreditet adunk, így az elején ingyen próbálhatod ki a rendszert!',
+    answer: 'A rendszerünk kredites alapon működik. Nincs zsákbamacska: a kredit (kb. egy kávé ára, ~2.000 Ft) csak akkor vonódik le a fiókodból, ha az ügyfél elfogadott szakemberként kiválaszt. Nincs százalékos jutalék, a munkadíjban ti állapodtok meg az ügyféllel, és az 100%-ban a tiéd. Induláskor ráadásul 10.000 Ft kezdő kreditet adunk, így az elején ingyen próbálhatod ki a rendszert!',
   },
   {
     question: 'Mennyi munkát tudtok adni havonta?',
@@ -408,10 +408,23 @@ function PartnerOnboardingContent() {
                 </button>
               </div>
 
-              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
-                <div className="flex items-center gap-2 text-[15px] text-blue-100/90 font-medium"><CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" /> <span>Nincs hűségidő</span></div>
-                <div className="flex items-center gap-2 text-[15px] text-blue-100/90 font-medium"><CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" /> <span>Nincs %-os rablás</span></div>
-                <div className="flex items-center gap-2 text-[15px] text-blue-100/90 font-medium"><CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" /> <span>Ingyenes regisztráció</span></div>
+              <div className="mt-10 flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 w-full">
+                <div className="flex items-center gap-2 text-[14px] sm:text-[15px] text-white font-medium bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+                  <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 drop-shadow-md" />
+                  <span>Nincs hűségidő</span>
+                </div>
+                <div className="flex items-center gap-2 text-[14px] sm:text-[15px] text-white font-medium bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+                  <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 drop-shadow-md" />
+                  <span>Nincs %-os rablás</span>
+                </div>
+                <div className="flex items-center gap-2 text-[14px] sm:text-[15px] text-white font-medium bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+                  <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 drop-shadow-md" />
+                  <span>Nincs zsákbamacska</span>
+                </div>
+                <div className="flex items-center gap-2 text-[14px] sm:text-[15px] text-white font-medium bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+                  <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 drop-shadow-md" />
+                  <span>Ingyenes regisztráció</span>
+                </div>
               </div>
             </div>
 

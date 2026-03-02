@@ -61,3 +61,10 @@ animation-prototype.html
 scripts/apply_*.mjs
 update_rpc*.sql
 docs/*.pdf
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
