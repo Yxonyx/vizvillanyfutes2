@@ -718,31 +718,31 @@ function PartnerOnboardingContent() {
           </div>
 
           {isSubmitted ? (
-            <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-10 text-center shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-emerald-500"></div>
+            <div className="bg-white border border-slate-200 rounded-3xl p-10 text-center shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-vvm-blue-500 to-vvm-blue-600"></div>
               <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg shadow-green-500/30">
                 <CheckCircle className="w-12 h-12 text-white" />
               </div>
-              <h3 className="text-3xl font-black text-white mb-4">Sikeres regisztráció!</h3>
-              <p className="text-slate-300 mb-8 text-lg">
-                Fiókod sikeresen létrejött a rendszerben és jelenleg adminisztrátori jóváhagyásra vár.
+              <h3 className="text-3xl font-black text-slate-900 mb-4">Sikeres regisztráció!</h3>
+              <p className="text-slate-600 mb-8 text-lg">
+                Fiókod sikeresen létrejött a rendszerben, és jelenleg adminisztrátori jóváhagyásra vár.
                 Kérjük türelmedet!
               </p>
 
-              <div className="bg-slate-900/50 rounded-2xl p-6 mb-10 max-w-md mx-auto border border-slate-700/50">
-                <p className="text-slate-400 font-semibold mb-3 uppercase tracking-wider text-sm">A következő lépések:</p>
-                <ul className="text-slate-200 text-left space-y-3 font-medium">
-                  <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-500/20 text-vvm-blue-400 flex items-center justify-center text-xs">1</div> Adatok ellenőrzése a rendszerben</li>
-                  <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-500/20 text-vvm-blue-400 flex items-center justify-center text-xs">2</div> Értesítés a fiók aktiválásáról</li>
-                  <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-500/20 text-vvm-blue-400 flex items-center justify-center text-xs">3</div> Bejelentkezés és munkák feloldása</li>
+              <div className="bg-slate-50 rounded-2xl p-6 mb-10 max-w-md mx-auto border border-slate-200">
+                <p className="text-slate-500 font-semibold mb-3 uppercase tracking-wider text-sm">A következő lépések:</p>
+                <ul className="text-slate-700 text-left space-y-3 font-medium">
+                  <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-100 text-vvm-blue-600 flex items-center justify-center text-xs">1</div> Adatok ellenőrzése a rendszerben</li>
+                  <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-100 text-vvm-blue-600 flex items-center justify-center text-xs">2</div> Értesítés a fiók aktiválásáról</li>
+                  <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-100 text-vvm-blue-600 flex items-center justify-center text-xs">3</div> Bejelentkezés és munkák feloldása</li>
                 </ul>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/" className="px-8 py-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all">
+                <Link href="/" className="px-8 py-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition-all">
                   Vissza a főoldalra
                 </Link>
-                <Link href="/login" className="px-8 py-4 rounded-xl bg-vvm-blue-600 hover:bg-vvm-blue-500 text-white font-bold shadow-lg shadow-vvm-blue-500/30 transition-all">
+                <Link href="/login" className="px-8 py-4 rounded-xl bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold shadow-lg shadow-vvm-blue-600/30 transition-all">
                   Tovább a bejelentkezéshez
                 </Link>
               </div>

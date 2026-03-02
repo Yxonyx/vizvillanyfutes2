@@ -16,8 +16,8 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient();
 
     // Get the site URL from environment or request
-    const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-                    `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ||
+      `${request.nextUrl.protocol}//${request.nextUrl.host}`;
 
     // Send password reset email
     const { error } = await supabase.auth.resetPasswordForEmail(email, {

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  Briefcase, Users, Clock, CheckCircle, AlertTriangle, 
+import {
+  Briefcase, Users, Clock, CheckCircle, AlertTriangle,
   LogOut, RefreshCw, Filter, Plus, Search, X
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,9 +12,9 @@ import ContractorCard from '@/components/ContractorCard';
 import { api, handleApiError } from '@/lib/api';
 
 // Simple notification component
-function Notification({ message, type, onClose }: { 
-  message: string; 
-  type: 'success' | 'error'; 
+function Notification({ message, type, onClose }: {
+  message: string;
+  type: 'success' | 'error';
   onClose: () => void;
 }) {
   useEffect(() => {
@@ -23,11 +23,10 @@ function Notification({ message, type, onClose }: {
   }, [onClose]);
 
   return (
-    <div className={`fixed top-24 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg animate-slide-up min-w-[300px] max-w-md ${
-      type === 'success' 
-        ? 'bg-green-50 border-green-200' 
+    <div className={`fixed top-24 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg animate-slide-up min-w-[300px] max-w-md ${type === 'success'
+        ? 'bg-green-50 border-green-200'
         : 'bg-red-50 border-red-200'
-    }`}>
+      }`}>
       {type === 'success' ? (
         <CheckCircle className="w-5 h-5 text-green-500" />
       ) : (
@@ -93,7 +92,7 @@ function AdminContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [jobFilter, setJobFilter] = useState<string>('new');
-  const [contractorFilter, setContractorFilter] = useState<string>('pending_approval');
+  const [contractorFilter, setContractorFilter] = useState<string>('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showAssignModal, setShowAssignModal] = useState<Job | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -106,7 +105,7 @@ function AdminContent() {
       }
       // Add cache-busting timestamp
       params.set('_t', Date.now().toString());
-      
+
       const response = await api.get<{ jobs: Job[] }>(`/api/admin/jobs?${params}`);
       if (response.success && response.data) {
         setJobs(response.data.jobs || []);
@@ -124,7 +123,7 @@ function AdminContent() {
       }
       // Add cache-busting timestamp
       params.set('_t', Date.now().toString());
-      
+
       const response = await api.get<{ contractors: Contractor[] }>(`/api/admin/contractors?${params}`);
       if (response.success && response.data) {
         setContractors(response.data.contractors || []);
@@ -137,7 +136,7 @@ function AdminContent() {
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-    
+
     if (activeView === 'jobs') {
       fetchJobs().finally(() => setIsLoading(false));
     } else {
@@ -236,8 +235,8 @@ function AdminContent() {
         setShowAssignModal(null);
         const assignedContractor = contractors.find(c => c.id === contractorId);
         // Optimistic update - no server refresh
-        setJobs(prev => prev.map(j => j.id === jobId ? { 
-          ...j, 
+        setJobs(prev => prev.map(j => j.id === jobId ? {
+          ...j,
           status: 'assigned',
           assignments: [...(j.assignments || []), {
             id: `temp-${Date.now()}`,
@@ -333,36 +332,32 @@ function AdminContent() {
         <div className="flex gap-4 mb-6">
           <button
             onClick={() => setActiveView('jobs')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors ${
-              activeView === 'jobs'
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors ${activeView === 'jobs'
                 ? 'bg-vvm-blue-600 text-white'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-            }`}
+              }`}
           >
             <Briefcase className="w-5 h-5" />
             <span>Munkák</span>
             {newJobsCount > 0 && (
-              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                activeView === 'jobs' ? 'bg-white text-vvm-blue-600' : 'bg-red-500 text-white'
-              }`}>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${activeView === 'jobs' ? 'bg-white text-vvm-blue-600' : 'bg-red-500 text-white'
+                }`}>
                 {newJobsCount}
               </span>
             )}
           </button>
           <button
             onClick={() => setActiveView('contractors')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors ${
-              activeView === 'contractors'
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors ${activeView === 'contractors'
                 ? 'bg-vvm-blue-600 text-white'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-            }`}
+              }`}
           >
             <Users className="w-5 h-5" />
             <span>Szakemberek</span>
             {pendingContractorsCount > 0 && (
-              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                activeView === 'contractors' ? 'bg-white text-vvm-blue-600' : 'bg-amber-500 text-white'
-              }`}>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${activeView === 'contractors' ? 'bg-white text-vvm-blue-600' : 'bg-amber-500 text-white'
+                }`}>
                 {pendingContractorsCount}
               </span>
             )}
@@ -374,7 +369,7 @@ function AdminContent() {
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-gray-400" />
             <span className="text-sm font-medium text-gray-700">Szűrés:</span>
-            
+
             {activeView === 'jobs' && (
               <div className="flex flex-wrap gap-2 ml-2">
                 {[
@@ -390,18 +385,17 @@ function AdminContent() {
                   <button
                     key={opt.value}
                     onClick={() => setJobFilter(opt.value)}
-                    className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                      jobFilter === opt.value
+                    className={`px-3 py-1 rounded-lg text-sm transition-colors ${jobFilter === opt.value
                         ? 'bg-vvm-blue-100 text-vvm-blue-700 font-medium'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
+                      }`}
                   >
                     {opt.label}
                   </button>
                 ))}
               </div>
             )}
-            
+
             {activeView === 'contractors' && (
               <div className="flex flex-wrap gap-2 ml-2">
                 {[
@@ -414,11 +408,10 @@ function AdminContent() {
                   <button
                     key={opt.value}
                     onClick={() => setContractorFilter(opt.value)}
-                    className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                      contractorFilter === opt.value
+                    className={`px-3 py-1 rounded-lg text-sm transition-colors ${contractorFilter === opt.value
                         ? 'bg-vvm-blue-100 text-vvm-blue-700 font-medium'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
+                      }`}
                   >
                     {opt.label}
                   </button>
@@ -469,7 +462,7 @@ function AdminContent() {
                         Létrehozva: {new Date(job.created_at).toLocaleDateString('hu-HU')}
                       </span>
                     </div>
-                    
+
                     {/* Assign/Reassign button - show if no active (pending/accepted) assignment exists */}
                     {(() => {
                       const assignments = job.assignments || [];
@@ -480,7 +473,7 @@ function AdminContent() {
                         (a: { status: string }) => a.status === 'declined'
                       );
                       const needsAssignment = !hasActiveAssignment && job.status !== 'completed' && job.status !== 'cancelled';
-                      
+
                       return needsAssignment && (
                         <button
                           onClick={() => setShowAssignModal(job)}
@@ -569,13 +562,13 @@ function AdminContent() {
 }
 
 // Separate component for contractor selection
-function AssignContractorList({ 
-  jobId, 
-  jobTrade, 
-  onAssign, 
-  isLoading 
-}: { 
-  jobId: string; 
+function AssignContractorList({
+  jobId,
+  jobTrade,
+  onAssign,
+  isLoading
+}: {
+  jobId: string;
   jobTrade: string;
   onAssign: (jobId: string, contractorId: string) => void;
   isLoading: boolean;
@@ -605,7 +598,7 @@ function AssignContractorList({
         setLoading(false);
       }
     };
-    
+
     fetchApprovedContractors();
   }, [jobTrade]);
 
@@ -621,11 +614,11 @@ function AssignContractorList({
     );
   }
 
-  const tradeLabels: Record<string, string> = { 
-    viz: 'Víz', 
-    villany: 'Villany', 
-    futes: 'Fűtés', 
-    combined: 'Kombinált' 
+  const tradeLabels: Record<string, string> = {
+    viz: 'Víz',
+    villany: 'Villany',
+    futes: 'Fűtés',
+    combined: 'Kombinált'
   };
 
   return (
@@ -637,11 +630,10 @@ function AssignContractorList({
             key={contractor.id}
             onClick={() => onAssign(jobId, contractor.id)}
             disabled={isLoading}
-            className={`w-full p-4 rounded-xl text-left transition-colors disabled:opacity-50 ${
-              matchesTrade 
-                ? 'bg-green-50 hover:bg-green-100 border border-green-200' 
+            className={`w-full p-4 rounded-xl text-left transition-colors disabled:opacity-50 ${matchesTrade
+                ? 'bg-green-50 hover:bg-green-100 border border-green-200'
                 : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
-            }`}
+              }`}
           >
             <div className="flex items-center justify-between">
               <div className="font-medium text-gray-900">{contractor.display_name}</div>
