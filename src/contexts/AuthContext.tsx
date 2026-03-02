@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   getSession,
   setSession,
@@ -31,9 +32,12 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<UserSession['user'] | null>(null);
   const [contractorProfile, setContractorProfile] = useState<UserSession['contractor_profile'] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Track whether our custom login API is in-flight to avoid race conditions
+  const loginInProgress = useRef(false);
 
   // Initialize from stored session
   useEffect(() => {
@@ -49,7 +53,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, sbSession) => {
+        // Handle password recovery — redirect to reset page with tokens
+        if (event === 'PASSWORD_RECOVERY' && sbSession) {
+          router.push(
+            `/reset-password?access_token=${encodeURIComponent(sbSession.access_token)}&refresh_token=${encodeURIComponent(sbSession.refresh_token)}&type=recovery`
+          );
+          return;
+        }
+
         if (event === 'SIGNED_IN' && sbSession?.user) {
+          // If our custom login API call is in progress, skip — it will handle the session itself
+          if (loginInProgress.current) return;
+
           // Check if we ALREADY have a valid local session (e.g., from our custom login endpoint)
           const currentLocalSession = getSession();
           if (currentLocalSession && currentLocalSession.user.id === sbSession.user.id) {
@@ -58,24 +73,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(currentLocalSession.user);
             setContractorProfile(currentLocalSession.contractor_profile || null);
           } else {
-            // A Supabase session appeared but we don't have a valid matching local user
-            // Create a local session from the Supabase session
-            const role = (sbSession.user.user_metadata?.role as UserSession['user']['role']) || 'customer';
-            const sessionData: UserSession = {
-              user: {
-                id: sbSession.user.id,
-                email: sbSession.user.email || '',
-                role: role,
-                status: 'active',
-              },
-              session: {
-                access_token: sbSession.access_token,
-                refresh_token: sbSession.refresh_token,
-                expires_at: sbSession.expires_at,
-              },
-            };
-            setSession(sessionData);
-            setUser(sessionData.user);
+            // A Supabase session appeared but we don't have a valid matching local user.
+            // Fetch the correct role from our API (reads user_meta DB table)
+            // instead of falling back to 'customer' from user_metadata.
+            try {
+              const response = await api.get<{
+                authenticated: boolean;
+                user?: UserSession['user'];
+                contractor_profile?: UserSession['contractor_profile'];
+              }>('/api/auth/session');
+
+              if (response.success && response.data?.authenticated && response.data.user) {
+                const sessionData: UserSession = {
+                  user: response.data.user,
+                  session: {
+                    access_token: sbSession.access_token,
+                    refresh_token: sbSession.refresh_token,
+                    expires_at: sbSession.expires_at,
+                  },
+                  contractor_profile: response.data.contractor_profile,
+                };
+                setSession(sessionData);
+                setUser(sessionData.user);
+                setContractorProfile(sessionData.contractor_profile || null);
+              } else {
+                // API says not authenticated or no user — fallback to basic session
+                const role = (sbSession.user.user_metadata?.role as UserSession['user']['role']) || 'customer';
+                const sessionData: UserSession = {
+                  user: {
+                    id: sbSession.user.id,
+                    email: sbSession.user.email || '',
+                    role: role,
+                    status: 'active',
+                  },
+                  session: {
+                    access_token: sbSession.access_token,
+                    refresh_token: sbSession.refresh_token,
+                    expires_at: sbSession.expires_at,
+                  },
+                };
+                setSession(sessionData);
+                setUser(sessionData.user);
+              }
+            } catch {
+              // Network error — fallback to metadata-based session
+              const role = (sbSession.user.user_metadata?.role as UserSession['user']['role']) || 'customer';
+              const sessionData: UserSession = {
+                user: {
+                  id: sbSession.user.id,
+                  email: sbSession.user.email || '',
+                  role: role,
+                  status: 'active',
+                },
+                session: {
+                  access_token: sbSession.access_token,
+                  refresh_token: sbSession.refresh_token,
+                  expires_at: sbSession.expires_at,
+                },
+              };
+              setSession(sessionData);
+              setUser(sessionData.user);
+            }
           }
         } else if (event === 'SIGNED_OUT') {
           clearSession();
@@ -85,11 +143,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
     return () => subscription.unsubscribe();
-  }, [user]);
+  }, [router]);
 
   // Login function
   const login = useCallback(async (email: string, password: string, requestedRole?: string) => {
     try {
+      loginInProgress.current = true;
       const response = await api.post<{
         user: UserSession['user'];
         session: UserSession['session'];
@@ -115,11 +174,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
+        loginInProgress.current = false;
         return { success: true };
       }
 
+      loginInProgress.current = false;
       return { success: false, error: response.error || 'Bejelentkezés sikertelen' };
     } catch (error) {
+      loginInProgress.current = false;
       return { success: false, error: handleApiError(error) };
     }
   }, []);
