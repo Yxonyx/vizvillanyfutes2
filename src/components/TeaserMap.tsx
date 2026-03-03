@@ -6,7 +6,6 @@ import Map, { Marker, Popup, NavigationControl, MapRef } from 'react-map-gl/mapb
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Droplets, Zap, Flame, Wrench, Clock, Search, Shield, ArrowRight, Maximize2, Plus, LogOut, Trash2, Award, AlertTriangle, FileCheck, Sparkles, LogIn, MapPin } from 'lucide-react';
 import Link from 'next/link';
-import MarketplaceSimulationOverlay from './MarketplaceSimulationOverlay';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from './AuthModal';
@@ -57,7 +56,6 @@ export default function TeaserMap() {
     const [mounted, setMounted] = useState(false);
     const [leads, setLeads] = useState<Lead[]>([]);
     const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-    const [isSimulationOpen, setIsSimulationOpen] = useState(false);
 
     // Auth from global context (supports both real and fake logins)
     const { isAuthenticated, user: authUser, role } = useAuth();
@@ -66,9 +64,6 @@ export default function TeaserMap() {
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [interactionLocation, setInteractionLocation] = useState<{ lat: number, lng: number } | null>(null);
-    const [autoAddOnOpen, setAutoAddOnOpen] = useState(false);
-    const [pendingViewMode, setPendingViewMode] = useState<'contractor' | 'customer'>('customer');
-    const [pendingInitialTab, setPendingInitialTab] = useState<'all' | 'own' | 'account'>('all');
 
     const mapRef = useRef<MapRef>(null);
 
@@ -83,27 +78,79 @@ export default function TeaserMap() {
         if (!user) return mockLeads;
         if (role === 'contractor') return leads;
 
-        // Customer: only their own leads + mock leads to make the map look busy
+        // Customer: only their own leads (jobs)
         const ownRealLeads = leads.filter(l => l.user_id === user.id);
-        const ownMockLeads = mockLeads.filter(l => l.user_id === user.id);
-        const otherMockLeads = mockLeads.filter(l => l.user_id !== user.id); // keep some fake ones for visuals if desired, or remove them
-
-        // Let's only show their OWN leads and NO mock leads if they have real ones, 
-        // OR show their own real leads AND the general mock leads so the map isn't empty.
-        // User requested: "csak a sajat hibajat a megfejlolt hiba viszont minden felhasznaloé a szaki verzióba latszik"
-        // This means customers ONLY see their own leads.
-        return ownRealLeads.length > 0 ? ownRealLeads : [];
+        return ownRealLeads;
     }, [user, role, leads]);
 
     // Initial load and subscriptions
     useEffect(() => {
         setMounted(true);
 
-        // Fetch initial leads
         const fetchLeads = async () => {
-            const { data, error } = await supabase.from('leads').select('*').eq('status', 'waiting').order('created_at', { ascending: false });
-            if (!error && data) {
-                setLeads(data as Lead[]);
+            if (!user) {
+                // Guests just use mockLeads anyway
+                return;
+            }
+
+            try {
+                let tempLeads: Lead[] = [];
+
+                if (role === 'contractor') {
+                    // Fetch open jobs map
+                    const { data, error } = await supabase
+                        .from('open_jobs_map')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+
+                    if (data && !error) {
+                        tempLeads = data.map((j: any) => ({
+                            id: j.id,
+                            user_id: 'contractor_view',
+                            lat: j.latitude,
+                            lng: j.longitude,
+                            type: j.trade === 'egyeb' ? 'viz' : (j.trade || 'viz'),
+                            title: j.title,
+                            description: j.description || '',
+                            district: j.district_or_city || null,
+                            status: j.status,
+                            created_at: j.created_at
+                        }));
+                    }
+                } else if (role === 'customer') {
+                    // Fetch customer's own jobs
+                    const { data, error } = await supabase
+                        .from('jobs')
+                        .select('id, title, description, trade, status, created_at, latitude, longitude, district_or_city')
+                        .order('created_at', { ascending: false });
+
+                    if (data && !error) {
+                        tempLeads = data.map((j: any) => ({
+                            id: j.id,
+                            user_id: user.id, // Mark as own lead
+                            lat: j.latitude,
+                            lng: j.longitude,
+                            type: j.trade === 'egyeb' ? 'viz' : (j.trade || 'viz'),
+                            title: j.title,
+                            description: j.description || '',
+                            district: j.district_or_city || null,
+                            status: j.status,
+                            created_at: j.created_at
+                        }));
+                    }
+                }
+
+                // Append any unassigned legacy leads just in case
+                const { data: legacyLeads } = await supabase
+                    .from('leads')
+                    .select('*')
+                    .in('status', ['waiting', 'new'])
+                    .order('created_at', { ascending: false });
+
+                const finalData = legacyLeads ? [...tempLeads, ...(legacyLeads as Lead[])] : tempLeads;
+                setLeads(finalData.filter((l: Lead) => l.lat && l.lng));
+            } catch (err) {
+                console.error("Error fetching map data:", err);
             }
         };
         fetchLeads();
@@ -128,23 +175,6 @@ export default function TeaserMap() {
             )
             .subscribe();
 
-        const handleCloseSimulation = () => {
-            setIsSimulationOpen(false);
-            setAutoAddOnOpen(false);
-        };
-
-        // Listen for portal open events from Header
-        const handleOpenPortal = (e: Event) => {
-            const detail = (e as CustomEvent).detail || {};
-            const mode = detail.mode || (role === 'contractor' ? 'contractor' : 'customer');
-            setPendingViewMode(mode);
-            setAutoAddOnOpen(!!detail.autoAdd);
-            setPendingInitialTab(detail.initialTab || 'all');
-            setIsSimulationOpen(true);
-        };
-
-        window.addEventListener('closeMarketplaceSimulation', handleCloseSimulation);
-        window.addEventListener('openPortal', handleOpenPortal);
 
         const updatePadding = () => {
             if (mapRef.current && window.innerWidth >= 1024) {
@@ -161,8 +191,6 @@ export default function TeaserMap() {
 
         return () => {
             supabase.removeChannel(subscription);
-            window.removeEventListener('closeMarketplaceSimulation', handleCloseSimulation);
-            window.removeEventListener('openPortal', handleOpenPortal);
             window.removeEventListener('resize', updatePadding);
         };
     }, [role]);
@@ -426,16 +454,24 @@ export default function TeaserMap() {
                             </div>
 
                             <div className="flex flex-col gap-1.5 sm:gap-2">
-                                <button
-                                    onClick={() => {
-                                        setSelectedLead(null);
-                                        setIsSimulationOpen(true);
-                                    }}
-                                    className="w-full bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-slate-900 font-bold py-1.5 sm:py-2.5 rounded-xl text-[11px] sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all shadow-md"
-                                >
-                                    <Maximize2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                                    {user ? 'Teljes Képernyős Nézet' : 'Részletek a Szaki Appban'}
-                                </button>
+                                {role === 'contractor' ? (
+                                    <Link
+                                        href="/contractor/dashboard"
+                                        className="w-full bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-1.5 sm:py-2.5 rounded-xl text-[11px] sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all shadow-md"
+                                    >
+                                        <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
+                                        Megtekintés az Irányítópulton
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href={user ? '/ugyfel/dashboard' : '/login'}
+                                        onClick={() => setSelectedLead(null)}
+                                        className="w-full bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-slate-900 font-bold py-1.5 sm:py-2.5 rounded-xl text-[11px] sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all shadow-md"
+                                    >
+                                        <Maximize2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                                        Megtekintés az Irányítópulton
+                                    </Link>
+                                )}
 
                                 {user && user.id === selectedLead.user_id && (
                                     <button
@@ -454,21 +490,6 @@ export default function TeaserMap() {
             </Map>
 
             {/* Enlarge Button moved to top wrapper */}
-
-            {/* Fullscreen Simulation Overlay */}
-            {isSimulationOpen && mounted && document.body && createPortal(
-                <MarketplaceSimulationOverlay
-                    onClose={() => { setIsSimulationOpen(false); setAutoAddOnOpen(false); }}
-                    mockLeads={displayLeads}
-                    getIcon={getIcon}
-                    getColor={getColor}
-                    viewMode={pendingViewMode}
-                    user={user}
-                    autoAddOnOpen={autoAddOnOpen}
-                    initialTab={pendingInitialTab}
-                />,
-                document.body
-            )}
 
             {/* Modals Portaled to Body */}
             {authModalOpen && mounted && document.body && createPortal(

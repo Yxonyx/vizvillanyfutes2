@@ -26,9 +26,10 @@ interface MarketplaceSimulationOverlayProps {
     user?: any;
     autoAddOnOpen?: boolean;
     initialTab?: 'all' | 'own' | 'account';
+    preloadedInterests?: Record<string, any[]>;
 }
 
-export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIcon, getColor, viewMode = 'contractor', user, autoAddOnOpen = false, initialTab = 'all' }: MarketplaceSimulationOverlayProps) {
+export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIcon, getColor, viewMode = 'contractor', user, autoAddOnOpen = false, initialTab = 'all', preloadedInterests }: MarketplaceSimulationOverlayProps) {
     const { logout, isAuthenticated } = useAuth();
     const [selectedLead, setSelectedLead] = useState<any | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(true);
@@ -107,6 +108,7 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
     const [interestSuccess, setInterestSuccess] = useState<string | null>(null);
     const [creditBalance, setCreditBalance] = useState<number | null>(null);
     const [acceptedLeads, setAcceptedLeads] = useState<any[]>([]);
+    const [cancellingId, setCancellingId] = useState<string | null>(null);
 
     // Lock body scroll when overlay is open (prevents background sliding on mobile)
     useEffect(() => {
@@ -197,28 +199,37 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
             loadRealJobs();
             loadInterests();
         } else {
-            // Customer: fetch interest counts for my leads
-            const myLeadIds = mockLeads.filter(l => l.user_id === user.id).map(l => l.id);
-            if (myLeadIds.length > 0) {
-                supabase.from('lead_interests').select('*').in('lead_id', myLeadIds)
-                    .then(({ data }) => {
-                        if (data) {
-                            const counts: Record<string, number> = {};
-                            const details: Record<string, any[]> = {};
-                            data.forEach(i => {
-                                if (i.status !== 'withdrawn' && i.status !== 'rejected') {
-                                    counts[i.lead_id] = (counts[i.lead_id] || 0) + 1;
-                                    if (!details[i.lead_id]) details[i.lead_id] = [];
-                                    details[i.lead_id].push(i);
-                                }
-                            });
-                            setLeadInterestCounts(counts);
-                            setLeadInterestDetails(details);
-                        }
-                    });
+            // Customer: use preloaded interests if provided, otherwise fetch
+            if (preloadedInterests) {
+                const counts: Record<string, number> = {};
+                Object.keys(preloadedInterests).forEach(leadId => {
+                    counts[leadId] = preloadedInterests[leadId].filter((i: any) => i.status !== 'withdrawn' && i.status !== 'rejected').length;
+                });
+                setLeadInterestCounts(counts);
+                setLeadInterestDetails(preloadedInterests);
+            } else {
+                const myLeadIds = mockLeads.filter(l => l.user_id === user.id).map(l => l.id);
+                if (myLeadIds.length > 0) {
+                    supabase.from('lead_interests').select('*').in('lead_id', myLeadIds)
+                        .then(({ data }) => {
+                            if (data) {
+                                const counts: Record<string, number> = {};
+                                const details: Record<string, any[]> = {};
+                                data.forEach(i => {
+                                    if (i.status !== 'withdrawn' && i.status !== 'rejected') {
+                                        counts[i.lead_id] = (counts[i.lead_id] || 0) + 1;
+                                        if (!details[i.lead_id]) details[i.lead_id] = [];
+                                        details[i.lead_id].push(i);
+                                    }
+                                });
+                                setLeadInterestCounts(counts);
+                                setLeadInterestDetails(details);
+                            }
+                        });
+                }
             }
         }
-    }, [user, viewMode, mockLeads]);
+    }, [user, viewMode, mockLeads, preloadedInterests]);
 
     // Handle contractor interest submission
     const handleInterest = useCallback(async (leadId: string) => {
@@ -296,9 +307,32 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
         }
     }, [user]);
 
+    const handleCancelJob = async (jobId: string) => {
+        if (!confirm('Biztosan törölni szeretnéd ezt a bejelentést?')) return;
+        setCancellingId(jobId);
+        try {
+            const res = await fetch(`/api/customer/jobs/${jobId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'cancel' }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Sikeres törlés!');
+                window.location.reload();
+            } else {
+                alert(data.error || 'Hiba történt a törlés során.');
+            }
+        } catch {
+            alert('Hiba történt a törlés során.');
+        } finally {
+            setCancellingId(null);
+        }
+    };
+
     const displayLeads = viewMode === 'contractor'
         ? (activeTab === 'own' && user ? realJobs.filter(j => alreadyInterested(j.id)) : realJobs)
-        : (activeTab === 'own' && user ? mockLeads.filter(l => l.user_id === user.id) : mockLeads);
+        : mockLeads; // For customers, mockLeads already contains only their own real jobs
     const alreadyInterested = (leadId: string) => myInterests.some(i => i.lead_id === leadId);
     const getInterestStatus = (leadId: string) => myInterests.find(i => i.lead_id === leadId)?.status;
 
@@ -350,7 +384,7 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="font-bold text-slate-800 leading-tight truncate">
-                                {viewMode === 'contractor' ? 'Minta Szakember' : 'Ügyfél Fiók'}
+                                {user ? user.email : (viewMode === 'contractor' ? 'Szakember' : 'Ügyfél')}
                             </div>
                             <div className={`flex items-center gap-1 text-[11px] font-bold ${viewMode === 'contractor' ? 'text-emerald-600' : 'text-blue-600'} uppercase tracking-widest mt-0.5`}>
                                 <Shield className="w-3 h-3" /> {viewMode === 'contractor' ? 'Partner' : 'Aktív'}
@@ -877,16 +911,11 @@ export default function MarketplaceSimulationOverlay({ onClose, mockLeads, getIc
                                             ✏️ Módosítás
                                         </button>
                                         <button
-                                            onClick={async () => {
-                                                if (window.confirm('Biztosan törölni szeretnéd ezt a bejelentést?')) {
-                                                    const { supabase } = await import('@/lib/supabase/client');
-                                                    await supabase.from('leads').delete().match({ id: selectedLead.id });
-                                                    setSelectedLead(null);
-                                                }
-                                            }}
-                                            className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors border border-red-200"
+                                            onClick={() => handleCancelJob(selectedLead.id)}
+                                            disabled={cancellingId === selectedLead.id}
+                                            className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors border border-red-200 disabled:opacity-50"
                                         >
-                                            🗑️ Törlés
+                                            {cancellingId === selectedLead.id ? 'Törlés...' : '🗑️ Törlés'}
                                         </button>
                                     </div>
                                 )}

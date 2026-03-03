@@ -20,16 +20,17 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Contractor profile not found' }, { status: 401 });
     }
 
-    // Check if contractor purchased this job lead
-    const { data: purchase, error: purchaseError } = await adminClient
-      .from('lead_purchases')
-      .select('*')
+    // Check if contractor has an accepted interest for this job
+    const { data: interest, error: interestError } = await adminClient
+      .from('job_interests')
+      .select('id')
       .eq('job_id', jobId)
       .eq('contractor_id', profileId)
+      .in('status', ['accepted', 'pending']) // Allow pending so they can view details while waiting
       .single();
 
-    if (purchaseError || !purchase) {
-      return NextResponse.json({ success: false, error: 'Job not found or not purchased by you' }, { status: 404 });
+    if (interestError || !interest) {
+      return NextResponse.json({ success: false, error: 'Job not found or no interest registered' }, { status: 404 });
     }
 
     const { data: job, error: jobError } = await adminClient
@@ -48,7 +49,7 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      data: { job, purchase },
+      data: { job, interest },
     });
 
   } catch (error) {
@@ -86,16 +87,17 @@ export async function PUT(
       return NextResponse.json({ success: false, error: 'Contractor profile not found' }, { status: 401 });
     }
 
-    // Verify contractor bought the lead
-    const { data: purchase, error: purchaseError } = await adminClient
-      .from('lead_purchases')
+    // Verify contractor has an accepted interest for this lead
+    const { data: interest, error: interestError } = await adminClient
+      .from('job_interests')
       .select('id')
       .eq('job_id', jobId)
       .eq('contractor_id', profileId)
+      .eq('status', 'accepted')
       .single();
 
-    if (purchaseError || !purchase) {
-      return NextResponse.json({ success: false, error: 'No purchased lead found for this job' }, { status: 403 });
+    if (interestError || !interest) {
+      return NextResponse.json({ success: false, error: 'No accepted interest found for this job' }, { status: 403 });
     }
 
     const { data: currentJob, error: jobFetchError } = await adminClient
@@ -117,7 +119,8 @@ export async function PUT(
     }
 
     const validTransitions: Record<string, string[]> = {
-      'unlocked': ['in_progress', 'completed'], // Unlocked handles the newly bought jobs
+      'unlocked': ['in_progress', 'completed'], // Legacy
+      'assigned': ['in_progress', 'completed'], // Escrow model
       'in_progress': ['completed'],
     };
 
@@ -143,12 +146,14 @@ export async function PUT(
       .single();
 
     if (updateError) {
+      console.error('Job update error:', updateError);
       return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, message: `Job status updated to ${new_status}`, data: { job: updatedJob } });
 
   } catch (error) {
+    console.error('Unhandled PUT error:', error);
     return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }

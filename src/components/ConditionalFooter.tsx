@@ -22,5 +22,10 @@ export default function ConditionalFooter() {
     //     return null;
     // }
 
+    // Hide entirely on customer and contractor dashboard routes
+    if (pathname?.startsWith('/ugyfel') || pathname?.startsWith('/contractor')) {
+        return null;
+    }
+
     return <Footer />;
 }

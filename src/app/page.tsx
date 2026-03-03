@@ -22,7 +22,6 @@ const problemSuggestions = [
 ];
 
 import TeaserMap from '@/components/TeaserMap';
-import MarketplaceSimulationOverlay from '@/components/MarketplaceSimulationOverlay';
 import HowItWorksAnimation from '@/components/HowItWorksAnimation';
 import { supabase } from '@/lib/supabase/client';
 
@@ -97,56 +96,7 @@ const stats = [
 
 
 
-// Mobile App Dashboard for authenticated users
-// Renders MarketplaceSimulationOverlay directly — NO demo TeaserMap
-function MobileAppDashboard({ isContractor }: { isContractor: boolean }) {
-  const { user } = useAuth();
-  const [leads, setLeads] = useState<any[]>([]);
-  const router = useRouter();
 
-  useEffect(() => {
-    const fetchLeads = async () => {
-      const { data } = await supabase.from('leads').select('*').eq('status', 'waiting').order('created_at', { ascending: false });
-      if (data) setLeads(data);
-    };
-    fetchLeads();
-
-    // Realtime subscription
-    const sub = supabase
-      .channel('mobile-leads')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => fetchLeads())
-      .subscribe();
-    return () => { supabase.removeChannel(sub); };
-  }, []);
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'viz': return <Droplets className="w-4 h-4 text-white" />;
-      case 'villany': return <Zap className="w-4 h-4 text-white" />;
-      case 'futes': return <Flame className="w-4 h-4 text-white" />;
-      default: return <Wrench className="w-4 h-4 text-white" />;
-    }
-  };
-
-  const getColor = (type: string) => {
-    switch (type) {
-      case 'viz': return 'bg-sky-500 shadow-sky-500/50';
-      case 'villany': return 'bg-amber-500 shadow-amber-500/50';
-      case 'futes': return 'bg-orange-500 shadow-orange-500/50';
-      default: return 'bg-slate-500 shadow-slate-500/50';
-    }
-  };
-
-  return (
-    <MarketplaceSimulationOverlay
-      mockLeads={leads}
-      getIcon={getIcon}
-      getColor={getColor}
-      viewMode={isContractor ? 'contractor' : 'customer'}
-      user={user ? { id: user.id, email: user.email } : undefined}
-    />
-  );
-}
 
 export default function HomePage() {
   const router = useRouter();
@@ -187,7 +137,7 @@ export default function HomePage() {
                   role === 'contractor' ? (
                     <>
                       <button
-                        onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'contractor' } }))}
+                        onClick={() => router.push('/contractor/dashboard')}
                         className="flex-1 bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold text-sm py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-all transform active:scale-95 shadow-[0_4px_20px_rgba(250,204,21,0.3)]"
                       >
                         <Search className="w-5 h-5" />
@@ -267,7 +217,7 @@ export default function HomePage() {
                   role === 'contractor' ? (
                     <>
                       <button
-                        onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'contractor' } }))}
+                        onClick={() => router.push('/contractor/dashboard')}
                         className="bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-gray-900 font-bold text-lg py-4 px-8 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105 shadow-[0_4px_20px_rgba(250,204,21,0.3)]"
                       >
                         <Search className="w-6 h-6" />
@@ -582,19 +532,21 @@ export default function HomePage() {
               </div>
 
               {/* Floating Affiliate Banner */}
-              <Link href="/ajanlo-program" className="absolute top-1/2 -right-16 -translate-y-1/2 bg-white rounded-xl shadow-2xl p-4 flex flex-col gap-3 z-30 transform transition-transform hover:scale-105 border border-emerald-100 group" style={{ animation: 'float 4s ease-in-out 0.2s infinite' }}>
-                <div className="flex items-start gap-3 w-56">
-                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-green-600 rounded-xl flex items-center justify-center shadow-inner flex-shrink-0">
-                    <Gift className="w-5 h-5 text-white" />
+              {!user && (
+                <Link href="/ajanlo-program" className="absolute top-1/2 -right-16 -translate-y-1/2 bg-white rounded-xl shadow-2xl p-4 flex flex-col gap-3 z-30 transform transition-transform hover:scale-105 border border-emerald-100 group" style={{ animation: 'float 4s ease-in-out 0.2s infinite' }}>
+                  <div className="flex items-start gap-3 w-56">
+                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-green-600 rounded-xl flex items-center justify-center shadow-inner flex-shrink-0">
+                      <Gift className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-[13px] font-bold text-slate-800 leading-tight mb-1">Érdekel, hogyan szerezhetsz még 10.000 Ft értékben kreditet?</h4>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-[13px] font-bold text-slate-800 leading-tight mb-1">Érdekel, hogyan szerezhetsz még 10.000 Ft értékben kreditet?</h4>
+                  <div className="bg-emerald-50 text-emerald-700 font-semibold text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-1 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                    Mutasd a részleteket <ArrowRight className="w-3 h-3" />
                   </div>
-                </div>
-                <div className="bg-emerald-50 text-emerald-700 font-semibold text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-1 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                  Mutasd a részleteket <ArrowRight className="w-3 h-3" />
-                </div>
-              </Link>
+                </Link>
+              )}
 
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,8 +9,18 @@ export async function PATCH(
     { params }: { params: { id: string } }
 ) {
     try {
-        const authHeader = request.headers.get('authorization');
-        const supabase = createServerClient(authHeader || undefined);
+        const cookieStore = cookies();
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            {
+                cookies: {
+                    get(name: string) {
+                        return cookieStore.get(name)?.value;
+                    },
+                },
+            }
+        );
 
         // Verify authentication
         const { data: { user }, error: authError } = await supabase.auth.getUser();

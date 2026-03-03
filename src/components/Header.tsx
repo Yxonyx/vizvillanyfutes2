@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, Calendar, ChevronDown, Users, LogIn, LayoutDashboard, LogOut, Shield, AlertTriangle, User } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
 import Logo from './Logo';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
@@ -45,6 +46,8 @@ export default function Header() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileSubmenu, setMobileSubmenu] = useState<string | null>(null);
   const { isAuthenticated, user, role, logout, isLoading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,6 +56,24 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const handleOpenPortal = (e: any) => {
+      const { mode, autoAdd, initialTab } = e.detail || {};
+      if (mode === 'customer' || role === 'customer') {
+        let query = '';
+        if (autoAdd) query = '?action=new';
+        else if (initialTab) query = `?tab=${initialTab}`;
+        else query = '?tab=own';
+        router.push('/ugyfel/dashboard' + query);
+      } else {
+        router.push('/contractor/dashboard');
+      }
+    };
+    window.addEventListener('openPortal', handleOpenPortal);
+    return () => window.removeEventListener('openPortal', handleOpenPortal);
+  }, [router, role]);
+
 
   const handleLogout = async () => {
     await logout();
@@ -158,6 +179,10 @@ export default function Header() {
       </div>
     );
   };
+
+  if (pathname?.startsWith('/ugyfel') || pathname?.startsWith('/contractor')) {
+    return null; // Do not render global header on customer/contractor dashboard
+  }
 
   return (
     <>

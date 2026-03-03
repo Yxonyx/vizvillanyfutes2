@@ -1,13 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { User, Mail, Shield, CreditCard, Bell, LogOut, ArrowLeft, Briefcase, FileText } from 'lucide-react';
 import Link from 'next/link';
 
 export default function FiokPage() {
-    const { user, role, logout, isAuthenticated, isLoading } = useAuth();
+    const { user, role, logout, isAuthenticated, isLoading, contractorProfile, refreshSession } = useAuth();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            refreshSession();
+        }
+    }, [isAuthenticated, refreshSession]);
 
     if (isLoading) {
         return (
@@ -117,7 +123,9 @@ export default function FiokPage() {
                             <CreditCard className="w-4 h-4 text-slate-300" />
                             <span className="text-xs text-slate-300 font-bold uppercase tracking-wider">Kredit egyenleg</span>
                         </div>
-                        <div className="text-3xl font-black font-mono mt-1">42 500 Ft</div>
+                        <div className="text-3xl font-black font-mono mt-1">
+                            {contractorProfile ? (contractorProfile.credit_balance || 0).toLocaleString('hu-HU') : 0} Ft
+                        </div>
                         <Link href="/contractor/topup" className="mt-3 inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm py-2 px-4 rounded-xl transition-colors">
                             + Kredit feltöltés
                         </Link>

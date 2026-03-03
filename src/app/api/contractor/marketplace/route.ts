@@ -32,6 +32,35 @@ export async function GET(request: NextRequest) {
             .select('*')
             .order('created_at', { ascending: false });
 
+        // 1b. Also fetch customer-submitted leads from the leads table
+        const { data: openLeads, error: leadsError } = await supabase
+            .from('leads')
+            .select('*')
+            .eq('status', 'waiting')
+            .order('created_at', { ascending: false });
+
+        if (leadsError) console.error('Error fetching leads:', leadsError);
+
+        // Map leads to the same format as open jobs so the dashboard can render them
+        const mappedLeads = (openLeads || []).map((lead: any) => ({
+            id: lead.id,
+            title: lead.title,
+            description: lead.description || '',
+            trade: lead.type === 'egyeb' ? 'viz' : (lead.type || 'viz'),
+            category: 'standard',
+            status: 'open',
+            priority: 'high',
+            latitude: lead.lat,
+            longitude: lead.lng,
+            district_or_city: lead.district || null,
+            created_at: lead.created_at,
+            lead_price: 2000,
+            source: 'lead',
+        }));
+
+        // Merge: leads first (newest customer submissions), then traditional jobs
+        const allOpenJobs = [...mappedLeads, ...(openJobs || [])];
+
         // 2. Fetch Job Interests (My Jobs based on Escrow model)
         const { data: leadInterests, error: interestsError } = await supabase
             .from('job_interests')
@@ -42,8 +71,8 @@ export async function GET(request: NextRequest) {
         job:jobs(
           id, title, description, trade, category, status, priority, 
           preferred_time_from, preferred_time_to, created_at, updated_at,
-          started_at, completed_at, lead_price,
-          customer:customers(full_name, phone),
+          lead_price,
+          customer:customers(full_name, phone, email),
           address:addresses(city, district, street, house_number)
         )
       `)
@@ -72,15 +101,17 @@ export async function GET(request: NextRequest) {
         const activeJobs = purchasedJobs.filter(j => j !== null && (j.assignment.status === 'pending' || j.assignment.status === 'accepted') && j.status !== 'completed' && j.status !== 'cancelled_by_customer');
         const completedJobs = purchasedJobs.filter(j => j !== null && (j.status === 'completed' || j.status === 'cancelled_by_customer' || j.assignment.status === 'rejected' || j.assignment.status === 'withdrawn'));
 
+        console.log("DEBUG: purchasedJobs length =", purchasedJobs.length, ", activeJobs length = ", activeJobs.length);
+
         return NextResponse.json({
             success: true,
             data: {
                 creditBalance: profile.credit_balance,
-                openJobs: openJobs || [],
+                openJobs: allOpenJobs,
                 activeJobs,
                 completedJobs,
                 statistics: {
-                    available: (openJobs || []).length,
+                    available: allOpenJobs.length,
                     active: activeJobs.length,
                     completed: completedJobs.length
                 }

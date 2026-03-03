@@ -59,6 +59,7 @@ interface JobCardProps {
     customer?: {
       full_name: string;
       phone: string;
+      email?: string;
     };
     address?: {
       city: string;
@@ -135,16 +136,28 @@ export default function JobCard({
   };
 
   const formatAddress = () => {
-    if (job.status === 'open' && job.district_or_city) {
-      return job.district_or_city;
+    // Determine the full address details if the relation is available
+    if (job.address) {
+      const { city, district, street, house_number } = job.address;
+      // If we only show the partial address when open, just use district summary
+      if (job.status === 'open') {
+        return job.district_or_city || `${city}${district ? ` ${district}. ker.` : ''}`;
+      }
+      return `${city}${district ? ` ${district}. ker.` : ''}, ${street} ${house_number}`;
     }
-    if (!job.address) return 'Cím nem elérhető';
-    const { city, district, street, house_number } = job.address;
-    return `${city}${district ? ` ${district}. ker.` : ''}, ${street} ${house_number}`;
+
+    // Fallback to exactly what the customer typed or the summarized district_or_city
+    return job.district_or_city || 'Cím nem elérhető';
+  };
+
+  const getBgClass = () => {
+    if (assignment?.status === 'pending') return 'bg-sky-50/50 border-sky-200';
+    if (assignment?.status === 'accepted') return 'bg-emerald-50/50 border-emerald-200';
+    return 'bg-white border-gray-200';
   };
 
   return (
-    <div className={`bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow ${compact ? 'p-4' : 'p-6'}`}>
+    <div className={`${getBgClass()} rounded-xl border overflow-hidden hover:shadow-md transition-shadow ${compact ? 'p-4' : 'p-6'}`}>
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex items-center gap-3">
@@ -188,16 +201,37 @@ export default function JobCard({
       {/* Details */}
       <div className="space-y-2 mb-4">
         {job.customer && (
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <User className="w-4 h-4 text-gray-400" />
-            <span>{job.customer.full_name}</span>
-            {job.customer.phone && (
-              <>
-                <span className="text-gray-300">•</span>
-                <a href={`tel:${job.customer.phone}`} className="text-vvm-blue-600 hover:underline">
-                  {job.customer.phone}
-                </a>
-              </>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <User className="w-4 h-4 text-gray-400 min-w-[16px]" />
+              <span>{job.customer.full_name}</span>
+            </div>
+
+            {/* Contact details only visible if accepted/assigned to this contractor */}
+            {assignment?.status === 'accepted' && (
+              <div className="flex flex-col gap-1 ml-6 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5 text-vvm-blue-500" />
+                  {job.customer.phone && job.customer.phone.trim() !== '' ? (
+                    <a href={`tel:${job.customer.phone}`} className="text-vvm-blue-600 hover:underline font-medium">
+                      {job.customer.phone}
+                    </a>
+                  ) : (
+                    <span className="text-gray-400 italic">Nincs megadva telefonszám</span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="w-3.5 h-3.5 flex items-center justify-center text-vvm-blue-500 text-xs font-bold">@</span>
+                  {job.customer.email && job.customer.email.trim() !== '' ? (
+                    <a href={`mailto:${job.customer.email}`} className="text-vvm-blue-600 hover:underline">
+                      {job.customer.email}
+                    </a>
+                  ) : (
+                    <span className="text-gray-400 italic">Nincs megadva email</span>
+                  )}
+                </div>
+              </div>
             )}
           </div>
         )}
@@ -318,10 +352,11 @@ export default function JobCard({
             </>
           )}
 
+          {/* Pending assignment - show pending approval message (for contractors waiting on customer) */}
           {assignment?.status === 'pending' && (!onAccept && !onDecline) && (
             <div className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-sm font-bold shadow-sm">
               <Clock className="w-4 h-4" />
-              Várakozás az ügyfél döntésére...
+              Folyamatban: amint az ügyfél jóváhagyja, megkapod az elérhetőséget
             </div>
           )}
 

@@ -71,7 +71,7 @@ BEGIN
     ) VALUES (
         v_contractor_profile_id,
         -v_lead_price,
-        'interest_escrow'::transaction_type,
+        'interest_escrow',
         p_job_id,
         'Érdeklődés leadása - összeg zárolva'
     );
@@ -83,9 +83,9 @@ BEGIN
         p_job_id, v_contractor_profile_id, 'pending'
     );
 
-    -- 7. Hide job from map setting status to pending
+    -- 7. Hide job from map setting status to unassigned
     UPDATE public.jobs
-    SET status = 'pending'
+    SET status = 'unassigned'
     WHERE id = p_job_id;
 
     RETURN json_build_object(

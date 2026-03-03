@@ -99,6 +99,8 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
     const [street, setStreet] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [contactPhone, setContactPhone] = useState('');
+    const [contactEmail, setContactEmail] = useState('');
 
     // Geocoding autocomplete state
     const [geoSuggestions, setGeoSuggestions] = useState<GeocodingSuggestion[]>([]);
@@ -244,7 +246,9 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
                 title,
                 description,
                 district: fullDistrict,
-                status: 'waiting'
+                status: 'waiting',
+                contact_phone: contactPhone,
+                contact_email: contactEmail
             });
 
             if (insertError) throw insertError;
@@ -258,7 +262,7 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
         }
     };
 
-    const isFormValid = title && description && street && (
+    const isFormValid = title && description && street && contactPhone && contactEmail && (
         (locationType === 'budapest' && selectedDistrict) ||
         (locationType === 'pest' && selectedZip)
     );
@@ -484,6 +488,36 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
                                 placeholder="Mióta áll fenn a probléma? Próbáltad már javítani?"
                                 maxLength={300}
                             />
+                        </div>
+
+                        {/* Contact Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                                    Telefonszám <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="tel"
+                                    required
+                                    value={contactPhone}
+                                    onChange={(e) => setContactPhone(e.target.value)}
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 outline-none transition-all placeholder:text-slate-400 font-medium text-sm"
+                                    placeholder="Pl.: +36 30 123 4567"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                                    E-mail cím <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={contactEmail}
+                                    onChange={(e) => setContactEmail(e.target.value)}
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 outline-none transition-all placeholder:text-slate-400 font-medium text-sm"
+                                    placeholder="Pl.: pelda@email.hu"
+                                />
+                            </div>
                         </div>
 
                     </form>

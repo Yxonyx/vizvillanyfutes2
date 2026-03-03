@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
                             description: 'Kredit egyenleg feltöltés lead vásárlásokhoz.',
                             images: ['https://vizvillanyfutes.hu/icon.svg'], // Optional logo
                         },
-                        unit_amount: amount, // HUF is a zero-decimal currency in Stripe — no * 100 needed
+                        unit_amount: amount * 100, // Stripe treats HUF as a 2-decimal currency, must multiply by 100
                     },
                     quantity: 1,
                 },
@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             success: true,
             sessionId: session.id,
+            url: session.url,
         });
 
     } catch (error) {

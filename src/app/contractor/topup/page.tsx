@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { loadStripe } from '@stripe/stripe-js';
@@ -38,9 +38,13 @@ const CREDIT_PACKAGES = [
 ];
 
 function TopupContent() {
-    const { contractorProfile } = useAuth();
+    const { contractorProfile, refreshSession } = useAuth();
     const [loadingPkg, setLoadingPkg] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        refreshSession();
+    }, [refreshSession]);
 
     const handleCheckout = async (pkg: typeof CREDIT_PACKAGES[0]) => {
         setLoadingPkg(pkg.id);
@@ -51,17 +55,10 @@ function TopupContent() {
                 bonus: pkg.bonus,
             });
 
-            if (response.success && (response as any).sessionId) {
-                const stripe = await stripePromise;
-                const { error: stripeError } = await (stripe as any).redirectToCheckout({
-                    sessionId: (response as any).sessionId,
-                });
-
-                if (stripeError) {
-                    setError(stripeError.message || 'Stripe hiba történt.');
-                }
+            if (response.success && (response as any).url) {
+                window.location.href = (response as any).url;
             } else {
-                setError(response.error || 'Nem sikerült elindítani a fizetést.');
+                setError(response.error || 'Nincs visszaadott fizetési hivatkozás.');
             }
         } catch (err) {
             setError(handleApiError(err));

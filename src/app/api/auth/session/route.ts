@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     if (userMeta?.role === 'contractor') {
       const { data: profile } = await supabase
         .from('contractor_profiles')
-        .select('id, display_name, phone, trades, service_areas, status')
+        .select('id, display_name, phone, trades, service_areas, status, credit_balance')
         .eq('user_id', user.id)
         .single();
 
