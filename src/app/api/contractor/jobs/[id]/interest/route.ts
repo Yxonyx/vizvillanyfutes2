@@ -49,115 +49,133 @@ export async function POST(
                 'egyeb': 'viz',
             };
 
-            // Step 1: Resolve or create customer
-            let customerId: string | null = null;
-            if (lead.user_id) {
-                const { data: existingCustomer } = await supabaseAdmin
-                    .from('customers')
-                    .select('id')
-                    .eq('user_id', lead.user_id)
-                    .single();
+            // Step 0: Check if this lead was ALREADY converted to a job (prevent duplicates!)
+            const { data: alreadyConvertedJob } = await supabaseAdmin
+                .from('jobs')
+                .select('id')
+                .eq('lead_id', jobId)
+                .single();
 
-                if (existingCustomer) {
-                    customerId = existingCustomer.id;
-                } else {
+            let finalJobId = '';
+
+            if (alreadyConvertedJob) {
+                // Someone already converted this lead! Just use that job.
+                finalJobId = alreadyConvertedJob.id;
+            } else {
+                // Safe to convert lead to job
+
+                // Step 1: Resolve or create customer
+                let customerId: string | null = null;
+                if (lead.user_id) {
+                    const { data: existingCustomer } = await supabaseAdmin
+                        .from('customers')
+                        .select('id')
+                        .eq('user_id', lead.user_id)
+                        .single();
+
+                    if (existingCustomer) {
+                        customerId = existingCustomer.id;
+                    } else {
+                        const dummyPhone = `lead_${jobId}`;
+                        const { data: newCustomer, error: custErr } = await supabaseAdmin
+                            .from('customers')
+                            .insert({
+                                full_name: lead.contact_name || 'Ügyfél',
+                                phone: lead.contact_phone || dummyPhone,
+                                email: lead.contact_email || null,
+                                user_id: lead.user_id,
+                                type: 'b2c',
+                            })
+                            .select('id')
+                            .single();
+                        if (custErr) console.error('Error creating customer:', custErr);
+                        customerId = newCustomer?.id || null;
+                    }
+                }
+
+                if (!customerId) {
                     const dummyPhone = `lead_${jobId}`;
-                    const { data: newCustomer, error: custErr } = await supabaseAdmin
+                    const { data: genericCustomer, error: gcErr } = await supabaseAdmin
                         .from('customers')
                         .insert({
-                            full_name: lead.contact_name || 'Ügyfél',
+                            full_name: lead.contact_name || 'Ügyfél (lead)',
                             phone: lead.contact_phone || dummyPhone,
                             email: lead.contact_email || null,
-                            user_id: lead.user_id,
                             type: 'b2c',
                         })
                         .select('id')
                         .single();
-                    if (custErr) console.error('Error creating customer:', custErr);
-                    customerId = newCustomer?.id || null;
+                    if (gcErr) console.error('Error creating generic customer:', gcErr);
+                    customerId = genericCustomer?.id || null;
                 }
-            }
 
-            if (!customerId) {
-                const dummyPhone = `lead_${jobId}`;
-                const { data: genericCustomer, error: gcErr } = await supabaseAdmin
-                    .from('customers')
+                if (!customerId) {
+                    return NextResponse.json({ success: false, error: 'Failed to create customer record' }, { status: 500 });
+                }
+
+                // Step 2: Create address record from lead's district info
+                const districtStr = lead.district || '';
+                const cityMatch = districtStr.match(/^([^,]+)/);
+                const districtMatch = districtStr.match(/([IVXLCDM]+\.?\s*kerület[^,]*)/i);
+                const streetMatch = districtStr.match(/,\s*(?:[^,]*kerület[^,]*,\s*)?(.+)$/i);
+
+                const { data: newAddress, error: addrErr } = await supabaseAdmin
+                    .from('addresses')
                     .insert({
-                        full_name: lead.contact_name || 'Ügyfél (lead)',
-                        phone: lead.contact_phone || dummyPhone,
-                        email: lead.contact_email || null,
-                        type: 'b2c',
+                        customer_id: customerId,
+                        city: cityMatch ? cityMatch[1].trim() : 'Budapest',
+                        district: districtMatch ? districtMatch[1].trim() : null,
+                        street: streetMatch ? streetMatch[1].trim() : '-',
+                        house_number: '-', // Required field by the DB constraint
                     })
                     .select('id')
                     .single();
-                if (gcErr) console.error('Error creating generic customer:', gcErr);
-                customerId = genericCustomer?.id || null;
+
+                if (addrErr || !newAddress) {
+                    console.error('Error creating address:', addrErr);
+                    return NextResponse.json({ success: false, error: 'Failed to create address record' }, { status: 500 });
+                }
+
+                // Step 3: Create the job row WITH lead_id tracking
+                const { data: newJob, error: insertError } = await supabaseAdmin
+                    .from('jobs')
+                    .insert({
+                        customer_id: customerId,
+                        address_id: newAddress.id,
+                        title: lead.title,
+                        description: lead.description || '',
+                        trade: tradeMap[lead.type] || 'viz',
+                        category: 'standard',
+                        status: 'open',
+                        priority: 'high',
+                        latitude: lead.lat,
+                        longitude: lead.lng,
+                        district_or_city: lead.district || null,
+                        source: 'web_form',
+                        lead_price: 2000,
+                        created_by_user_id: lead.user_id || null,
+                        lead_id: lead.id,
+                    })
+                    .select('id')
+                    .single();
+
+
+                if (insertError || !newJob) {
+                    console.error('Error converting lead to job:', insertError);
+                    return NextResponse.json({ success: false, error: 'Failed to process lead' }, { status: 500 });
+                }
+
+                // Step 4: Mark lead as converted
+                await supabaseAdmin
+                    .from('leads')
+                    .update({ status: 'converted' })
+                    .eq('id', jobId);
+
+                finalJobId = newJob.id;
             }
 
-            if (!customerId) {
-                return NextResponse.json({ success: false, error: 'Failed to create customer record' }, { status: 500 });
-            }
-
-            // Step 2: Create address record from lead's district info
-            // Parse district string like "Budapest, XIV. kerület (Zugló), Margit híd"
-            const districtStr = lead.district || '';
-            const cityMatch = districtStr.match(/^([^,]+)/);
-            const districtMatch = districtStr.match(/([IVXLCDM]+\.?\s*kerület[^,]*)/i);
-            const streetMatch = districtStr.match(/,\s*(?:[^,]*kerület[^,]*,\s*)?(.+)$/i);
-
-            const { data: newAddress, error: addrErr } = await supabaseAdmin
-                .from('addresses')
-                .insert({
-                    customer_id: customerId,
-                    city: cityMatch ? cityMatch[1].trim() : 'Budapest',
-                    district: districtMatch ? districtMatch[1].trim() : null,
-                    street: streetMatch ? streetMatch[1].trim() : '-',
-                    house_number: '-', // Required field by the DB constraint
-                })
-                .select('id')
-                .single();
-
-            if (addrErr) console.error('Error creating address:', addrErr);
-
-            if (!newAddress) {
-                return NextResponse.json({ success: false, error: 'Failed to create address record' }, { status: 500 });
-            }
-
-            // Step 3: Create the job row
-            const { data: newJob, error: insertError } = await supabaseAdmin
-                .from('jobs')
-                .insert({
-                    customer_id: customerId,
-                    address_id: newAddress.id,
-                    title: lead.title,
-                    description: lead.description || '',
-                    trade: tradeMap[lead.type] || 'viz',
-                    category: 'standard',
-                    status: 'open',
-                    priority: 'high',
-                    latitude: lead.lat,
-                    longitude: lead.lng,
-                    district_or_city: lead.district || null,
-                    source: 'web_form', // Changed to match jobs_source_check constraint
-                    lead_price: 2000,
-                    created_by_user_id: lead.user_id || null,
-                })
-                .select('id')
-                .single();
-
-            if (insertError || !newJob) {
-                console.error('Error converting lead to job:', insertError);
-                return NextResponse.json({ success: false, error: 'Failed to process lead' }, { status: 500 });
-            }
-
-            // Step 4: Mark lead as converted
-            await supabaseAdmin
-                .from('leads')
-                .update({ status: 'converted' })
-                .eq('id', jobId);
-
-            // Use the new job ID for the interest RPC
-            jobId = newJob.id;
+            // Use the established final job ID for the interest RPC
+            jobId = finalJobId;
         }
 
         // Call the PostgreSQL RPC function 'express_job_interest'

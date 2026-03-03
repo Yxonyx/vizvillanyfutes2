@@ -119,13 +119,23 @@ export default function TeaserMap() {
                     }
                 } else if (role === 'customer') {
                     // Fetch customer's own jobs
-                    const { data, error } = await supabase
+                    const { data: jobsData, error: jobsError } = await supabase
                         .from('jobs')
                         .select('id, title, description, trade, status, created_at, latitude, longitude, district_or_city')
                         .order('created_at', { ascending: false });
 
-                    if (data && !error) {
-                        tempLeads = data.map((j: any) => ({
+                    // Also fetch customer's raw waiting leads
+                    const { data: leadsData, error: leadsError } = await supabase
+                        .from('leads')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .eq('status', 'waiting')
+                        .order('created_at', { ascending: false });
+
+                    let combinedLeads: Lead[] = [];
+
+                    if (jobsData && !jobsError) {
+                        combinedLeads = [...combinedLeads, ...jobsData.map((j: any) => ({
                             id: j.id,
                             user_id: user.id, // Mark as own lead
                             lat: j.latitude,
@@ -136,8 +146,27 @@ export default function TeaserMap() {
                             district: j.district_or_city || null,
                             status: j.status,
                             created_at: j.created_at
-                        }));
+                        }))];
                     }
+
+                    if (leadsData && !leadsError) {
+                        combinedLeads = [...combinedLeads, ...leadsData.map((l: any) => ({
+                            id: l.id,
+                            user_id: user.id,
+                            lat: l.lat,
+                            lng: l.lng,
+                            type: l.type === 'egyeb' ? 'viz' : (l.type || 'viz'),
+                            title: l.title,
+                            description: l.description || '',
+                            district: l.district || null,
+                            status: l.status,
+                            created_at: l.created_at
+                        }))];
+                    }
+
+                    // Sort combined by created_at descending
+                    combinedLeads.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                    tempLeads = combinedLeads;
                 }
 
                 // Append any unassigned legacy leads just in case
@@ -194,6 +223,32 @@ export default function TeaserMap() {
             window.removeEventListener('resize', updatePadding);
         };
     }, [role]);
+
+    // Fit bounds to displayLeads on load or when selection clears
+    useEffect(() => {
+        if (selectedLead) return;
+
+        const validLeads = displayLeads.filter(l => l && l.lat != null && l.lng != null);
+        if (validLeads.length > 0 && mapRef.current) {
+            let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+            validLeads.forEach(l => {
+                const lat = Number(l.lat);
+                const lng = Number(l.lng);
+                if (lat < minLat) minLat = lat;
+                if (lat > maxLat) maxLat = lat;
+                if (lng < minLng) minLng = lng;
+                if (lng > maxLng) maxLng = lng;
+            });
+
+            mapRef.current.fitBounds(
+                [
+                    [minLng, minLat],
+                    [maxLng, maxLat]
+                ],
+                { padding: window.innerWidth >= 1024 ? { top: 50, bottom: 50, left: window.innerWidth * 0.3 + 50, right: 50 } : 50, duration: 1500, maxZoom: 10 }
+            );
+        }
+    }, [displayLeads, selectedLead]);
 
     const handleMapClick = (e: any) => {
         // If they click the map (not a marker), we either clear selection or ask to add a pin
@@ -307,9 +362,9 @@ export default function TeaserMap() {
                     padding: 8px 10px !important;
                     border-radius: 12px !important;
                     overflow: hidden !important;
-                    box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3) !important;
-                    background: #1e293b !important;
-                    color: white !important;
+                    box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+                    background: white !important;
+                    color: #1e293b !important;
                     width: 260px !important;
                 }
                 .mapboxgl-popup-content button,
@@ -317,7 +372,7 @@ export default function TeaserMap() {
                     pointer-events: auto !important;
                 }
                 .mapboxgl-popup-tip {
-                    border-top-color: #1e293b !important;
+                    border-top-color: white !important;
                 }
                 .mapboxgl-popup-close-button {
                     pointer-events: auto !important;
@@ -331,7 +386,7 @@ export default function TeaserMap() {
                 }
                 .mapboxgl-popup-close-button:hover {
                     background-color: transparent !important;
-                    color: white !important;
+                    color: #0f172a !important;
                 }
                 @media (max-width: 1023px) {
                     .mapboxgl-ctrl-bottom-right {
@@ -370,8 +425,8 @@ export default function TeaserMap() {
                                 e.originalEvent.stopPropagation();
                                 setSelectedLead(lead);
                                 mapRef.current?.flyTo({
-                                    center: [lead.lng, lead.lat + 0.025], // Offset latitude to center the popup vertically
-                                    zoom: 12.5,
+                                    center: [lead.lng, window.innerWidth >= 1024 ? lead.lat + 0.015 : lead.lat - 0.08],
+                                    zoom: 10,
                                     duration: 800
                                 });
                             }}
@@ -414,41 +469,36 @@ export default function TeaserMap() {
                         offset={45} // Offset to clear the glowing marker
                         onClose={() => {
                             setSelectedLead(null);
-                            mapRef.current?.flyTo({
-                                center: [DEFAULT_VIEWPORT.longitude, DEFAULT_VIEWPORT.latitude],
-                                zoom: DEFAULT_VIEWPORT.zoom,
-                                duration: 800
-                            });
                         }}
                         closeOnClick={false}
                         className="z-50 min-w-[300px]"
                         maxWidth="340px"
                     >
                         <div className="p-0.5">
-                            <div className="flex items-center gap-2 mb-2 border-b border-slate-700 pb-2">
+                            <div className="flex items-center gap-2 mb-2 border-b border-slate-100 pb-2">
                                 <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${getColor(selectedLead.type)} flex flex-shrink-0 items-center justify-center text-white shadow-md *:w-4 *:h-4 sm:*:w-5 sm:*:h-5`}>
                                     {getIcon(selectedLead.type)}
                                 </div>
-                                <div className="flex-1 pr-1 border-gray-600">
-                                    <h3 className="font-bold text-white text-[13px] sm:text-base leading-tight mb-0.5">{selectedLead.title}</h3>
-                                    <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-400 font-medium">
+                                <div className="flex-1 pr-1">
+                                    <h3 className="font-bold text-slate-800 text-[13px] sm:text-base leading-tight mb-0.5">{selectedLead.title}</h3>
+                                    <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-500 font-medium">
                                         <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
                                         {selectedLead.district}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-slate-700/50 rounded-lg p-2 sm:p-3 mb-2 sm:mb-4 text-[11px] sm:text-sm text-slate-300 border border-slate-600 leading-snug italic shadow-inner">
+                            <div className="bg-slate-50 text-slate-600 rounded-lg p-2 sm:p-3 mb-2 sm:mb-4 text-[11px] sm:text-sm border border-slate-200 leading-snug italic shadow-inner">
                                 &quot;{selectedLead.description}&quot;
                             </div>
 
                             <div className="flex items-center justify-between mb-2 sm:mb-4 px-0.5">
-                                <div className="flex items-center gap-1 sm:gap-1.5 text-red-400 font-bold bg-red-950/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-red-500/30 text-[10px] sm:text-xs">
-                                    <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                <div className="flex items-center gap-1 sm:gap-1.5 text-red-600 font-bold bg-red-50/80 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-red-100 text-[10px] sm:text-xs">
+                                    <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-500" />
                                     Azonnali SOS
                                 </div>
-                                <div className="flex items-center gap-1 sm:gap-1.5 text-blue-400 font-bold bg-blue-950/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-500/30 text-[10px] sm:text-xs">
-                                    <Search className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                <div className="flex items-center gap-1 sm:gap-1.5 text-blue-600 font-bold bg-blue-50/80 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-100 text-[10px] sm:text-xs">
+                                    <Search className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-500" />
                                     Szakit keres
                                 </div>
                             </div>

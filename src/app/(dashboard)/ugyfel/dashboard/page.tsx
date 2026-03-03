@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { AlertCircle, Clock, MapPin, Search, CheckCircle, Shield, ArrowRight, User, Droplets, Zap, Flame, Briefcase, Trash2, Plus, ArrowLeft, X, Edit3, Loader2, Settings, FileText, Navigation } from 'lucide-react';
 import Link from 'next/link';
-import Map, { Marker, NavigationControl, GeolocateControl, Popup } from 'react-map-gl/mapbox';
+import Map, { Marker, NavigationControl, GeolocateControl, Popup, MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import AddLeadModal from '@/components/AddLeadModal';
 
@@ -21,6 +21,16 @@ const DEFAULT_VIEWPORT = {
 // Simple types for the dashboard
 type JobAssignment = {
     status: string;
+    contractor_profiles: {
+        display_name: string;
+        phone: string;
+    };
+};
+
+type JobInterest = {
+    id: string;
+    status: string;
+    created_at: string;
     contractor_profiles: {
         display_name: string;
         phone: string;
@@ -44,6 +54,7 @@ type Job = {
     longitude: number | null;
     addresses: Address;
     job_assignments: JobAssignment[];
+    job_interests?: JobInterest[];
 };
 
 // Mobile bottom sheet snap positions (as % of viewport height from top)
@@ -67,6 +78,7 @@ export default function CustomerDashboard() {
     const [editForm, setEditForm] = useState({ title: '', description: '' });
     const [savingEdit, setSavingEdit] = useState(false);
     const [isAddLeadModalOpen, setIsAddLeadModalOpen] = useState(false);
+    const [interestActionLoading, setInterestActionLoading] = useState<string | null>(null);
 
     // Mobile bottom sheet state
     const [sheetPosition, setSheetPosition] = useState<SheetPosition>('half');
@@ -79,8 +91,40 @@ export default function CustomerDashboard() {
     const isDragging = useRef(false);
     const sheetRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
+    const mapRef = useRef<MapRef>(null);
 
-    // Touch handlers for mobile bottom sheet
+    // Track desktop vs mobile view for conditional rendering
+    const [isDesktop, setIsDesktop] = useState(true);
+    useEffect(() => {
+        const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+        handleResize(); // Set initial value safely on client
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Fly to job location when selected
+    useEffect(() => {
+        if (selectedJob && selectedJob.latitude && selectedJob.longitude) {
+            const lat = Number(selectedJob.latitude);
+            const lng = Number(selectedJob.longitude);
+            const centerLat = window.innerWidth >= 1024 ? lat : lat - 0.08;
+
+            mapRef.current?.flyTo({
+                center: [lng, centerLat],
+                zoom: 10,
+                duration: 1500
+            });
+
+            // On mobile, if coming from reports tab, switch to map view
+            if (window.innerWidth < 1024 && mobileTab === 'reports') {
+                setMobileTab('map');
+                setSheetPosition('collapsed');
+            }
+        }
+    }, [selectedJob, mobileTab]);
+
+
+
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
         // Only initiate drag from the grab handle area (first 48px)
         const touch = e.touches[0];
@@ -155,7 +199,9 @@ export default function CustomerDashboard() {
 
         try {
             setLoadingJobs(true);
-            const { data, error } = await supabase
+
+            // 1. Fetch standard jobs (including interests for accept/reject flow)
+            const { data: jobsData, error: jobsError } = await supabase
                 .from('jobs')
                 .select(`
         id, title, description, trade, status, created_at, latitude, longitude,
@@ -163,14 +209,58 @@ export default function CustomerDashboard() {
         job_assignments (
           status,
           contractor_profiles ( display_name, phone )
+        ),
+        job_interests (
+          id, status, created_at,
+          contractor_profiles ( display_name, phone )
         )
       `)
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
+            if (jobsError) throw jobsError;
 
-            // The cast is needed because the supabase nested select typings can be complex
-            setJobs(data as unknown as Job[]);
+            // 2. Fetch raw leads (waiting status)
+            const { data: leadsData, error: leadsError } = await supabase
+                .from('leads')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('status', 'waiting')
+                .order('created_at', { ascending: false });
+
+            if (leadsError) throw leadsError;
+
+            let allJobs: Job[] = [];
+
+            // Map jobs
+            if (jobsData) {
+                allJobs = [...allJobs, ...(jobsData as unknown as Job[])];
+            }
+
+            // Map leads to Job format
+            if (leadsData) {
+                const mappedLeads = leadsData.map((l: any): Job => ({
+                    id: l.id,
+                    title: l.title,
+                    description: l.description || '',
+                    trade: l.type === 'egyeb' ? 'viz' : (l.type || 'viz'),
+                    status: l.status, // "waiting", which we'll treat as "new" conceptually
+                    created_at: l.created_at,
+                    latitude: l.lat,
+                    longitude: l.lng,
+                    addresses: {
+                        city: 'Budapest', // Default or parse from address if needed
+                        district: l.district ? l.district.replace('. kerület', '') : '',
+                        street: l.address || ''
+                    },
+                    job_assignments: [] // Raw leads have no assignments yet
+                }));
+                allJobs = [...allJobs, ...mappedLeads];
+            }
+
+            // Sort all descending by date
+            allJobs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+            setJobs(allJobs);
         } catch (err) {
             console.error('Error fetching customer jobs:', err);
         } finally {
@@ -182,19 +272,34 @@ export default function CustomerDashboard() {
         if (!confirm('Biztosan törölni szeretnéd ezt a bejelentést?')) return;
         setCancellingId(jobId);
         try {
-            const res = await fetch(`/api/customer/jobs/${jobId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'cancel' }),
-            });
-            const data = await res.json();
-            if (data.success) {
-                setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'cancelled_by_customer' } : j));
-                if (selectedJob?.id === jobId) {
-                    setSelectedJob(prev => prev ? { ...prev, status: 'cancelled_by_customer' } : null);
-                }
+            // Check if it's a raw lead (which only has string ID like UUID, but let's just attempt both if uncertain, or try API first)
+            // But since customer deletes from dashboard, the API handles jobs. For leads, we might need a direct Supabase delete or a new API. 
+            // Let's implement a direct delete for 'waiting' status leads since they aren't jobs yet.
+            const jobObj = jobs.find(j => j.id === jobId);
+
+            if (jobObj && jobObj.status === 'waiting') {
+                // It's a raw lead, delete it directly from Supabase
+                const { error } = await supabase.from('leads').delete().eq('id', jobId);
+                if (error) throw error;
+
+                setJobs(prev => prev.filter(j => j.id !== jobId));
+                if (selectedJob?.id === jobId) setSelectedJob(null);
             } else {
-                alert(data.error || 'Hiba történt a törlés során.');
+                // It's a real job
+                const res = await fetch(`/api/customer/jobs/${jobId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'cancel' }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'cancelled_by_customer' } : j));
+                    if (selectedJob?.id === jobId) {
+                        setSelectedJob(prev => prev ? { ...prev, status: 'cancelled_by_customer' } : null);
+                    }
+                } else {
+                    alert(data.error || 'Hiba történt a törlés során.');
+                }
             }
         } catch {
             alert('Hiba történt a törlés során.');
@@ -207,12 +312,25 @@ export default function CustomerDashboard() {
         if (!selectedJob) return;
         setSavingEdit(true);
         try {
-            const { error } = await supabase
-                .from('jobs')
-                .update({ title: editForm.title, description: editForm.description })
-                .eq('id', selectedJob.id);
+            let updateError = null;
 
-            if (error) throw error;
+            if (selectedJob.status === 'waiting') {
+                // Update raw lead
+                const { error } = await supabase
+                    .from('leads')
+                    .update({ title: editForm.title, description: editForm.description })
+                    .eq('id', selectedJob.id);
+                updateError = error;
+            } else {
+                // Update real job
+                const { error } = await supabase
+                    .from('jobs')
+                    .update({ title: editForm.title, description: editForm.description })
+                    .eq('id', selectedJob.id);
+                updateError = error;
+            }
+
+            if (updateError) throw updateError;
 
             // Update local state
             setJobs(prev => prev.map(j => j.id === selectedJob.id ? { ...j, title: editForm.title, description: editForm.description } : j));
@@ -231,6 +349,50 @@ export default function CustomerDashboard() {
         setEditForm({ title: job.title, description: job.description });
     };
 
+    const activeJobs = jobs.filter(j => !['completed', 'cancelled', 'cancelled_by_customer'].includes(j.status));
+    const pastJobs = jobs.filter(j => ['completed', 'cancelled', 'cancelled_by_customer'].includes(j.status));
+
+    // Fit bounds to all jobs when loaded
+    useEffect(() => {
+        console.log('MAP DEBUG: activeJobs changed, length=', activeJobs.length, 'mapRef=', !!mapRef.current, 'selectedJob=', !!selectedJob);
+        const validJobs = activeJobs.filter(j => j?.latitude && j?.longitude);
+        console.log('MAP DEBUG: validJobs with coords:', validJobs.length, validJobs.map(j => ({ lat: j.latitude, lng: j.longitude })));
+        if (validJobs.length > 0 && !selectedJob) {
+            const doCenter = () => {
+                if (!mapRef.current) {
+                    console.log('MAP DEBUG: mapRef not ready, retrying in 500ms');
+                    setTimeout(doCenter, 500);
+                    return;
+                }
+                if (validJobs.length === 1) {
+                    console.log('MAP DEBUG: Flying to single job at', validJobs[0].latitude, validJobs[0].longitude);
+                    mapRef.current.flyTo({
+                        center: [validJobs[0].longitude!, validJobs[0].latitude!],
+                        zoom: 14,
+                        duration: 1000
+                    });
+                } else {
+                    let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+                    validJobs.forEach(j => {
+                        const lat = Number(j.latitude);
+                        const lng = Number(j.longitude);
+                        if (lat < minLat) minLat = lat;
+                        if (lat > maxLat) maxLat = lat;
+                        if (lng < minLng) minLng = lng;
+                        if (lng > maxLng) maxLng = lng;
+                    });
+                    console.log('MAP DEBUG: Fitting bounds', { minLat, maxLat, minLng, maxLng });
+                    mapRef.current.fitBounds(
+                        [[minLng, minLat], [maxLng, maxLat]],
+                        { padding: 80, duration: 1000, maxZoom: 14 }
+                    );
+                }
+            };
+            // Small delay to ensure map tiles are ready
+            setTimeout(doCenter, 500);
+        }
+    }, [activeJobs, selectedJob]);
+
     if (isLoading || !user || !isCustomer) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -239,10 +401,38 @@ export default function CustomerDashboard() {
         );
     }
 
-    const activeJobs = jobs.filter(j => !['completed', 'cancelled', 'cancelled_by_customer'].includes(j.status));
-    const pastJobs = jobs.filter(j => ['completed', 'cancelled', 'cancelled_by_customer'].includes(j.status));
+    const handleAcceptInterest = async (interestId: string) => {
+        setInterestActionLoading(interestId);
+        try {
+            const { data, error } = await supabase.rpc('accept_job_interest', { p_interest_id: interestId });
+            if (error) throw error;
+            setSelectedJob(null);
+            await fetchJobs();
+        } catch (err) {
+            console.error('Error accepting interest:', err);
+            alert('Hiba történt az elfogadás során: ' + (err instanceof Error ? err.message : String(err)));
+        } finally {
+            setInterestActionLoading(null);
+        }
+    };
 
-    const getStatusBadge = (status: string, assignments: JobAssignment[]) => {
+    const handleRejectInterest = async (interestId: string) => {
+        if (!confirm('Biztosan elutasítod ezt a szakembert?')) return;
+        setInterestActionLoading(interestId);
+        try {
+            const { data, error } = await supabase.rpc('reject_job_interest', { p_interest_id: interestId });
+            if (error) throw error;
+            setSelectedJob(null);
+            await fetchJobs();
+        } catch (err) {
+            console.error('Error rejecting interest:', err);
+            alert('Hiba történt az elutasítás során: ' + (err instanceof Error ? err.message : String(err)));
+        } finally {
+            setInterestActionLoading(null);
+        }
+    };
+
+    const getStatusBadge = (status: string, assignments: JobAssignment[], interests?: JobInterest[]) => {
         // If we have an accepted assignment, the pro is on their way or assigned
         const acceptedAssignment = assignments?.find(a => a.status === 'accepted');
 
@@ -255,10 +445,22 @@ export default function CustomerDashboard() {
             );
         }
 
+        // Check for pending interests (contractor expressed interest)
+        const pendingInterests = interests?.filter(i => i.status === 'pending') || [];
+        if (pendingInterests.length > 0) {
+            return (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 animate-pulse">
+                    <User className="w-4 h-4" />
+                    {pendingInterests.length} szakember jelentkezett!
+                </span>
+            );
+        }
+
         switch (status) {
             case 'new':
             case 'unassigned':
             case 'open':
+            case 'waiting':
                 return (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800 animate-pulse">
                         <Search className="w-4 h-4" />
@@ -318,6 +520,7 @@ export default function CustomerDashboard() {
     const renderMap = () => (
         MAPBOX_TOKEN ? (
             <Map
+                ref={mapRef}
                 initialViewState={{
                     ...DEFAULT_VIEWPORT,
                     latitude: activeJobs.find(j => j.latitude)?.latitude || DEFAULT_VIEWPORT.latitude,
@@ -328,6 +531,32 @@ export default function CustomerDashboard() {
                 mapboxAccessToken={MAPBOX_TOKEN}
                 style={{ width: '100%', height: '100%' }}
                 onClick={() => setMapPopupJob(null)}
+                onLoad={() => {
+                    // Once map is loaded, fit bounds to show all jobs
+                    const validJobs = jobs.filter(j => j.latitude && j.longitude);
+                    if (validJobs.length === 0 || !mapRef.current) return;
+                    if (validJobs.length === 1) {
+                        mapRef.current.flyTo({
+                            center: [validJobs[0].longitude!, validJobs[0].latitude!],
+                            zoom: 14,
+                            duration: 800
+                        });
+                    } else {
+                        let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+                        validJobs.forEach(j => {
+                            const lat = Number(j.latitude);
+                            const lng = Number(j.longitude);
+                            if (lat < minLat) minLat = lat;
+                            if (lat > maxLat) maxLat = lat;
+                            if (lng < minLng) minLng = lng;
+                            if (lng > maxLng) maxLng = lng;
+                        });
+                        mapRef.current.fitBounds(
+                            [[minLng, minLat], [maxLng, maxLat]],
+                            { padding: 80, duration: 800, maxZoom: 14 }
+                        );
+                    }
+                }}
             >
                 <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
                     <NavigationControl showCompass={false} />
@@ -343,6 +572,11 @@ export default function CustomerDashboard() {
                         onClick={(e) => {
                             e.originalEvent.stopPropagation();
                             setMapPopupJob(job);
+                            mapRef.current?.flyTo({
+                                center: [job.longitude!, window.innerWidth >= 1024 ? job.latitude! : job.latitude! - 0.08],
+                                zoom: 10,
+                                duration: 800
+                            });
                         }}
                     >
                         <div className="relative group cursor-pointer hover:scale-110 transition-transform z-10 hover:z-20">
@@ -384,7 +618,7 @@ export default function CustomerDashboard() {
                                 </div>
                             </div>
                             <div className="mb-3">
-                                {getStatusBadge(mapPopupJob.status, mapPopupJob.job_assignments)}
+                                {getStatusBadge(mapPopupJob.status, mapPopupJob.job_assignments, mapPopupJob.job_interests)}
                             </div>
                             <p className="text-xs text-slate-600 line-clamp-2 mb-3 leading-relaxed">{mapPopupJob.description}</p>
                             <div className="flex gap-2">
@@ -394,7 +628,7 @@ export default function CustomerDashboard() {
                                 >
                                     Részletek
                                 </button>
-                                {['open', 'new', 'unassigned'].includes(mapPopupJob.status) && (
+                                {['open', 'new', 'unassigned', 'waiting'].includes(mapPopupJob.status) && (
                                     <button
                                         onClick={() => { setIsEditing(true); openJobDetails(mapPopupJob); setMapPopupJob(null); }}
                                         className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 px-3 rounded-lg transition-colors"
@@ -453,7 +687,7 @@ export default function CustomerDashboard() {
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -translate-y-16 translate-x-16 opacity-50 group-hover:scale-110 transition-transform pointer-events-none"></div>
 
                                     <div className="flex justify-between items-start mb-4 relative z-10">
-                                        {getStatusBadge(job.status, job.job_assignments)}
+                                        {getStatusBadge(job.status, job.job_assignments, job.job_interests)}
                                         <span className="text-xs text-slate-400 font-black">
                                             {new Date(job.created_at).toLocaleDateString('hu-HU')}
                                         </span>
@@ -537,7 +771,7 @@ export default function CustomerDashboard() {
                                             <span className="truncate">{job.addresses?.street}</span>
                                         </div>
                                         <div className="scale-75 origin-right brightness-90">
-                                            {getStatusBadge(job.status, job.job_assignments)}
+                                            {getStatusBadge(job.status, job.job_assignments, job.job_interests)}
                                         </div>
                                     </div>
                                 </div>
@@ -557,342 +791,346 @@ export default function CustomerDashboard() {
         <div className="relative h-full w-full overflow-hidden bg-white lg:bg-slate-50">
 
             {/* ====== DESKTOP LAYOUT (lg+) ====== */}
-            <div className="hidden lg:flex flex-col h-full w-full">
-                <div className="flex flex-1 min-h-0">
-                    {/* Left Sidebar */}
-                    <div className="w-[340px] xl:w-[380px] flex-shrink-0 h-full flex flex-col bg-white border-r border-slate-100 shadow-sm z-10">
-                        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pt-4 pb-8">
-                            {/* Profile Header */}
-                            <div className="px-5 pb-5 border-b border-slate-100">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">
-                                        <User className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h1 className="text-base font-black text-slate-900">Ügyfél Fiók</h1>
-                                        <div className="flex items-center gap-1 text-vvm-blue-600 text-xs font-bold">
-                                            <Shield className="w-3 h-3" />
-                                            <span>AKTÍV</span>
+            {isDesktop && (
+                <div className="flex flex-col h-full w-full">
+                    <div className="flex flex-1 min-h-0">
+                        {/* Left Sidebar */}
+                        <div className="w-[340px] xl:w-[380px] flex-shrink-0 h-full flex flex-col bg-white border-r border-slate-100 shadow-sm z-10">
+                            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pt-4 pb-8">
+                                {/* Profile Header */}
+                                <div className="px-5 pb-5 border-b border-slate-100">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">
+                                            <User className="w-5 h-5" />
                                         </div>
+                                        <div>
+                                            <h1 className="text-base font-black text-slate-900">Ügyfél Fiók</h1>
+                                            <div className="flex items-center gap-1 text-vvm-blue-600 text-xs font-bold">
+                                                <Shield className="w-3 h-3" />
+                                                <span>AKTÍV</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Navigation Items */}
+                                <nav className="py-2">
+                                    <button
+                                        onClick={() => setDesktopTab('map')}
+                                        className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors ${desktopTab === 'map'
+                                            ? 'text-vvm-blue-600 bg-vvm-blue-600/5'
+                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                            }`}
+                                    >
+                                        <Navigation className="w-4 h-4 flex-shrink-0" />
+                                        <span>Élő Térkép</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setDesktopTab('reports')}
+                                        className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors ${desktopTab === 'reports'
+                                            ? 'text-vvm-blue-600 bg-vvm-blue-600/5 border-l-2 border-vvm-blue-600'
+                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                            }`}
+                                    >
+                                        <FileText className="w-4 h-4 flex-shrink-0" />
+                                        <span>Saját bejelentéseim</span>
+                                        <ArrowRight className="w-4 h-4 ml-auto text-slate-300" />
+                                    </button>
+                                    <button
+                                        onClick={() => setDesktopTab('account')}
+                                        className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors ${desktopTab === 'account'
+                                            ? 'text-vvm-blue-600 bg-vvm-blue-600/5 border-l-2 border-vvm-blue-600'
+                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                            }`}
+                                    >
+                                        <Settings className="w-4 h-4 flex-shrink-0" />
+                                        <span>Saját fiókom</span>
+                                        <ArrowRight className="w-4 h-4 ml-auto text-slate-300" />
+                                    </button>
+                                </nav>
+
+                                {/* Section Content */}
+                                {desktopTab === 'reports' && (
+                                    <div className="px-4 py-4 border-t border-slate-100">
+                                        <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-3 px-1">
+                                            Saját bejelentéseim ({activeJobs.length})
+                                        </h2>
+
+                                        {/* CTA */}
+                                        <button
+                                            onClick={() => setIsAddLeadModalOpen(true)}
+                                            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white p-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15 active:scale-95 mb-4 text-sm"
+                                        >
+                                            <Plus className="w-5 h-5" />
+                                            <span>Új probléma bejelentése</span>
+                                        </button>
+
+                                        {/* Job cards - compact */}
+                                        {loadingJobs ? (
+                                            <div className="p-8 text-center">
+                                                <div className="w-6 h-6 border-3 border-vvm-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                            </div>
+                                        ) : jobs.length === 0 ? (
+                                            <div className="p-6 text-center text-slate-400 text-sm">
+                                                Még nincsenek bejelentéseid.
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                {activeJobs.map(job => (
+                                                    <div
+                                                        key={job.id}
+                                                        onClick={() => openJobDetails(job)}
+                                                        className="bg-slate-50 hover:bg-slate-100 rounded-xl p-3 cursor-pointer transition-colors active:scale-[0.98] border border-slate-100"
+                                                    >
+                                                        <div className="flex items-center gap-2.5">
+                                                            <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-white ${getTradeColor(job.trade)}`}>
+                                                                <div className="text-white brightness-200 scale-75">
+                                                                    {getTradeIcon(job.trade)}
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <h3 className="font-bold text-[13px] text-slate-900 truncate">{job.title}</h3>
+                                                                <p className="text-[11px] text-slate-500 truncate">{job.addresses?.city}, {job.addresses?.district}. ker</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="mt-2 flex items-center justify-between">
+                                                            <div className="scale-[0.85] origin-left">
+                                                                {getStatusBadge(job.status, job.job_assignments, job.job_interests)}
+                                                            </div>
+                                                            <span className="text-[10px] text-slate-400 font-semibold">
+                                                                {new Date(job.created_at).toLocaleDateString('hu-HU')}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {/* Past jobs in sidebar */}
+                                                {pastJobs.length > 0 && (
+                                                    <>
+                                                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mt-4 mb-2 px-1">
+                                                            Korábbi ({pastJobs.length})
+                                                        </h3>
+                                                        {pastJobs.map(job => (
+                                                            <div
+                                                                key={job.id}
+                                                                onClick={() => openJobDetails(job)}
+                                                                className="bg-slate-50/50 hover:bg-slate-100 rounded-xl p-3 cursor-pointer transition-colors active:scale-[0.98] opacity-50 hover:opacity-100 border border-transparent hover:border-slate-100"
+                                                            >
+                                                                <div className="flex items-center gap-2.5">
+                                                                    <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-white ${getTradeColor(job.trade)} opacity-70`}>
+                                                                        <div className="brightness-200 scale-75">
+                                                                            {getTradeIcon(job.trade)}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <h3 className="font-bold text-[13px] text-slate-700 truncate">{job.title}</h3>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {desktopTab === 'account' && (
+                                    <div className="px-4 py-4 border-t border-slate-100">
+                                        <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-3 px-1">
+                                            Fiók kezelése
+                                        </h2>
+                                        <Link
+                                            href="/fiok"
+                                            className="bg-slate-50 hover:bg-slate-100 rounded-xl p-3 flex items-center justify-between transition-colors border border-slate-100"
+                                        >
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center text-slate-500">
+                                                    <Settings className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-sm font-semibold text-slate-700">Fiók beállítások</span>
+                                            </div>
+                                            <ArrowRight className="w-4 h-4 text-slate-400" />
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Main Map Area */}
+                        <div className="flex-1 h-full relative">
+                            {/* Top bar overlay shadow */}
+                            <div className="absolute top-0 left-0 right-0 z-10 h-12 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+
+                            {/* Floating Navigation Pill */}
+                            <div className="absolute top-4 left-4 z-20">
+                                <div className="bg-white/95 backdrop-blur-md rounded-full shadow-lg flex items-center px-2 py-1.5 border border-slate-200/50 hover:shadow-xl hover:border-slate-300 transition-all">
+                                    <Link
+                                        href="/"
+                                        className="flex items-center gap-2 px-3 py-1.5 text-slate-700 hover:text-slate-900 font-bold text-sm hover:bg-slate-50 rounded-full transition-colors"
+                                    >
+                                        <ArrowLeft className="w-4 h-4" />
+                                        Vissza
+                                    </Link>
+                                    <div className="w-px h-5 bg-slate-200 mx-1"></div>
+                                    <div className="flex items-center gap-2 px-3 py-1.5">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                        <span className="text-slate-600 font-bold text-sm">Ügyfél Portál</span>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Navigation Items */}
-                            <nav className="py-2">
+                            {renderMap()}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ====== MOBILE LAYOUT (<lg) ====== */}
+            {!isDesktop && (
+                <div className="h-dvh w-full relative pb-safe">
+                    {/* Full-screen Map Background */}
+                    <div className="absolute inset-0 z-0">
+                        {renderMap()}
+                    </div>
+
+                    {/* Back button overlay */}
+                    <div className="absolute top-4 left-4 z-10">
+                        <Link href="/" className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg text-slate-700 hover:bg-white transition-colors">
+                            <ArrowLeft className="w-5 h-5" />
+                        </Link>
+                    </div>
+
+                    {/* Draggable Bottom Sheet */}
+                    <div
+                        ref={sheetRef}
+                        className="absolute left-0 right-0 bottom-0 z-20 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] border-t border-slate-100 flex flex-col"
+                        style={{
+                            top: mobileSheetTop,
+                            transition: sheetTranslateY !== null ? 'none' : 'top 0.35s cubic-bezier(0.32, 0.72, 0, 1)',
+                        }}
+                    >
+                        {/* Grab Handle */}
+                        <div
+                            className="flex-shrink-0 py-3 cursor-grab active:cursor-grabbing touch-none"
+                            onTouchStart={handleTouchStart}
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handleTouchEnd}
+                        >
+                            <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto"></div>
+                        </div>
+
+                        {/* Compact Header + Tabs */}
+                        <div className="flex-shrink-0 px-4 pb-3">
+                            {/* Compact profile row */}
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 flex-shrink-0">
+                                    <User className="w-5 h-5" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h1 className="text-base font-black text-slate-900 leading-tight">Ügyfél Fiók</h1>
+                                    <div className="flex items-center gap-1 text-vvm-blue-600 text-xs font-bold">
+                                        <Shield className="w-3 h-3" />
+                                        <span>AKTÍV</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Navigation Tabs */}
+                            <div className="flex gap-1 bg-slate-100 rounded-xl p-1">
                                 <button
-                                    onClick={() => setDesktopTab('map')}
-                                    className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors ${desktopTab === 'map'
-                                        ? 'text-vvm-blue-600 bg-vvm-blue-600/5'
-                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                    onClick={() => setMobileTab('map')}
+                                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all ${mobileTab === 'map'
+                                        ? 'bg-white text-slate-900 shadow-sm'
+                                        : 'text-slate-500 hover:text-slate-700'
                                         }`}
                                 >
-                                    <Navigation className="w-4 h-4 flex-shrink-0" />
+                                    <Navigation className="w-3.5 h-3.5" />
                                     <span>Élő Térkép</span>
                                 </button>
                                 <button
-                                    onClick={() => setDesktopTab('reports')}
-                                    className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors ${desktopTab === 'reports'
-                                        ? 'text-vvm-blue-600 bg-vvm-blue-600/5 border-l-2 border-vvm-blue-600'
-                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                    onClick={() => setMobileTab('reports')}
+                                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all ${mobileTab === 'reports'
+                                        ? 'bg-white text-slate-900 shadow-sm'
+                                        : 'text-slate-500 hover:text-slate-700'
                                         }`}
                                 >
-                                    <FileText className="w-4 h-4 flex-shrink-0" />
-                                    <span>Saját bejelentéseim</span>
-                                    <ArrowRight className="w-4 h-4 ml-auto text-slate-300" />
+                                    <FileText className="w-3.5 h-3.5" />
+                                    <span>Bejelentéseim</span>
                                 </button>
                                 <button
-                                    onClick={() => setDesktopTab('account')}
-                                    className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors ${desktopTab === 'account'
-                                        ? 'text-vvm-blue-600 bg-vvm-blue-600/5 border-l-2 border-vvm-blue-600'
-                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                    onClick={() => setMobileTab('account')}
+                                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all ${mobileTab === 'account'
+                                        ? 'bg-white text-slate-900 shadow-sm'
+                                        : 'text-slate-500 hover:text-slate-700'
                                         }`}
                                 >
-                                    <Settings className="w-4 h-4 flex-shrink-0" />
-                                    <span>Saját fiókom</span>
-                                    <ArrowRight className="w-4 h-4 ml-auto text-slate-300" />
+                                    <Settings className="w-3.5 h-3.5" />
+                                    <span>Fiókom</span>
                                 </button>
-                            </nav>
+                            </div>
+                        </div>
 
-                            {/* Section Content */}
-                            {desktopTab === 'reports' && (
-                                <div className="px-4 py-4 border-t border-slate-100">
-                                    <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-3 px-1">
-                                        Saját bejelentéseim ({activeJobs.length})
-                                    </h2>
-
-                                    {/* CTA */}
+                        {/* Scrollable Content Area */}
+                        <div
+                            ref={contentRef}
+                            className={`flex-1 min-h-0 px-4 pb-20 custom-scrollbar ${isSheetExpanded ? 'overflow-y-auto' : 'overflow-y-auto'
+                                }`}
+                            style={{ WebkitOverflowScrolling: 'touch' }}
+                        >
+                            {mobileTab === 'map' && (
+                                <div className="space-y-4 pt-2">
+                                    <p className="text-sm text-slate-500 font-medium text-center">
+                                        Húzd le ezt a panelt a térkép megtekintéséhez
+                                    </p>
                                     <button
-                                        onClick={() => setIsAddLeadModalOpen(true)}
-                                        className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white p-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/15 active:scale-95 mb-4 text-sm"
+                                        onClick={() => setSheetPosition('collapsed')}
+                                        className="w-full bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white p-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm"
                                     >
-                                        <Plus className="w-5 h-5" />
-                                        <span>Új probléma bejelentése</span>
+                                        <Navigation className="w-4 h-4" />
+                                        Térkép megnyitása
                                     </button>
-
-                                    {/* Job cards - compact */}
-                                    {loadingJobs ? (
-                                        <div className="p-8 text-center">
-                                            <div className="w-6 h-6 border-3 border-vvm-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                        </div>
-                                    ) : jobs.length === 0 ? (
-                                        <div className="p-6 text-center text-slate-400 text-sm">
-                                            Még nincsenek bejelentéseid.
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2">
-                                            {activeJobs.map(job => (
-                                                <div
-                                                    key={job.id}
-                                                    onClick={() => openJobDetails(job)}
-                                                    className="bg-slate-50 hover:bg-slate-100 rounded-xl p-3 cursor-pointer transition-colors active:scale-[0.98] border border-slate-100"
-                                                >
-                                                    <div className="flex items-center gap-2.5">
-                                                        <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-white ${getTradeColor(job.trade)}`}>
-                                                            <div className="text-white brightness-200 scale-75">
-                                                                {getTradeIcon(job.trade)}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <h3 className="font-bold text-[13px] text-slate-900 truncate">{job.title}</h3>
-                                                            <p className="text-[11px] text-slate-500 truncate">{job.addresses?.city}, {job.addresses?.district}. ker</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="mt-2 flex items-center justify-between">
-                                                        <div className="scale-[0.85] origin-left">
-                                                            {getStatusBadge(job.status, job.job_assignments)}
-                                                        </div>
-                                                        <span className="text-[10px] text-slate-400 font-semibold">
-                                                            {new Date(job.created_at).toLocaleDateString('hu-HU')}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ))}
-
-                                            {/* Past jobs in sidebar */}
-                                            {pastJobs.length > 0 && (
-                                                <>
-                                                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mt-4 mb-2 px-1">
-                                                        Korábbi ({pastJobs.length})
-                                                    </h3>
-                                                    {pastJobs.map(job => (
-                                                        <div
-                                                            key={job.id}
-                                                            onClick={() => openJobDetails(job)}
-                                                            className="bg-slate-50/50 hover:bg-slate-100 rounded-xl p-3 cursor-pointer transition-colors active:scale-[0.98] opacity-50 hover:opacity-100 border border-transparent hover:border-slate-100"
-                                                        >
-                                                            <div className="flex items-center gap-2.5">
-                                                                <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-white ${getTradeColor(job.trade)} opacity-70`}>
-                                                                    <div className="brightness-200 scale-75">
-                                                                        {getTradeIcon(job.trade)}
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex-1 min-w-0">
-                                                                    <h3 className="font-bold text-[13px] text-slate-700 truncate">{job.title}</h3>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </>
-                                            )}
-                                        </div>
-                                    )}
                                 </div>
                             )}
 
-                            {desktopTab === 'account' && (
-                                <div className="px-4 py-4 border-t border-slate-100">
-                                    <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-3 px-1">
-                                        Fiók kezelése
-                                    </h2>
+                            {mobileTab === 'reports' && (
+                                <div className="space-y-4 pt-2">
+                                    {/* CTA */}
+                                    <button
+                                        onClick={() => setIsAddLeadModalOpen(true)}
+                                        className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white p-4 rounded-2xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-95"
+                                    >
+                                        <Plus className="w-5 h-5" />
+                                        <span className="text-base">Új probléma bejelentése</span>
+                                    </button>
+
+                                    {renderJobList()}
+                                </div>
+                            )}
+
+                            {mobileTab === 'account' && (
+                                <div className="space-y-4 pt-2">
                                     <Link
                                         href="/fiok"
-                                        className="bg-slate-50 hover:bg-slate-100 rounded-xl p-3 flex items-center justify-between transition-colors border border-slate-100"
+                                        className="w-full bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
                                     >
-                                        <div className="flex items-center gap-2.5">
-                                            <div className="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center text-slate-500">
-                                                <Settings className="w-4 h-4" />
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500">
+                                                <Settings className="w-5 h-5" />
                                             </div>
-                                            <span className="text-sm font-semibold text-slate-700">Fiók beállítások</span>
+                                            <div>
+                                                <p className="font-bold text-slate-900 text-sm">Fiók beállítások</p>
+                                                <p className="text-xs text-slate-500">Email, jelszó, értesítések</p>
+                                            </div>
                                         </div>
-                                        <ArrowRight className="w-4 h-4 text-slate-400" />
+                                        <ArrowRight className="w-5 h-5 text-slate-400" />
                                     </Link>
                                 </div>
                             )}
                         </div>
                     </div>
-
-                    {/* Main Map Area */}
-                    <div className="flex-1 h-full relative">
-                        {/* Top bar overlay shadow */}
-                        <div className="absolute top-0 left-0 right-0 z-10 h-12 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
-
-                        {/* Floating Navigation Pill */}
-                        <div className="absolute top-4 left-4 z-20">
-                            <div className="bg-white/95 backdrop-blur-md rounded-full shadow-lg flex items-center px-2 py-1.5 border border-slate-200/50 hover:shadow-xl hover:border-slate-300 transition-all">
-                                <Link
-                                    href="/"
-                                    className="flex items-center gap-2 px-3 py-1.5 text-slate-700 hover:text-slate-900 font-bold text-sm hover:bg-slate-50 rounded-full transition-colors"
-                                >
-                                    <ArrowLeft className="w-4 h-4" />
-                                    Vissza
-                                </Link>
-                                <div className="w-px h-5 bg-slate-200 mx-1"></div>
-                                <div className="flex items-center gap-2 px-3 py-1.5">
-                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                                    <span className="text-slate-600 font-bold text-sm">Ügyfél Portál</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {renderMap()}
-                    </div>
                 </div>
-            </div>
-
-            {/* ====== MOBILE LAYOUT (<lg) ====== */}
-            <div className="lg:hidden h-dvh w-full relative pb-safe">
-                {/* Full-screen Map Background */}
-                <div className="absolute inset-0 z-0">
-                    {renderMap()}
-                </div>
-
-                {/* Back button overlay */}
-                <div className="absolute top-4 left-4 z-10">
-                    <Link href="/" className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg text-slate-700 hover:bg-white transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-                </div>
-
-                {/* Draggable Bottom Sheet */}
-                <div
-                    ref={sheetRef}
-                    className="absolute left-0 right-0 bottom-0 z-20 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] border-t border-slate-100 flex flex-col"
-                    style={{
-                        top: mobileSheetTop,
-                        transition: sheetTranslateY !== null ? 'none' : 'top 0.35s cubic-bezier(0.32, 0.72, 0, 1)',
-                    }}
-                >
-                    {/* Grab Handle */}
-                    <div
-                        className="flex-shrink-0 py-3 cursor-grab active:cursor-grabbing touch-none"
-                        onTouchStart={handleTouchStart}
-                        onTouchMove={handleTouchMove}
-                        onTouchEnd={handleTouchEnd}
-                    >
-                        <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto"></div>
-                    </div>
-
-                    {/* Compact Header + Tabs */}
-                    <div className="flex-shrink-0 px-4 pb-3">
-                        {/* Compact profile row */}
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 flex-shrink-0">
-                                <User className="w-5 h-5" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <h1 className="text-base font-black text-slate-900 leading-tight">Ügyfél Fiók</h1>
-                                <div className="flex items-center gap-1 text-vvm-blue-600 text-xs font-bold">
-                                    <Shield className="w-3 h-3" />
-                                    <span>AKTÍV</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Navigation Tabs */}
-                        <div className="flex gap-1 bg-slate-100 rounded-xl p-1">
-                            <button
-                                onClick={() => setMobileTab('map')}
-                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all ${mobileTab === 'map'
-                                    ? 'bg-white text-slate-900 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-700'
-                                    }`}
-                            >
-                                <Navigation className="w-3.5 h-3.5" />
-                                <span>Élő Térkép</span>
-                            </button>
-                            <button
-                                onClick={() => setMobileTab('reports')}
-                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all ${mobileTab === 'reports'
-                                    ? 'bg-white text-slate-900 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-700'
-                                    }`}
-                            >
-                                <FileText className="w-3.5 h-3.5" />
-                                <span>Bejelentéseim</span>
-                            </button>
-                            <button
-                                onClick={() => setMobileTab('account')}
-                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all ${mobileTab === 'account'
-                                    ? 'bg-white text-slate-900 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-700'
-                                    }`}
-                            >
-                                <Settings className="w-3.5 h-3.5" />
-                                <span>Fiókom</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Scrollable Content Area */}
-                    <div
-                        ref={contentRef}
-                        className={`flex-1 min-h-0 px-4 pb-20 custom-scrollbar ${isSheetExpanded ? 'overflow-y-auto' : 'overflow-y-auto'
-                            }`}
-                        style={{ WebkitOverflowScrolling: 'touch' }}
-                    >
-                        {mobileTab === 'map' && (
-                            <div className="space-y-4 pt-2">
-                                <p className="text-sm text-slate-500 font-medium text-center">
-                                    Húzd le ezt a panelt a térkép megtekintéséhez
-                                </p>
-                                <button
-                                    onClick={() => setSheetPosition('collapsed')}
-                                    className="w-full bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white p-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm"
-                                >
-                                    <Navigation className="w-4 h-4" />
-                                    Térkép megnyitása
-                                </button>
-                            </div>
-                        )}
-
-                        {mobileTab === 'reports' && (
-                            <div className="space-y-4 pt-2">
-                                {/* CTA */}
-                                <button
-                                    onClick={() => setIsAddLeadModalOpen(true)}
-                                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white p-4 rounded-2xl font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-95"
-                                >
-                                    <Plus className="w-5 h-5" />
-                                    <span className="text-base">Új probléma bejelentése</span>
-                                </button>
-
-                                {renderJobList()}
-                            </div>
-                        )}
-
-                        {mobileTab === 'account' && (
-                            <div className="space-y-4 pt-2">
-                                <Link
-                                    href="/fiok"
-                                    className="w-full bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500">
-                                            <Settings className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-slate-900 text-sm">Fiók beállítások</p>
-                                            <p className="text-xs text-slate-500">Email, jelszó, értesítések</p>
-                                        </div>
-                                    </div>
-                                    <ArrowRight className="w-5 h-5 text-slate-400" />
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+            )}
 
             {/* Job Details Modal */}
             {selectedJob && (
@@ -925,7 +1163,7 @@ export default function CustomerDashboard() {
                         {/* Body */}
                         <div className="p-6 overflow-y-auto custom-scrollbar">
                             <div className="flex justify-between items-start mb-6">
-                                {getStatusBadge(selectedJob.status, selectedJob.job_assignments)}
+                                {getStatusBadge(selectedJob.status, selectedJob.job_assignments, selectedJob.job_interests)}
                             </div>
 
                             {isEditing ? (
@@ -982,6 +1220,55 @@ export default function CustomerDashboard() {
                                 </div>
                             )}
 
+                            {/* Job Interests / Pending Contractors */}
+                            {!isEditing && selectedJob.job_interests && selectedJob.job_interests.filter(i => i.status === 'pending').length > 0 && (
+                                <div className="mb-4">
+                                    <h4 className="text-xs font-black text-blue-600 uppercase tracking-[0.2em] mb-4 ml-1 flex items-center gap-2">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></div>
+                                        Jelentkezett szakemberek
+                                    </h4>
+                                    <div className="space-y-3">
+                                        {selectedJob.job_interests.filter(i => i.status === 'pending').map(interest => (
+                                            <div key={interest.id} className="p-4 rounded-[1.5rem] border border-blue-200 bg-blue-50/50 ring-1 ring-blue-100 transition-all">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg bg-blue-500 text-white shadow-md">
+                                                        {interest.contractor_profiles?.display_name?.charAt(0) || '?'}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <p className="font-black text-slate-900">{interest.contractor_profiles?.display_name || 'Szakember'}</p>
+                                                        <p className="text-[11px] text-blue-600 font-black uppercase tracking-wider mt-1">
+                                                            🔔 Érdeklődik a munkád iránt!
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleAcceptInterest(interest.id)}
+                                                        disabled={interestActionLoading === interest.id}
+                                                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 shadow-md"
+                                                    >
+                                                        {interestActionLoading === interest.id ? (
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                        ) : (
+                                                            <CheckCircle className="w-4 h-4" />
+                                                        )}
+                                                        Elfogadom
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleRejectInterest(interest.id)}
+                                                        disabled={interestActionLoading === interest.id}
+                                                        className="flex-1 bg-white hover:bg-red-50 text-red-600 font-black py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all border border-red-200 active:scale-95 disabled:opacity-50"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                        Elutasítom
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Job Assignments / Specialists */}
                             {!isEditing && (
                                 <div className="mb-4">
@@ -1014,18 +1301,18 @@ export default function CustomerDashboard() {
                                                 </div>
                                             ))}
                                         </div>
-                                    ) : (
+                                    ) : selectedJob.job_interests?.filter(i => i.status === 'pending').length === 0 ? (
                                         <div className="text-xs font-black text-amber-700 bg-amber-50/50 p-5 rounded-2xl flex items-center gap-4 border border-amber-100/50">
                                             <div className="w-3 h-3 rounded-full bg-amber-500 animate-pulse flex-shrink-0"></div>
                                             Még nincs szakember hozzárendelve. Automatikusan értesítettük a környékbeli mestereket.
                                         </div>
-                                    )}
+                                    ) : null}
                                 </div>
                             )}
                         </div>
 
                         {/* Footer Commands */}
-                        {!isEditing && (['open', 'new', 'unassigned'].includes(selectedJob.status)) && (
+                        {!isEditing && !(['completed', 'cancelled_by_customer', 'cancelled'].includes(selectedJob.status)) && (
                             <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3 z-10 backdrop-blur-sm">
                                 <button
                                     onClick={() => {

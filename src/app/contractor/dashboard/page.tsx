@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl/mapbox';
+import Map, { Marker, Popup, NavigationControl, GeolocateControl, MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 import {
   Briefcase, CheckCircle, AlertTriangle, ArrowLeft, ArrowRight,
-  LogOut, RefreshCw, Phone, Settings, X, Zap, CreditCard, Droplets, Flame, User, MapPin, Gift, Copy, Link as LinkIcon
+  LogOut, RefreshCw, Phone, Settings, X, Zap, CreditCard, Droplets, Flame, User, MapPin, Gift, Copy, Link as LinkIcon, Navigation
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -89,6 +89,32 @@ function DashboardContent() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
+  // New state variables for swipe gestures
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const [touchEndY, setTouchEndY] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  // Touch event handlers for swipe down
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEndY(null); // Reset
+    setTouchStartY(e.targetTouches[0].clientY);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEndY(e.targetTouches[0].clientY);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStartY || !touchEndY) return;
+    const distance = touchEndY - touchStartY;
+    const isDownSwipe = distance > minSwipeDistance;
+    if (isDownSwipe) {
+      // Swiped down - switch to 'map' tab which minimizes the panel
+      setActiveTab('map');
+    }
+  };
+
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
 
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -96,6 +122,48 @@ function DashboardContent() {
 
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const mapRef = useRef<MapRef>(null);
+
+  // Fly to job location when selected
+  useEffect(() => {
+    if (selectedJob && selectedJob.latitude && selectedJob.longitude) {
+      const lat = Number(selectedJob.latitude);
+      const lng = Number(selectedJob.longitude);
+      const centerLat = window.innerWidth >= 1024 ? lat : lat - 0.08;
+
+      mapRef.current?.flyTo({
+        center: [lng, centerLat],
+        zoom: 10,
+        duration: 1500
+      });
+    }
+  }, [selectedJob]);
+
+  // Fit bounds to all jobs when loaded
+  useEffect(() => {
+    const mapJobs = activeTab === 'map' ? openJobs : (activeTab === 'active' ? activeJobs : []);
+    const validJobs = mapJobs.filter(j => j?.latitude && j?.longitude);
+    if (validJobs.length > 0 && mapRef.current && !selectedJob) {
+      let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+      validJobs.forEach(j => {
+        const lat = Number(j.latitude);
+        const lng = Number(j.longitude);
+        if (lat < minLat) minLat = lat;
+        if (lat > maxLat) maxLat = lat;
+        if (lng < minLng) minLng = lng;
+        if (lng > maxLng) maxLng = lng;
+      });
+
+      // Add a little padding to the bounds
+      mapRef.current.fitBounds(
+        [
+          [minLng, minLat],
+          [maxLng, maxLat]
+        ],
+        { padding: 50, duration: 1500, maxZoom: 10 }
+      );
+    }
+  }, [openJobs, activeJobs, activeTab]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -219,13 +287,13 @@ function DashboardContent() {
               padding: 8px 10px !important;
               border-radius: 12px !important;
               overflow: hidden !important;
-              box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3) !important;
-              background: #1e293b !important;
-              color: white !important;
+              box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+              background: white !important;
+              color: #1e293b !important;
               width: 260px !important;
           }
           .dashboard-map-popup .mapboxgl-popup-tip {
-              border-top-color: #1e293b !important;
+              border-top-color: white !important;
           }
           .dashboard-map-popup .mapboxgl-popup-close-button {
               font-size: 24px !important;
@@ -238,7 +306,7 @@ function DashboardContent() {
           }
           .dashboard-map-popup .mapboxgl-popup-close-button:hover {
               background-color: transparent !important;
-              color: white !important;
+              color: #0f172a !important;
           }
       `}</style>
       {notification && (
@@ -254,6 +322,7 @@ function DashboardContent() {
           </div>
         ) : (
           <Map
+            ref={mapRef}
             initialViewState={DEFAULT_VIEWPORT}
             mapStyle="mapbox://styles/mapbox/streets-v12"
             mapboxAccessToken={MAPBOX_TOKEN}
@@ -296,20 +365,20 @@ function DashboardContent() {
                 maxWidth="340px"
               >
                 <div className="p-0.5">
-                  <div className="flex items-center gap-2 mb-2 border-b border-slate-700 pb-2">
+                  <div className="flex items-center gap-2 mb-2 border-b border-slate-100 pb-2">
                     <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${getTradeColor(selectedJob.trade)} flex flex-shrink-0 items-center justify-center text-white shadow-md *:w-4 *:h-4 sm:*:w-5 sm:*:h-5`}>
                       {getTradeIcon(selectedJob.trade)}
                     </div>
-                    <div className="flex-1 pr-1 border-gray-600">
-                      <h3 className="font-bold text-white text-[13px] sm:text-base leading-tight mb-0.5">{selectedJob.title}</h3>
-                      <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-400 font-medium">
+                    <div className="flex-1 pr-1">
+                      <h3 className="font-bold text-slate-800 text-[13px] sm:text-base leading-tight mb-0.5">{selectedJob.title}</h3>
+                      <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-500 font-medium">
                         <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
                         {selectedJob.district_or_city || 'Cím nem elérhető'}
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-slate-700/50 rounded-lg p-2 sm:p-3 mb-2 sm:mb-4 text-[11px] sm:text-sm text-slate-300 border border-slate-600 leading-snug italic shadow-inner line-clamp-2">
+                  <div className="bg-slate-50 text-slate-600 rounded-lg p-2 sm:p-3 mb-2 sm:mb-4 text-[11px] sm:text-sm border border-slate-200 leading-snug italic shadow-inner line-clamp-2">
                     &quot;{selectedJob.description || 'Nincs leírás'}&quot;
                   </div>
 
@@ -361,15 +430,30 @@ function DashboardContent() {
         </div>
 
         {/* Main Side Panel */}
-        <div className="w-full lg:w-[420px] xl:w-[460px] flex flex-col pointer-events-auto h-full overflow-hidden mt-[32vh] lg:mt-0 bg-white rounded-t-[2.5rem] lg:rounded-none shadow-[0_-15px_30px_rgba(0,0,0,0.05)] lg:shadow-[15px_0_30px_rgba(0,0,0,0.4)] border-t border-slate-100 lg:border-r lg:border-t-0 z-10">
+        <div
+          className={`w-full lg:w-[420px] xl:w-[460px] flex flex-col pointer-events-auto overflow-hidden transition-all duration-500 ease-in-out bg-white rounded-t-[2.5rem] lg:rounded-none shadow-[0_-15px_30px_rgba(0,0,0,0.05)] lg:shadow-[15px_0_30px_rgba(0,0,0,0.4)] border-t border-slate-100 lg:border-r lg:border-t-0 z-10 ${activeTab === 'map' ? 'h-[35vh] mt-[65vh] lg:h-full lg:mt-0' : 'h-[85vh] mt-[15vh] lg:h-full lg:mt-0'
+            }`}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
 
           {/* Grab Handle for Mobile */}
-          <div className="w-full flex justify-center py-3 lg:hidden flex-shrink-0">
-            <div className="w-12 h-1.5 bg-slate-200 rounded-full"></div>
+          <div className="w-full flex justify-center py-3 lg:hidden flex-shrink-0 cursor-grab active:cursor-grabbing">
+            <div className="w-12 h-1.5 bg-slate-300 rounded-full"></div>
           </div>
 
           {/* User & Balance Section */}
-          <div className="bg-white/95 lg:bg-white backdrop-blur-xl lg:backdrop-blur-none lg:rounded-none p-5 lg:p-6 lg:border-b lg:border-slate-100 flex-shrink-0">
+          <div
+            className="bg-white/95 lg:bg-white backdrop-blur-xl lg:backdrop-blur-none lg:rounded-none p-5 lg:p-6 lg:border-b lg:border-slate-100 flex-shrink-0"
+            // Stop propagation here so scrolling inside the content doesn't trigger the pull-down
+            onTouchStart={(e) => {
+              // Only allow pull down from the handle/header area
+              if ((e.target as HTMLElement).closest('.custom-scrollbar')) {
+                e.stopPropagation();
+              }
+            }}
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 lg:w-12 lg:h-12 bg-vvm-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-vvm-blue-100">
@@ -479,12 +563,79 @@ function DashboardContent() {
                         </div>
                       ) : (
                         activeJobs.map((job: any) => (
-                          <div key={job.id} onClick={() => handleJobCardClick(job)} className="cursor-pointer group">
-                            <JobCard
-                              job={job}
-                              assignment={job.assignment}
-                              showActions={false}
-                            />
+                          <div key={job.id} className="space-y-0">
+                            {/* Standard Job Card */}
+                            <div onClick={() => handleJobCardClick(job)} className="cursor-pointer group">
+                              <JobCard
+                                job={job}
+                                assignment={job.assignment}
+                                showActions={false}
+                              />
+                            </div>
+
+                            {/* Congratulation Banner — only for accepted interests */}
+                            {job.assignment?.status === 'accepted' && (
+                              <div className="mx-1 -mt-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-b-2xl p-5 text-white shadow-lg shadow-emerald-200 relative overflow-hidden">
+                                {/* Decorative circles */}
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-8 translate-x-8"></div>
+                                <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-6 -translate-x-6"></div>
+
+                                <div className="relative z-10">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-2xl">🎉</span>
+                                    <div>
+                                      <p className="font-black text-sm">Gratulálunk!</p>
+                                      <p className="text-emerald-100 text-xs font-bold">Az ügyfél elfogadta az ajánlatod!</p>
+                                    </div>
+                                  </div>
+
+                                  {/* Customer contact */}
+                                  {job.customer && (
+                                    <div className="bg-white/15 backdrop-blur-sm rounded-xl p-3 mb-3">
+                                      <p className="text-[10px] font-black uppercase tracking-wider text-emerald-200 mb-1.5">Vedd fel a kapcsolatot:</p>
+                                      <p className="font-black text-base">{job.customer.full_name}</p>
+                                      {job.customer.phone && (
+                                        <a href={`tel:${job.customer.phone}`} className="flex items-center gap-2 mt-2 bg-white text-emerald-700 font-black py-2.5 px-4 rounded-xl text-sm hover:bg-emerald-50 transition-all active:scale-95 shadow-sm w-full justify-center">
+                                          📞 {job.customer.phone}
+                                        </a>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  {/* Navigation buttons */}
+                                  {job.latitude && job.longitude && (
+                                    <div className="flex gap-2">
+                                      <a
+                                        href={`https://waze.com/ul?ll=${job.latitude},${job.longitude}&navigate=yes`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex-1 bg-[#33ccff] hover:bg-[#28b8e8] text-white font-black py-3 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
+                                      >
+                                        <Navigation className="w-4 h-4" />
+                                        Waze
+                                      </a>
+                                      <a
+                                        href={`https://www.google.com/maps/dir/?api=1&destination=${job.latitude},${job.longitude}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex-1 bg-white hover:bg-slate-50 text-slate-800 font-black py-3 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
+                                      >
+                                        <MapPin className="w-4 h-4" />
+                                        Google Maps
+                                      </a>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Pending state info */}
+                            {job.assignment?.status === 'pending' && (
+                              <div className="mx-1 -mt-1 bg-sky-50 border border-sky-200 border-t-0 rounded-b-2xl p-3 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></div>
+                                <p className="text-xs font-bold text-sky-700">Várakozás az ügyfél döntésére...</p>
+                              </div>
+                            )}
                           </div>
                         ))
                       )}

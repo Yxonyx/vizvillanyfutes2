@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         job:jobs(
           id, title, description, trade, category, status, priority, 
           preferred_time_from, preferred_time_to, created_at, updated_at,
-          lead_price,
+          lead_price, latitude, longitude, district_or_city,
           customer:customers(full_name, phone, email),
           address:addresses(city, district, street, house_number)
         )
