@@ -10,7 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         '/villanyszerelo-budapest',
         '/futeskorszerusites',
         '/dugulaselharitas-budapest',
-        '/arak',
         '/gyik',
         '/szolgaltatasi-teruletek',
         '/rolunk',
@@ -49,7 +48,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         ) {
             priority = 0.9;
             changeFrequency = 'weekly';
-        } else if (route === '/arak' || route === '/szolgaltatasi-teruletek') {
+        } else if (route === '/szolgaltatasi-teruletek') {
             priority = 0.8;
             changeFrequency = 'monthly';
         }

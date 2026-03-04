@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { MapPin, CheckCircle, Clock, Phone, Calendar, AlertTriangle } from 'lucide-react';
+import { MapPin, CheckCircle, Clock, Phone, Calendar, AlertTriangle, ExternalLink } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Szolgáltatási Területek | VízVillanyFűtés Budapest és Pest megye',
@@ -62,11 +62,23 @@ export default function SzolgaltatasiTeruletekPage() {
             víz-, villany- és fűtésszerelést.
           </p>
 
-          <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4">
-            <Clock className="w-6 h-6 text-vvm-yellow-400" />
-            <p className="text-lg">
-              <strong>SOS hibaelhárítás:</strong> átlagosan 60 percen belül a helyszínen
-            </p>
+          <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
+            <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4">
+              <Clock className="w-6 h-6 text-vvm-yellow-400" />
+              <p className="text-lg">
+                <strong>SOS hibaelhárítás:</strong> átlagosan 60 percen belül a helyszínen
+              </p>
+            </div>
+            <a
+              href="https://www.google.com/maps/place/Pest+County/@47.5004157,18.739821,9z/data=!3m1!4b1!4m6!3m5!1s0x4741b86248f2e1d3:0x100c4290c1e10f0!8m2!3d47.4480001!4d19.4618128!16zL20vMDFkcWtz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl px-5 py-3 text-white font-semibold transition-colors border border-white/10"
+            >
+              <MapPin className="w-5 h-5" />
+              <span>Térkép megtekintése</span>
+              <ExternalLink className="w-4 h-4 opacity-70" />
+            </a>
           </div>
         </div>
       </section>

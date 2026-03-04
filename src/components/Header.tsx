@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Calendar, ChevronDown, Users, LogIn, LayoutDashboard, LogOut, Shield, AlertTriangle, User } from 'lucide-react';
+import { Menu, X, Calendar, ChevronDown, Users, LogIn, LayoutDashboard, LogOut, Shield, AlertTriangle, User, ArrowRight } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import Logo from './Logo';
 import { useAuth } from '@/contexts/AuthContext';
@@ -31,8 +31,8 @@ const mainNav: NavItem[] = [
       { name: 'Fűtéskorszerűsítés', href: '/futeskorszerusites' },
     ]
   },
-  { name: 'Árak', href: '/arak' },
-  { name: 'Pályázatok', href: '/palyazat-kalkulator' },
+
+  { name: 'Kapcsolat', href: '/kapcsolat' },
 ];
 
 // Secondary nav - for B2B partners (no dropdown needed)
@@ -97,6 +97,8 @@ export default function Header() {
   };
 
   const allNavItems = [...mainNav, ...secondaryNav];
+
+  const isPartnerPage = pathname === '/csatlakozz-partnerkent';
 
   const renderNavItem = (item: NavItem, isMobile: boolean = false) => {
     if (isMobile) {
@@ -312,11 +314,17 @@ export default function Header() {
                 {/* Hide CTA when logged in as contractor */}
                 {role !== 'contractor' && (
                   <button
-                    onClick={() => openPortal('customer', true)}
+                    onClick={() => {
+                      if (isPartnerPage) {
+                        document.getElementById('szakember_regisztracio')?.scrollIntoView({ behavior: 'smooth' });
+                      } else {
+                        openPortal('customer', true);
+                      }
+                    }}
                     className="btn-primary text-sm px-5 py-2.5"
                   >
-                    <AlertTriangle className="w-4 h-4" />
-                    <span>Probléma bejelentése</span>
+                    {isPartnerPage ? <User className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
+                    <span>{isPartnerPage ? 'Regisztráció' : 'Probléma bejelentése'}</span>
                   </button>
                 )}
               </div>
@@ -408,10 +416,17 @@ export default function Header() {
                 <div className="pt-3">
                   <button
                     className="btn-primary w-full justify-center"
-                    onClick={() => openPortal('customer', true)}
+                    onClick={() => {
+                      setIsOpen(false);
+                      if (isPartnerPage) {
+                        setTimeout(() => document.getElementById('szakember_regisztracio')?.scrollIntoView({ behavior: 'smooth' }), 100);
+                      } else {
+                        openPortal('customer', true);
+                      }
+                    }}
                   >
-                    <AlertTriangle className="w-5 h-5" />
-                    <span>Probléma bejelentése</span>
+                    {isPartnerPage ? <User className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+                    <span>{isPartnerPage ? 'Regisztráció' : 'Probléma bejelentése'}</span>
                   </button>
                 </div>
               )}
@@ -424,11 +439,26 @@ export default function Header() {
       {!isAuthenticated && role !== 'contractor' && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-lg">
           <button
-            onClick={() => openPortal('customer', true)}
-            className="w-full flex items-center justify-center gap-2 py-4 bg-vvm-yellow-400 text-vvm-blue-800 font-bold"
+            onClick={() => {
+              if (isPartnerPage) {
+                document.getElementById('szakember_regisztracio')?.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                openPortal('customer', true);
+              }
+            }}
+            className={`w-full flex items-center justify-center gap-2 py-4 font-bold text-[15px] transition-colors ${isPartnerPage ? 'bg-vvm-yellow-400 hover:bg-vvm-yellow-500 text-[#002f5d]' : 'bg-vvm-yellow-400 text-vvm-blue-800'}`}
           >
-            <AlertTriangle className="w-5 h-5" />
-            <span>Probléma bejelentése</span>
+            {isPartnerPage ? (
+              <>
+                <span>Regisztrálok szakemberként</span>
+                <ArrowRight className="w-5 h-5" />
+              </>
+            ) : (
+              <>
+                <AlertTriangle className="w-5 h-5" />
+                <span>Probléma bejelentése</span>
+              </>
+            )}
           </button>
         </div>
       )}

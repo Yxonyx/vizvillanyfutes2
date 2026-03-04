@@ -115,7 +115,7 @@ export default function FuteskorszerusitesPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/palyazat-kalkulator" className="btn-primary py-4 px-8 text-lg">
+                <Link href="/kapcsolat" className="btn-primary py-4 px-8 text-lg">
                   <Award className="w-5 h-5" />
                   <span>Pályázat kalkulátor</span>
                 </Link>
@@ -156,7 +156,7 @@ export default function FuteskorszerusitesPage() {
                   </div>
                 </div>
 
-                <Link href="/palyazat-kalkulator" className="btn-secondary w-full mt-6">
+                <Link href="/kapcsolat" className="btn-secondary w-full mt-6">
                   <span>Számoljuk ki az Ön megtakarítását!</span>
                   <ArrowRight className="w-5 h-5" />
                 </Link>
@@ -242,7 +242,7 @@ export default function FuteskorszerusitesPage() {
                 </div>
               </div>
 
-              <Link href="/palyazat-kalkulator" className="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold py-4 px-8 rounded-xl hover:bg-emerald-50 transition-colors shadow-xl">
+              <Link href="/kapcsolat" className="inline-flex items-center gap-2 bg-white text-emerald-700 font-bold py-4 px-8 rounded-xl hover:bg-emerald-50 transition-colors shadow-xl">
                 <span>Jogosultság ellenőrzése</span>
                 <ArrowRight className="w-5 h-5" />
               </Link>
@@ -324,7 +324,7 @@ export default function FuteskorszerusitesPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/palyazat-kalkulator" className="btn-primary py-4 px-10 text-lg">
+            <Link href="/kapcsolat" className="btn-primary py-4 px-10 text-lg">
               <Award className="w-6 h-6" />
               <span>Pályázat ellenőrzés</span>
             </Link>

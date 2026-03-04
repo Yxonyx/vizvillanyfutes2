@@ -70,10 +70,6 @@ export default function NotFound() {
               Villanyszerelés
             </Link>
             <span className="text-blue-400">•</span>
-            <Link href="/arak" className="text-blue-200 hover:text-white transition-colors">
-              Árak
-            </Link>
-            <span className="text-blue-400">•</span>
             <Link href="/gyik" className="text-blue-200 hover:text-white transition-colors">
               GYIK
             </Link>

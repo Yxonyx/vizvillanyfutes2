@@ -253,6 +253,18 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
 
             if (insertError) throw insertError;
 
+            // Fire-and-forget: notify customer via email that their lead was created
+            fetch('/api/customer/lead-created-notification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customerEmail: contactEmail,
+                    customerName: 'Ügyfél',
+                    jobTitle: title,
+                    trade: type,
+                }),
+            }).catch(() => { /* fire-and-forget */ });
+
             if (onSuccess) onSuccess();
             onClose();
         } catch (err: any) {

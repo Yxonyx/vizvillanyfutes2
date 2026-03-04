@@ -401,8 +401,9 @@ function DashboardContent() {
         <div
           className={`w-full lg:w-[420px] xl:w-[460px] flex flex-col pointer-events-auto overflow-hidden transition-all duration-500 ease-in-out bg-white rounded-t-[2.5rem] lg:rounded-none shadow-[0_-15px_30px_rgba(0,0,0,0.05)] lg:shadow-[15px_0_30px_rgba(0,0,0,0.4)] border-t border-slate-100 lg:border-r lg:border-t-0 z-10 ${activeTab === 'map' ? 'h-[35vh] mt-[65vh] lg:h-full lg:mt-0' : 'h-[85vh] mt-[15vh] lg:h-full lg:mt-0'
             }`}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
+          style={{ touchAction: 'none' }}
+          onTouchStart={(e) => { e.stopPropagation(); onTouchStart(e); }}
+          onTouchMove={(e) => { e.stopPropagation(); onTouchMove(e); }}
           onTouchEnd={onTouchEnd}
         >
 

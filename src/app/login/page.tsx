@@ -257,7 +257,7 @@ function LoginPageContent() {
           </div>
 
           {loginMode === 'contractor' && (
-            <div className="bg-gray-50 rounded-xl p-4 mb-6">
+            <div className="bg-gray-50 rounded-xl p-3 mb-4">
               <p className="text-sm text-gray-600 text-center">
                 🔧 Ez a felület a regisztrált <strong>vízszerelők, villanyszerelők és fűtésszerelők</strong> számára készült,
                 ahol a munkáikat kezelhetik.
@@ -266,7 +266,7 @@ function LoginPageContent() {
           )}
 
           {loginMode === 'customer' && !registerSuccess && (
-            <div className="bg-vvm-blue-50 rounded-xl p-4 mb-6">
+            <div className="bg-vvm-blue-50 rounded-xl p-3 mb-4">
               <p className="text-sm text-vvm-blue-800 text-center">
                 {isCustomerRegister
                   ? (regStep === 'code'
@@ -278,7 +278,7 @@ function LoginPageContent() {
           )}
 
           {expired && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-amber-800">
                 A munkamenet lejárt. Kérjük jelentkezz be újra.
@@ -287,14 +287,14 @@ function LoginPageContent() {
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
 
           {loginMode === 'contractor' ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   E-mail cím
@@ -421,7 +421,7 @@ function LoginPageContent() {
               </form>
             ) : (
               /* ===== EMAIL + PASSWORD form (used for BOTH login and registration step 1) ===== */
-              <form onSubmit={isCustomerRegister ? handleRegisterStep1 : handleCustomerLogin} className="space-y-6">
+              <form onSubmit={isCustomerRegister ? handleRegisterStep1 : handleCustomerLogin} className="space-y-4">
                 {isCustomerRegister && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Teljes név <span className="text-red-500">*</span></label>
@@ -483,7 +483,7 @@ function LoginPageContent() {
           )}
 
           {loginMode === 'contractor' && (
-            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+            <div className="mt-5 pt-4 border-t border-gray-200 text-center">
               <p className="text-gray-600 text-sm">
                 Még nincs fiókod?{' '}
                 <Link href="/csatlakozz-partnerkent" className="text-vvm-blue-600 hover:underline font-medium">

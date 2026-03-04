@@ -106,13 +106,17 @@ export default function HomePage() {
       {/* Uber-Style Hero Section */}
       <section className="relative w-full h-[100dvh] lg:h-auto lg:min-h-[85vh] bg-zinc-950 overflow-hidden flex flex-col lg:justify-center pt-0 lg:pt-28 lg:pb-20 border-b border-white/5">
 
-        {/* Desktop Gradient Overlay - Dark Gray on the left (softer), fading quickly to transparent on the right */}
-        <div className="hidden lg:block absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-zinc-950/95 via-zinc-950/20 to-transparent z-10 pointer-events-none"></div>
+        {/* BACKGROUND - Map Visualization and Portrait Image */}
+        <div className="absolute top-0 left-0 w-full h-full z-0 flex justify-center items-center overflow-hidden">
+          <div className="absolute inset-0 max-w-[1920px] mx-auto w-full h-full">
+            <TeaserMap />
+          </div>
 
-        {/* BACKGROUND - Map Visualization */}
-        <div className="absolute top-0 left-0 w-full h-full z-0">
-          <TeaserMap />
+
         </div>
+
+        {/* Desktop Gradient Overlay - Dark Gray on the left (softer), fading quickly to transparent on the right to blend the map/portrait */}
+        <div className="hidden lg:block absolute inset-y-0 left-0 w-[65%] bg-gradient-to-r from-zinc-950/95 via-zinc-950/60 to-transparent z-10 pointer-events-none"></div>
 
         {/* LEFT/BOTTOM - Floating Bottom Sheet (Mobile) & Landing Text (Desktop) */}
         <div className="relative z-20 flex-1 flex flex-col justify-end lg:justify-center w-full max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pointer-events-none h-full">
@@ -402,12 +406,15 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0di00aC0ydjRoLTR2Mmg0djRoMnYtNGg0di0yaC00em0wLTMwVjBoLTJ2NGgtNHYyaDR2NGgyVjZoNFY0aC00ek02IDM0di00SDR2NEgwdjJoNHY0aDJ2LTRoNHYtMkg2ek02IDRWMEg0djRIMHYyaDR2NGgyVjZoNFY0SDZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30 pointer-events-none"></div>
 
         {/* Mobile background figure — visible only below lg */}
-        <div className="absolute inset-0 lg:hidden pointer-events-none" aria-hidden="true">
-          <img
-            src="/hero_stats_large.webp"
-            alt=""
-            className="absolute right-[-15%] top-0 h-[70%] w-auto object-contain object-top opacity-[0.4]"
-          />
+        <div className="absolute inset-0 lg:hidden pointer-events-none overflow-hidden" aria-hidden="true">
+          {/* Container = the "window" you see through. Image is zoomed inside it. */}
+          <div className="absolute right-0 top-10 w-[60%] h-[30%] overflow-hidden rounded-bl-3xl">
+            <img
+              src="/partner-hero-bg-new.png"
+              alt=""
+              className="w-full h-full object-cover object-top scale-[1.55] origin-top opacity-40 sm:opacity-55"
+            />
+          </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 md:py-24">
@@ -479,16 +486,23 @@ export default function HomePage() {
             </div>
 
             {/* Right - Desktop figure (hidden on mobile, shown on lg+) */}
-            <div className="relative hidden lg:flex items-center justify-center">
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 blur-2xl rounded-[3rem] -z-10"></div>
-              <img
-                src="/hero_stats_large.webp"
-                alt="Szakemberünk munka közben"
-                className="w-full max-w-lg rounded-2xl shadow-2xl drop-shadow-xl object-contain"
-              />
+            <div className="relative hidden lg:flex items-center justify-center h-full min-h-[550px]">
+
+              {/* Card container with upper body crop */}
+              <div className="relative w-[420px] h-[520px] rounded-[2rem] overflow-hidden shadow-2xl border-2 border-white/15 z-10">
+                {/* Subtle glow behind card */}
+                <div className="absolute -inset-6 bg-gradient-to-br from-blue-500/25 to-indigo-500/25 blur-3xl rounded-[3rem] -z-10"></div>
+                <img
+                  src="/partner-hero-bg-new.png"
+                  alt="Szakemberünk munka közben"
+                  className="w-full h-full object-cover scale-110" style={{ objectPosition: '50% 2%' }}
+                />
+                {/* Bottom gradient fade */}
+                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-vvm-blue-900/60 to-transparent pointer-events-none"></div>
+              </div>
 
               {/* Floating Badge: Free registration */}
-              <div className="absolute top-4 -left-8 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 animate-float z-20">
+              <div className="absolute top-[5%] -left-8 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 animate-float z-20">
                 <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center">
                   <CheckCircle className="w-5 h-5 text-emerald-600" />
                 </div>
@@ -499,7 +513,7 @@ export default function HomePage() {
               </div>
 
               {/* Floating Badge: Starting credit */}
-              <div className="absolute bottom-8 -left-12 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 0.5s infinite' }}>
+              <div className="absolute bottom-12 -left-12 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 0.5s infinite' }}>
                 <div className="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center">
                   <Award className="w-5 h-5 text-amber-600" />
                 </div>
@@ -510,7 +524,7 @@ export default function HomePage() {
               </div>
 
               {/* Floating Badge: No commission */}
-              <div className="absolute top-12 -right-6 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 1s infinite' }}>
+              <div className="absolute top-8 -right-6 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 1s infinite' }}>
                 <div className="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center">
                   <Receipt className="w-5 h-5 text-red-500" />
                 </div>
@@ -521,7 +535,7 @@ export default function HomePage() {
               </div>
 
               {/* Floating Badge: You set the price */}
-              <div className="absolute bottom-4 -right-2 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 1.5s infinite' }}>
+              <div className="absolute bottom-8 -right-2 bg-white rounded-xl shadow-xl px-4 py-3 flex items-center gap-2 z-20" style={{ animation: 'float 3s ease-in-out 1.5s infinite' }}>
                 <div className="w-9 h-9 bg-sky-100 rounded-lg flex items-center justify-center">
                   <Briefcase className="w-5 h-5 text-sky-600" />
                 </div>

@@ -209,8 +209,8 @@ export default function RolunkPage() {
       {/* How It Works */}
       <section className="py-16 lg:py-24 bg-slate-50 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 xl:gap-28 items-start">
+            <div className="min-w-0">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-800 font-heading mb-6">
                 Hogyan működik?
               </h2>
@@ -261,7 +261,7 @@ export default function RolunkPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-white to-blue-50/50 rounded-3xl p-6 lg:p-10 shadow-xl border border-white relative overflow-hidden">
+            <div className="bg-gradient-to-br from-white to-blue-50/50 rounded-3xl p-6 lg:p-10 shadow-xl border border-white relative overflow-hidden min-w-0">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/40 rounded-full blur-3xl -mr-20 -mt-20"></div>
 
               <h3 className="text-xl lg:text-2xl font-bold text-slate-800 mb-6 lg:mb-8 relative z-10">Miért a VízVillanyFűtés?</h3>

@@ -16,7 +16,6 @@ const pageNames: Record<string, string> = {
   'rolunk': 'Rólunk',
   'kapcsolat': 'Kapcsolat',
   'szolgaltatasi-teruletek': 'Szolgáltatási területek',
-  'palyazat-kalkulator': 'Pályázat kalkulátor',
   'general-kivitelezo-partner': 'Generálkivitelezőknek',
   'aszf': 'ÁSZF',
   'adatkezeles': 'Adatkezelés',

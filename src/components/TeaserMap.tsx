@@ -449,8 +449,8 @@ export default function TeaserMap() {
                                 e.originalEvent.stopPropagation();
                                 setSelectedLead(lead);
                                 mapRef.current?.flyTo({
-                                    center: [lead.lng, window.innerWidth >= 1024 ? lead.lat + 0.015 : lead.lat - 0.08],
-                                    zoom: 10,
+                                    center: [lead.lng, window.innerWidth >= 1024 ? lead.lat + 0.015 : lead.lat + 0.015],
+                                    zoom: window.innerWidth >= 1024 ? 10 : 12,
                                     duration: 800
                                 });
                             }}

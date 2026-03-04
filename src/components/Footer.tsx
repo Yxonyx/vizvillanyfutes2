@@ -18,8 +18,7 @@ const footerLinks = {
     { name: 'SOS Hibaelhárítás', href: '/login?role=customer' },
   ],
   informacio: [
-    { name: 'Áraink', href: '/arak' },
-    { name: 'Pályázat kalkulátor', href: '/palyazat-kalkulator' },
+
     { name: 'Blog / Tudástár', href: '/blog' },
     { name: 'Gyakori kérdések', href: '/gyik' },
     { name: 'Szolgáltatási területek', href: '/szolgaltatasi-teruletek' },

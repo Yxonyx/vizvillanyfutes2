@@ -6,20 +6,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-// Price list data
-const priceList = [
-  { name: 'Kiszállási díj', price: 'Ajánlat alapján', note: 'Szakemberenként eltérő lehet' },
-  { name: 'Mosdó csaptelep csere', price: '16 500 Ft-tól', includes: 'Munkadíj + segédanyagok' },
-  { name: 'Konyhai csaptelep csere', price: '18 500 Ft-tól', includes: 'Munkadíj + segédanyagok' },
-  { name: 'WC tartály javítás', price: '12 000 Ft-tól', includes: 'Munkadíj + kisebb alkatrészek' },
-  { name: 'WC tartály csere', price: '24 500 Ft-tól', includes: 'Munkadíj, tartály külön' },
-  { name: 'Szifon csere', price: '8 500 Ft-tól', includes: 'Munkadíj + standard szifon' },
-  { name: 'Bojler vízkőtelenítés', price: '19 500 Ft-tól', includes: 'Teljes körű karbantartás' },
-  { name: 'Bojler csere (80L)', price: '32 000 Ft-tól', includes: 'Munkadíj, bojler külön' },
-  { name: 'Csőtörés elhárítás', price: '25 000 Ft-tól', includes: 'Sürgősségi díjszabás egyeztetés szerint' },
-  { name: 'Duguláselhárítás (kézi)', price: '15 000 Ft-tól', includes: 'Standard dugulás' },
-  { name: 'Duguláselhárítás (gépi)', price: '28 000 Ft-tól', includes: 'Súlyosabb dugulás' },
-];
 
 // FAQ data
 const faqs = [
@@ -256,57 +242,6 @@ export default function VizszereloPage() {
         </div>
       </section>
 
-      {/* Price List */}
-      <section className="py-16 bg-white" id="arak">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 font-heading mb-4">
-              Vízszerelési áraink
-            </h2>
-            <p className="text-lg text-gray-600">
-              Átlátható, fix árak – nincsenek rejtett költségek.
-            </p>
-          </div>
-
-          <div className="bg-gray-50 rounded-2xl overflow-hidden">
-            <div className="grid grid-cols-3 gap-4 p-4 bg-sky-600 text-white font-semibold">
-              <div>Szolgáltatás</div>
-              <div className="text-center">Ár</div>
-              <div className="text-right">Tartalmazza</div>
-            </div>
-
-            {priceList.map((item, index) => (
-              <div
-                key={index}
-                className={`grid grid-cols-3 gap-4 p-4 items-center ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                  }`}
-              >
-                <div className="font-medium text-gray-900">{item.name}</div>
-                <div className="text-center text-sky-600 font-bold">{item.price}</div>
-                <div className="text-right text-sm text-gray-500">{item.includes || item.note}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 p-4 bg-amber-50 rounded-xl flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-800">
-              <strong>Megjegyzés:</strong> Az árak tájékoztató jellegűek, az anyagárat nem tartalmazzák.
-              A pontos árat a helyszíni felmérés után adjuk meg. SOS (éjszaka, hétvége, ünnepnap) esetén a szakemberek egyedi díjszabást alkalmazhatnak.
-            </p>
-          </div>
-
-          <div className="text-center mt-8">
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode: 'customer' } }))}
-              className="btn-primary inline-flex py-4 px-8"
-            >
-              <Calendar className="w-5 h-5" />
-              <span>Szakember keresése</span>
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* FAQ Section */}
       <section className="py-16 bg-gray-50">

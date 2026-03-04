@@ -133,9 +133,6 @@ export default function KapcsolatPage() {
                   <Link href="/gyik" className="flex items-center gap-2 text-blue-100 hover:text-white">
                     → Gyakran Ismételt Kérdések
                   </Link>
-                  <Link href="/arak" className="flex items-center gap-2 text-blue-100 hover:text-white">
-                    → Áraink
-                  </Link>
                   <Link href="/szolgaltatasi-teruletek" className="flex items-center gap-2 text-blue-100 hover:text-white">
                     → Szolgáltatási területek
                   </Link>

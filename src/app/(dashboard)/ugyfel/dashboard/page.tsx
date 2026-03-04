@@ -216,7 +216,7 @@ export default function CustomerDashboard() {
           contractor_profiles ( display_name, phone )
         )
       `)
-                .eq('customer_id', user.id)
+                .eq('created_by_user_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (jobsError) throw jobsError;
@@ -435,8 +435,18 @@ export default function CustomerDashboard() {
     const handleAcceptInterest = async (interestId: string) => {
         setInterestActionLoading(interestId);
         try {
-            const { data, error } = await supabase.rpc('accept_job_interest', { p_interest_id: interestId });
-            if (error) throw error;
+            const session = getSession();
+            const token = session?.session?.access_token;
+            const res = await fetch('/api/customer/interests/accept', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({ interest_id: interestId }),
+            });
+            const result = await res.json();
+            if (!res.ok || !result.success) throw new Error(result.error || 'Hiba történt');
             setSelectedJob(null);
             await fetchJobs();
         } catch (err) {
@@ -451,8 +461,18 @@ export default function CustomerDashboard() {
         if (!confirm('Biztosan elutasítod ezt a szakembert?')) return;
         setInterestActionLoading(interestId);
         try {
-            const { data, error } = await supabase.rpc('reject_job_interest', { p_interest_id: interestId });
-            if (error) throw error;
+            const session = getSession();
+            const token = session?.session?.access_token;
+            const res = await fetch('/api/customer/interests/reject', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({ interest_id: interestId }),
+            });
+            const result = await res.json();
+            if (!res.ok || !result.success) throw new Error(result.error || 'Hiba történt');
             setSelectedJob(null);
             await fetchJobs();
         } catch (err) {

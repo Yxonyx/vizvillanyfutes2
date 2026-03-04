@@ -54,7 +54,11 @@ export async function POST(
     // Send approval notification email
     if (contractorEmail) {
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/send-email`, {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
+          request.headers.get('origin') ||
+          `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+
+        await fetch(`${baseUrl}/api/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -62,6 +66,7 @@ export async function POST(
             data: {
               to_email: contractorEmail,
               display_name: contractor?.display_name,
+              login_link: `${baseUrl}/login`,
             },
           }),
         });
