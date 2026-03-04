@@ -473,7 +473,7 @@ export default function HomePage() {
                       <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent -translate-x-full animate-shine opacity-50" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-white font-bold leading-tight mb-0.5 text-[13px] sm:text-[14px]">Érdekel, hogyan szerezhetsz még <span className="text-vvm-yellow-400">10.000 Ft</span> értékben kreditet?</h4>
+                      <h4 className="text-white font-bold leading-tight mb-0.5 text-[13px] sm:text-[14px]">Érdekel, hogyan szerezhetsz még <span className="text-vvm-yellow-400">5.000 Ft</span> értékben kreditet?</h4>
                       <div className="flex items-center gap-1 text-blue-200 text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase">
                         Kreditgyűjtő program <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 group-hover:translate-x-1 transition-transform" />
                       </div>
@@ -553,7 +553,7 @@ export default function HomePage() {
                       <Gift className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h4 className="text-[13px] font-bold text-slate-800 leading-tight mb-1">Érdekel, hogyan szerezhetsz még 10.000 Ft értékben kreditet?</h4>
+                      <h4 className="text-[13px] font-bold text-slate-800 leading-tight mb-1">Érdekel, hogyan szerezhetsz még 5.000 Ft értékben kreditet?</h4>
                     </div>
                   </div>
                   <div className="bg-emerald-50 text-emerald-700 font-semibold text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-1 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
