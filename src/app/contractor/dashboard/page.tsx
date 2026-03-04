@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import JobCard from '@/components/JobCard';
 import { api, handleApiError } from '@/lib/api';
+import { useMarketplace } from '@/hooks/useMarketplace';
 import { Loader2 } from 'lucide-react';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
@@ -78,13 +79,12 @@ const getTradeColor = (trade: string) => {
 function DashboardContent() {
   const { user, contractorProfile, logout } = useAuth();
 
-  const [openJobs, setOpenJobs] = useState<any[]>([]);
-  const [activeJobs, setActiveJobs] = useState<any[]>([]);
-  const [completedJobs, setCompletedJobs] = useState<any[]>([]);
-  const [creditBalance, setCreditBalance] = useState<number>(0);
+  // SWR-powered marketplace data (replaces manual useEffect + setState)
+  const {
+    openJobs, activeJobs, completedJobs, creditBalance,
+    isLoading, error, refresh: refreshMarketplace
+  } = useMarketplace();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'map' | 'active' | 'completed' | 'affiliate'>('map');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -109,9 +109,13 @@ function DashboardContent() {
     if (!touchStartY || !touchEndY) return;
     const distance = touchEndY - touchStartY;
     const isDownSwipe = distance > minSwipeDistance;
+    const isUpSwipe = distance < -minSwipeDistance;
     if (isDownSwipe) {
       // Swiped down - switch to 'map' tab which minimizes the panel
       setActiveTab('map');
+    } else if (isUpSwipe && activeTab === 'map') {
+      // Swiped up from map mode - expand panel to available tab
+      setActiveTab('active');
     }
   };
 
@@ -165,42 +169,29 @@ function DashboardContent() {
     }
   }, [openJobs, activeJobs, activeTab]);
 
-  const fetchData = useCallback(async () => {
-    try {
-      setError(null);
-      const response = await api.get<any>(`/api/contractor/marketplace?_t=${Date.now()}`);
-
-      if (response.success && response.data) {
-        setOpenJobs(response.data.openJobs || []);
-        setActiveJobs(response.data.activeJobs || []);
-        setCompletedJobs(response.data.completedJobs || []);
-        setCreditBalance(response.data.creditBalance || 0);
-      }
-
-      const profileResponse = await api.get<any>(`/api/contractor/profile?_t=${Date.now()}`);
-      if (profileResponse.success && profileResponse.data) {
-        if (profileResponse.data.profile?.referral_code) {
-          setReferralCode(profileResponse.data.profile.referral_code);
+  // Fetch affiliate/profile data separately (not part of marketplace)
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profileResponse = await api.get<any>('/api/contractor/profile');
+        if (profileResponse.success && profileResponse.data) {
+          if (profileResponse.data.profile?.referral_code) {
+            setReferralCode(profileResponse.data.profile.referral_code);
+          }
+          if (profileResponse.data.affiliate_stats) {
+            setAffiliateStats(profileResponse.data.affiliate_stats);
+          }
         }
-        if (profileResponse.data.affiliate_stats) {
-          setAffiliateStats(profileResponse.data.affiliate_stats);
-        }
+      } catch (err) {
+        console.warn('Failed to fetch profile:', err);
       }
-    } catch (err) {
-      setError(handleApiError(err));
-    } finally {
-      setIsLoading(false);
-    }
+    };
+    fetchProfile();
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
   const handleRefresh = useCallback(async () => {
-    setIsLoading(true);
-    await fetchData();
-  }, [fetchData]);
+    refreshMarketplace();
+  }, [refreshMarketplace]);
 
   const handleMapJobClick = (job: any) => {
     setSelectedJob(job);
@@ -227,7 +218,7 @@ function DashboardContent() {
         setNotification({ message: '✨ Sikeres érdeklődés! 2.000 Ft zárolásra került. Várunk az ügyfél döntésére.', type: 'success' });
         setIsDetailModalOpen(false);
         setSelectedJob(null);
-        await fetchData(); // Full reload to get contact info and move to 'active'
+        await refreshMarketplace(); // SWR revalidation
         setActiveTab('active');
       } else {
         setNotification({ message: response.error || 'Vásárlás nem sikerült.', type: 'error' });
@@ -235,7 +226,7 @@ function DashboardContent() {
     } catch (err) {
       const errorMsg = handleApiError(err);
       setNotification({ message: errorMsg, type: 'error' });
-      await fetchData(); // Might have been bought by someone else
+      await refreshMarketplace(); // Might have been bought by someone else
     } finally {
       setActionLoading(null);
     }
@@ -247,7 +238,7 @@ function DashboardContent() {
       const response = await api.put<any>(`/api/contractor/jobs/${jobId}`, { new_status: 'in_progress' });
       if (response.success) {
         setNotification({ message: '🚀 Munka elkezdve!', type: 'success' });
-        await fetchData();
+        await refreshMarketplace();
       } else {
         setNotification({ message: response.error || 'Hiba történt', type: 'error' });
       }
@@ -264,7 +255,7 @@ function DashboardContent() {
       const response = await api.put<any>(`/api/contractor/jobs/${jobId}`, { new_status: 'completed' });
       if (response.success) {
         setNotification({ message: '🎉 Munka befejezve! Gratulálunk!', type: 'success' });
-        await fetchData();
+        await refreshMarketplace();
         setIsDetailModalOpen(false);
         setActiveTab('completed');
       } else {
@@ -281,40 +272,17 @@ function DashboardContent() {
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-white lg:bg-slate-900 relative flex flex-col lg:block">
-      <style>{`
-          .dashboard-map-popup .mapboxgl-popup-content {
-              pointer-events: auto !important;
-              padding: 8px 10px !important;
-              border-radius: 12px !important;
-              overflow: hidden !important;
-              box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-              background: white !important;
-              color: #1e293b !important;
-              width: 260px !important;
-          }
-          .dashboard-map-popup .mapboxgl-popup-tip {
-              border-top-color: white !important;
-          }
-          .dashboard-map-popup .mapboxgl-popup-close-button {
-              font-size: 24px !important;
-              padding: 4px 8px !important;
-              color: #94a3b8 !important;
-              outline: none !important;
-              right: 4px !important;
-              top: 4px !important;
-              transition: color 0.2s !important;
-          }
-          .dashboard-map-popup .mapboxgl-popup-close-button:hover {
-              background-color: transparent !important;
-              color: #0f172a !important;
-          }
-      `}</style>
       {notification && (
+
         <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />
       )}
 
-      {/* Map Section: Background on Desktop, Top on Mobile */}
-      <div className="h-[35vh] lg:h-full w-full lg:absolute lg:inset-0 lg:z-0 z-0 flex-shrink-0">
+      {/* Map Section: Full background on both desktop and mobile */}
+      {/* Mobile Back Button */}
+      <Link href="/" className="lg:hidden absolute top-4 left-4 z-20 bg-white/90 backdrop-blur-sm text-slate-700 font-bold text-sm py-2.5 px-4 rounded-xl shadow-lg border border-slate-200 flex items-center gap-2 active:scale-95 transition-all">
+        <ArrowLeft className="w-4 h-4" /> Vissza
+      </Link>
+      <div className="h-full w-full absolute inset-0 z-0">
         {!MAPBOX_TOKEN ? (
           <div className="w-full h-full flex flex-col justify-center items-center bg-slate-100 p-8 text-center">
             <MapPin className="w-16 h-16 text-slate-300 mb-4" />
@@ -625,6 +593,19 @@ function DashboardContent() {
                                       </a>
                                     </div>
                                   )}
+
+                                  {/* Complete job button */}
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleComplete(job.id); }}
+                                    disabled={actionLoading === job.id}
+                                    className="w-full mt-3 bg-white hover:bg-emerald-50 text-emerald-700 font-black py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm border border-white/30 disabled:opacity-50"
+                                  >
+                                    {actionLoading === job.id ? (
+                                      <><span className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></span> Feldolgozás...</>
+                                    ) : (
+                                      <>✅ Elvégeztem a munkát</>
+                                    )}
+                                  </button>
                                 </div>
                               </div>
                             )}

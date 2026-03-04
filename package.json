@@ -27,7 +27,8 @@
     "react-leaflet": "^4.2.1",
     "react-map-gl": "^8.1.0",
     "resend": "^6.5.2",
-    "stripe": "^20.3.1"
+    "stripe": "^20.3.1",
+    "swr": "^2.4.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

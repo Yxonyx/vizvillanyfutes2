@@ -98,16 +98,19 @@ export function handleApiError(error: unknown): string {
   return 'Ismeretlen hiba történt';
 }
 
-// Add cache-busting query parameter to URL
-function addCacheBuster(endpoint: string): string {
-  const separator = endpoint.includes('?') ? '&' : '?';
-  return `${endpoint}${separator}_t=${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+// SWR fetcher — use with useSWR(key, swrFetcher)
+export async function swrFetcher<T = unknown>(endpoint: string): Promise<T> {
+  const response = await apiClient<T>(endpoint, { method: 'GET' });
+  if (!response.success) {
+    throw new ApiError(response.error || 'Request failed', 0);
+  }
+  return response.data as T;
 }
 
 // Convenience methods for common API calls
 export const api = {
   get: <T>(endpoint: string) =>
-    apiClient<T>(addCacheBuster(endpoint), { method: 'GET' }),
+    apiClient<T>(endpoint, { method: 'GET' }),
 
   post: <T>(endpoint: string, body: unknown) =>
     apiClient<T>(endpoint, {

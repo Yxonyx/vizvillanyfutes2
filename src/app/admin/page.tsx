@@ -10,6 +10,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import JobCard from '@/components/JobCard';
 import ContractorCard from '@/components/ContractorCard';
 import { api, handleApiError } from '@/lib/api';
+import { useAdminJobs, useAdminContractors } from '@/hooks/useAdminData';
 
 // Simple notification component
 function Notification({ message, type, onClose }: {
@@ -24,8 +25,8 @@ function Notification({ message, type, onClose }: {
 
   return (
     <div className={`fixed top-24 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg animate-slide-up min-w-[300px] max-w-md ${type === 'success'
-        ? 'bg-green-50 border-green-200'
-        : 'bg-red-50 border-red-200'
+      ? 'bg-green-50 border-green-200'
+      : 'bg-red-50 border-red-200'
       }`}>
       {type === 'success' ? (
         <CheckCircle className="w-5 h-5 text-green-500" />
@@ -87,64 +88,18 @@ interface Contractor {
 function AdminContent() {
   const { user, logout } = useAuth();
   const [activeView, setActiveView] = useState<'jobs' | 'contractors'>('jobs');
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [contractors, setContractors] = useState<Contractor[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [jobFilter, setJobFilter] = useState<string>('new');
   const [contractorFilter, setContractorFilter] = useState<string>('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showAssignModal, setShowAssignModal] = useState<Job | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  const fetchJobs = useCallback(async () => {
-    try {
-      const params = new URLSearchParams();
-      if (jobFilter && jobFilter !== 'all') {
-        params.set('status', jobFilter);
-      }
-      // Add cache-busting timestamp
-      params.set('_t', Date.now().toString());
+  // SWR-powered data fetching (replaces manual useEffect + useCallback)
+  const { jobs, isLoading: jobsLoading, refresh: refreshJobs, mutateJobs } = useAdminJobs(jobFilter);
+  const { contractors, isLoading: contractorsLoading, refresh: refreshContractors, mutateContractors } = useAdminContractors(contractorFilter);
 
-      const response = await api.get<{ jobs: Job[] }>(`/api/admin/jobs?${params}`);
-      if (response.success && response.data) {
-        setJobs(response.data.jobs || []);
-      }
-    } catch (err) {
-      setError(handleApiError(err));
-    }
-  }, [jobFilter]);
+  const isLoading = activeView === 'jobs' ? jobsLoading : contractorsLoading;
 
-  const fetchContractors = useCallback(async () => {
-    try {
-      const params = new URLSearchParams();
-      if (contractorFilter && contractorFilter !== 'all') {
-        params.set('status', contractorFilter);
-      }
-      // Add cache-busting timestamp
-      params.set('_t', Date.now().toString());
-
-      const response = await api.get<{ contractors: Contractor[] }>(`/api/admin/contractors?${params}`);
-      if (response.success && response.data) {
-        setContractors(response.data.contractors || []);
-      }
-    } catch (err) {
-      setError(handleApiError(err));
-    }
-  }, [contractorFilter]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    setError(null);
-
-    if (activeView === 'jobs') {
-      fetchJobs().finally(() => setIsLoading(false));
-    } else {
-      fetchContractors().finally(() => setIsLoading(false));
-    }
-  }, [activeView, fetchJobs, fetchContractors]);
-
-  // All handlers use OPTIMISTIC UPDATES - no server refresh (returns stale data)
 
   const handleApproveContractor = async (contractorId: string) => {
     if (!confirm('Biztosan jóváhagyod ezt a szakembert?')) return;
@@ -152,8 +107,6 @@ function AdminContent() {
     try {
       const response = await api.post(`/api/admin/contractors/${contractorId}/approve`, {});
       if (response.success) {
-        // Optimistic update - no server refresh
-        setContractors(prev => prev.map(c => c.id === contractorId ? { ...c, status: 'approved' } : c));
         setNotification({ message: 'Szakember sikeresen jóváhagyva', type: 'success' });
         setContractorFilter('approved');
       } else {
@@ -173,9 +126,8 @@ function AdminContent() {
     try {
       const response = await api.post(`/api/admin/contractors/${contractorId}/reject`, { internal_notes: reason });
       if (response.success) {
-        // Optimistic update - no server refresh
-        setContractors(prev => prev.map(c => c.id === contractorId ? { ...c, status: 'rejected' } : c));
         setNotification({ message: 'Szakember elutasítva', type: 'success' });
+        refreshContractors();
       } else {
         setNotification({ message: response.error || 'Hiba történt', type: 'error' });
       }
@@ -193,10 +145,9 @@ function AdminContent() {
     try {
       const response = await api.post(`/api/admin/contractors/${contractorId}/suspend`, { reason });
       if (response.success) {
-        // Optimistic update - no server refresh
-        setContractors(prev => prev.map(c => c.id === contractorId ? { ...c, status: 'suspended' } : c));
         setNotification({ message: 'Szakember felfüggesztve', type: 'success' });
         setContractorFilter('suspended');
+        refreshContractors();
       } else {
         setNotification({ message: response.error || 'Hiba történt', type: 'error' });
       }
@@ -213,10 +164,9 @@ function AdminContent() {
     try {
       const response = await api.post(`/api/admin/contractors/${contractorId}/activate`, {});
       if (response.success) {
-        // Optimistic update - no server refresh
-        setContractors(prev => prev.map(c => c.id === contractorId ? { ...c, status: 'approved' } : c));
         setNotification({ message: 'Szakember újraaktiválva', type: 'success' });
         setContractorFilter('approved');
+        refreshContractors();
       } else {
         setNotification({ message: response.error || 'Hiba történt', type: 'error' });
       }
@@ -233,23 +183,9 @@ function AdminContent() {
       const response = await api.post('/api/admin/jobs/assign', { job_id: jobId, contractor_id: contractorId });
       if (response.success) {
         setShowAssignModal(null);
-        const assignedContractor = contractors.find(c => c.id === contractorId);
-        // Optimistic update - no server refresh
-        setJobs(prev => prev.map(j => j.id === jobId ? {
-          ...j,
-          status: 'assigned',
-          assignments: [...(j.assignments || []), {
-            id: `temp-${Date.now()}`,
-            status: 'pending',
-            contractor: assignedContractor ? {
-              id: assignedContractor.id,
-              display_name: assignedContractor.display_name,
-              phone: assignedContractor.phone,
-            } : undefined,
-          }]
-        } : j));
-        setNotification({ message: `Munka sikeresen kiosztva: ${assignedContractor?.display_name || 'szakember'}`, type: 'success' });
+        setNotification({ message: `Munka sikeresen kiosztva`, type: 'success' });
         setJobFilter('assigned');
+        refreshJobs();
       } else {
         setNotification({ message: response.error || 'Hiba történt', type: 'error' });
       }
@@ -271,10 +207,9 @@ function AdminContent() {
         cancellation_reason: reason,
       });
       if (response.success) {
-        // Optimistic update - no server refresh
-        setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'cancelled', cancellation_reason: reason } : j));
         setNotification({ message: 'Munka sikeresen lemondva', type: 'success' });
         setJobFilter('cancelled');
+        refreshJobs();
       } else {
         setNotification({ message: response.error || 'Hiba történt', type: 'error' });
       }
@@ -311,7 +246,7 @@ function AdminContent() {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => activeView === 'jobs' ? fetchJobs() : fetchContractors()}
+              onClick={() => activeView === 'jobs' ? refreshJobs() : refreshContractors()}
               className="btn-outline py-2 px-4"
               disabled={isLoading}
             >
@@ -333,8 +268,8 @@ function AdminContent() {
           <button
             onClick={() => setActiveView('jobs')}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors ${activeView === 'jobs'
-                ? 'bg-vvm-blue-600 text-white'
-                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+              ? 'bg-vvm-blue-600 text-white'
+              : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
               }`}
           >
             <Briefcase className="w-5 h-5" />
@@ -349,8 +284,8 @@ function AdminContent() {
           <button
             onClick={() => setActiveView('contractors')}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors ${activeView === 'contractors'
-                ? 'bg-vvm-blue-600 text-white'
-                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+              ? 'bg-vvm-blue-600 text-white'
+              : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
               }`}
           >
             <Users className="w-5 h-5" />
@@ -386,8 +321,8 @@ function AdminContent() {
                     key={opt.value}
                     onClick={() => setJobFilter(opt.value)}
                     className={`px-3 py-1 rounded-lg text-sm transition-colors ${jobFilter === opt.value
-                        ? 'bg-vvm-blue-100 text-vvm-blue-700 font-medium'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-vvm-blue-100 text-vvm-blue-700 font-medium'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                   >
                     {opt.label}
@@ -409,8 +344,8 @@ function AdminContent() {
                     key={opt.value}
                     onClick={() => setContractorFilter(opt.value)}
                     className={`px-3 py-1 rounded-lg text-sm transition-colors ${contractorFilter === opt.value
-                        ? 'bg-vvm-blue-100 text-vvm-blue-700 font-medium'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-vvm-blue-100 text-vvm-blue-700 font-medium'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                   >
                     {opt.label}
@@ -421,13 +356,7 @@ function AdminContent() {
           </div>
         </div>
 
-        {/* Error */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
-        )}
+        {/* Error — no separate error state needed, SWR handles it */}
 
         {/* Content */}
         {isLoading ? (
@@ -631,8 +560,8 @@ function AssignContractorList({
             onClick={() => onAssign(jobId, contractor.id)}
             disabled={isLoading}
             className={`w-full p-4 rounded-xl text-left transition-colors disabled:opacity-50 ${matchesTrade
-                ? 'bg-green-50 hover:bg-green-100 border border-green-200'
-                : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
+              ? 'bg-green-50 hover:bg-green-100 border border-green-200'
+              : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
               }`}
           >
             <div className="flex items-center justify-between">

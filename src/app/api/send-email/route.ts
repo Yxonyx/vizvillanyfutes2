@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 // Format booking email
 function formatBookingEmail(data: Record<string, unknown>): string {
@@ -339,6 +340,16 @@ Küldve: ${new Date().toLocaleString('hu-HU')}
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 5 requests per minute per IP
+    const clientIp = getClientIp(request);
+    const { success: rateLimitOk } = rateLimit(`send-email:${clientIp}`, 5, 60 * 1000);
+    if (!rateLimitOk) {
+      return NextResponse.json(
+        { error: 'Túl sok kérés. Kérjük próbáld újra 1 perc múlva.' },
+        { status: 429 }
+      );
+    }
+
     // Check content type to determine how to parse body
     const contentType = request.headers.get('content-type') || '';
 
@@ -462,7 +473,8 @@ export async function POST(request: NextRequest) {
       case 'contractor_approved':
         subject = `✅ Partner fiókja jóváhagyva - VízVillanyFűtés`;
         emailBody = formatContractorApprovedEmail(data);
-        recipientEmail = data.to_email as string || recipientEmail;
+        // to_email must come from server-side logic, not client
+        if (data.to_email && typeof data.to_email === 'string') recipientEmail = data.to_email;
         break;
       case 'job_assigned_contractor':
         subject = `${data.priority === 'critical' ? '🚨 SÜRGŐS' : '📋'} Új munka megbízás: ${data.title || 'Munka'}`;

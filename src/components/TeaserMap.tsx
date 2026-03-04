@@ -7,6 +7,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Droplets, Zap, Flame, Wrench, Clock, Search, Shield, ArrowRight, Maximize2, Plus, LogOut, Trash2, Award, AlertTriangle, FileCheck, Sparkles, LogIn, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
+import { getSession } from '@/lib/auth';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from './AuthModal';
 import AddLeadModal from './AddLeadModal';
@@ -75,11 +76,12 @@ export default function TeaserMap() {
     // Customer: sees ONLY their own real leads, plus mock leads for simulation
     // Guest: sees mock leads
     const displayLeads = useMemo(() => {
+        const hiddenStatuses = ['completed', 'cancelled', 'cancelled_by_customer'];
         if (!user) return mockLeads;
-        if (role === 'contractor') return leads;
+        if (role === 'contractor') return leads.filter(l => !hiddenStatuses.includes(l.status));
 
-        // Customer: only their own leads (jobs)
-        const ownRealLeads = leads.filter(l => l.user_id === user.id);
+        // Customer: only their own leads (jobs), excluding finished ones
+        const ownRealLeads = leads.filter(l => l.user_id === user.id && !hiddenStatuses.includes(l.status));
         return ownRealLeads;
     }, [user, role, leads]);
 
@@ -122,6 +124,7 @@ export default function TeaserMap() {
                     const { data: jobsData, error: jobsError } = await supabase
                         .from('jobs')
                         .select('id, title, description, trade, status, created_at, latitude, longitude, district_or_city')
+                        .eq('customer_id', user.id)
                         .order('created_at', { ascending: false });
 
                     // Also fetch customer's raw waiting leads
@@ -269,8 +272,29 @@ export default function TeaserMap() {
     const handleDelete = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
         if (window.confirm('Biztosan törlöd ezt a bejelentést?')) {
-            await supabase.from('leads').delete().match({ id });
-            setSelectedLead(null);
+            try {
+                const { data: { session: sbSession } } = await supabase.auth.getSession();
+                const storedSession = getSession();
+                const token = sbSession?.access_token || storedSession?.session?.access_token;
+                if (!token) {
+                    alert('Nincs érvényes munkamenet. Kérjük jelentkezzen be újra.');
+                    return;
+                }
+                const res = await fetch(`/api/customer/jobs/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setSelectedLead(null);
+                    // Remove the lead from the local state
+                    setLeads(prev => prev.filter(l => l.id !== id));
+                } else {
+                    alert(data.error || 'Hiba történt a törlés során.');
+                }
+            } catch {
+                alert('Hiba történt a törlés során.');
+            }
         }
     };
 

@@ -3,8 +3,9 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { getSession } from '@/lib/auth';
 import { supabase } from '@/lib/supabase/client';
-import { AlertCircle, Clock, MapPin, Search, CheckCircle, Shield, ArrowRight, User, Droplets, Zap, Flame, Briefcase, Trash2, Plus, ArrowLeft, X, Edit3, Loader2, Settings, FileText, Navigation } from 'lucide-react';
+import { AlertCircle, Clock, MapPin, Search, CheckCircle, Shield, ArrowRight, User, Droplets, Zap, Flame, Briefcase, Trash2, Plus, ArrowLeft, X, Edit3, Loader2, Settings, FileText, Navigation, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import Map, { Marker, NavigationControl, GeolocateControl, Popup, MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -215,6 +216,7 @@ export default function CustomerDashboard() {
           contractor_profiles ( display_name, phone )
         )
       `)
+                .eq('customer_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (jobsError) throw jobsError;
@@ -272,39 +274,69 @@ export default function CustomerDashboard() {
         if (!confirm('Biztosan törölni szeretnéd ezt a bejelentést?')) return;
         setCancellingId(jobId);
         try {
-            // Check if it's a raw lead (which only has string ID like UUID, but let's just attempt both if uncertain, or try API first)
-            // But since customer deletes from dashboard, the API handles jobs. For leads, we might need a direct Supabase delete or a new API. 
-            // Let's implement a direct delete for 'waiting' status leads since they aren't jobs yet.
-            const jobObj = jobs.find(j => j.id === jobId);
-
-            if (jobObj && jobObj.status === 'waiting') {
-                // It's a raw lead, delete it directly from Supabase
-                const { error } = await supabase.from('leads').delete().eq('id', jobId);
-                if (error) throw error;
-
-                setJobs(prev => prev.filter(j => j.id !== jobId));
+            // Try both token sources: Supabase session (AuthModal login) and localStorage (API login)
+            const { data: { session: sbSession } } = await supabase.auth.getSession();
+            const storedSession = getSession();
+            const token = sbSession?.access_token || storedSession?.session?.access_token;
+            if (!token) {
+                alert('Nincs érvényes munkamenet. Kérjük jelentkezzen be újra.');
+                setCancellingId(null);
+                return;
+            }
+            const res = await fetch(`/api/customer/jobs/${jobId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            const data = await res.json();
+            if (data.success) {
+                const jobObj = jobs.find(j => j.id === jobId);
+                if (jobObj && jobObj.status === 'waiting') {
+                    // Lead deleted — remove from list
+                    setJobs(prev => prev.filter(j => j.id !== jobId));
+                } else {
+                    // Job cancelled — update status
+                    setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'cancelled_by_customer' } : j));
+                }
                 if (selectedJob?.id === jobId) setSelectedJob(null);
             } else {
-                // It's a real job
-                const res = await fetch(`/api/customer/jobs/${jobId}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'cancel' }),
-                });
-                const data = await res.json();
-                if (data.success) {
-                    setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'cancelled_by_customer' } : j));
-                    if (selectedJob?.id === jobId) {
-                        setSelectedJob(prev => prev ? { ...prev, status: 'cancelled_by_customer' } : null);
-                    }
-                } else {
-                    alert(data.error || 'Hiba történt a törlés során.');
-                }
+                alert(data.error || 'Hiba történt a törlés során.');
             }
         } catch {
             alert('Hiba történt a törlés során.');
         } finally {
             setCancellingId(null);
+        }
+    };
+
+    const [completingId, setCompletingId] = useState<string | null>(null);
+    const handleCompleteJob = async (jobId: string) => {
+        if (!confirm('Megerősíted, hogy a szakember elvégezte a munkát?')) return;
+        setCompletingId(jobId);
+        try {
+            const { data: { session: sbSession } } = await supabase.auth.getSession();
+            const storedSession = getSession();
+            const token = sbSession?.access_token || storedSession?.session?.access_token;
+            const res = await fetch(`/api/customer/jobs/${jobId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({ action: 'complete' }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'completed' } : j));
+                if (selectedJob?.id === jobId) {
+                    setSelectedJob(prev => prev ? { ...prev, status: 'completed' } : null);
+                }
+            } else {
+                alert(data.error || 'Hiba történt.');
+            }
+        } catch {
+            alert('Hiba történt.');
+        } finally {
+            setCompletingId(null);
         }
     };
 
@@ -352,46 +384,45 @@ export default function CustomerDashboard() {
     const activeJobs = jobs.filter(j => !['completed', 'cancelled', 'cancelled_by_customer'].includes(j.status));
     const pastJobs = jobs.filter(j => ['completed', 'cancelled', 'cancelled_by_customer'].includes(j.status));
 
-    // Fit bounds to all jobs when loaded
+    // Fit bounds to all jobs ONCE on initial load (not on every selection change)
+    const hasInitiallyFitted = useRef(false);
     useEffect(() => {
-        console.log('MAP DEBUG: activeJobs changed, length=', activeJobs.length, 'mapRef=', !!mapRef.current, 'selectedJob=', !!selectedJob);
+        // Only run on initial load, skip if we already fitted or a job is selected
+        if (hasInitiallyFitted.current || selectedJob) return;
         const validJobs = activeJobs.filter(j => j?.latitude && j?.longitude);
-        console.log('MAP DEBUG: validJobs with coords:', validJobs.length, validJobs.map(j => ({ lat: j.latitude, lng: j.longitude })));
-        if (validJobs.length > 0 && !selectedJob) {
-            const doCenter = () => {
-                if (!mapRef.current) {
-                    console.log('MAP DEBUG: mapRef not ready, retrying in 500ms');
-                    setTimeout(doCenter, 500);
-                    return;
-                }
-                if (validJobs.length === 1) {
-                    console.log('MAP DEBUG: Flying to single job at', validJobs[0].latitude, validJobs[0].longitude);
-                    mapRef.current.flyTo({
-                        center: [validJobs[0].longitude!, validJobs[0].latitude!],
-                        zoom: 14,
-                        duration: 1000
-                    });
-                } else {
-                    let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-                    validJobs.forEach(j => {
-                        const lat = Number(j.latitude);
-                        const lng = Number(j.longitude);
-                        if (lat < minLat) minLat = lat;
-                        if (lat > maxLat) maxLat = lat;
-                        if (lng < minLng) minLng = lng;
-                        if (lng > maxLng) maxLng = lng;
-                    });
-                    console.log('MAP DEBUG: Fitting bounds', { minLat, maxLat, minLng, maxLng });
-                    mapRef.current.fitBounds(
-                        [[minLng, minLat], [maxLng, maxLat]],
-                        { padding: 80, duration: 1000, maxZoom: 14 }
-                    );
-                }
-            };
-            // Small delay to ensure map tiles are ready
-            setTimeout(doCenter, 500);
-        }
+        if (validJobs.length === 0) return;
+
+        const doCenter = () => {
+            if (!mapRef.current) {
+                setTimeout(doCenter, 500);
+                return;
+            }
+            hasInitiallyFitted.current = true;
+            if (validJobs.length === 1) {
+                mapRef.current.flyTo({
+                    center: [validJobs[0].longitude!, validJobs[0].latitude!],
+                    zoom: 14,
+                    duration: 1000
+                });
+            } else {
+                let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+                validJobs.forEach(j => {
+                    const lat = Number(j.latitude);
+                    const lng = Number(j.longitude);
+                    if (lat < minLat) minLat = lat;
+                    if (lat > maxLat) maxLat = lat;
+                    if (lng < minLng) minLng = lng;
+                    if (lng > maxLng) maxLng = lng;
+                });
+                mapRef.current.fitBounds(
+                    [[minLng, minLat], [maxLng, maxLat]],
+                    { padding: 80, duration: 1000, maxZoom: 14 }
+                );
+            }
+        };
+        setTimeout(doCenter, 500);
     }, [activeJobs, selectedJob]);
+
 
     if (isLoading || !user || !isCustomer) {
         return (
@@ -599,43 +630,64 @@ export default function CustomerDashboard() {
                         onClose={() => setMapPopupJob(null)}
                         closeOnClick={false}
                         className="map-popup-card"
-                        maxWidth="320px"
+                        maxWidth="300px"
                         offset={20}
                     >
-                        <div className="p-1">
-                            <div className="flex items-start gap-3 mb-3">
-                                <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-white ${getTradeColor(mapPopupJob.trade)}`}>
-                                    <div className="text-white brightness-200 scale-90">
-                                        {getTradeIcon(mapPopupJob.trade)}
+                        <div className="overflow-hidden rounded-xl">
+                            {/* Colored header strip */}
+                            <div className={`px-4 py-2.5 ${mapPopupJob.trade === 'viz' ? 'bg-gradient-to-r from-sky-500 to-sky-400' :
+                                mapPopupJob.trade === 'villany' ? 'bg-gradient-to-r from-amber-500 to-amber-400' :
+                                    mapPopupJob.trade === 'futes' ? 'bg-gradient-to-r from-orange-500 to-orange-400' :
+                                        'bg-gradient-to-r from-blue-600 to-blue-500'
+                                }`}>
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                        <div className="text-white scale-75">
+                                            {getTradeIcon(mapPopupJob.trade)}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-bold text-sm text-slate-900 leading-tight">{mapPopupJob.title}</h3>
-                                    <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                                        <MapPin className="w-3 h-3 flex-shrink-0" />
-                                        <span className="truncate">{mapPopupJob.addresses?.city}, {mapPopupJob.addresses?.district}. ker</span>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-bold text-sm text-white leading-tight truncate">{mapPopupJob.title}</h3>
+                                        <div className="flex items-center gap-1 text-[11px] text-white/80 mt-0.5">
+                                            <MapPin className="w-3 h-3 flex-shrink-0" />
+                                            <span className="truncate">{mapPopupJob.addresses?.city}, {mapPopupJob.addresses?.district}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="mb-3">
-                                {getStatusBadge(mapPopupJob.status, mapPopupJob.job_assignments, mapPopupJob.job_interests)}
-                            </div>
-                            <p className="text-xs text-slate-600 line-clamp-2 mb-3 leading-relaxed">{mapPopupJob.description}</p>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => { openJobDetails(mapPopupJob); setMapPopupJob(null); }}
-                                    className="flex-1 bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors"
-                                >
-                                    Részletek
-                                </button>
-                                {['open', 'new', 'unassigned', 'waiting'].includes(mapPopupJob.status) && (
-                                    <button
-                                        onClick={() => { setIsEditing(true); openJobDetails(mapPopupJob); setMapPopupJob(null); }}
-                                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 px-3 rounded-lg transition-colors"
-                                    >
-                                        <Edit3 className="w-3.5 h-3.5" />
-                                    </button>
+
+                            {/* Content body */}
+                            <div className="px-4 py-3 bg-white">
+                                {/* Status badge */}
+                                <div className="mb-2">
+                                    {getStatusBadge(mapPopupJob.status, mapPopupJob.job_assignments, mapPopupJob.job_interests)}
+                                </div>
+
+                                {/* Description */}
+                                {mapPopupJob.description && (
+                                    <p className="text-xs text-slate-500 line-clamp-2 mb-3 leading-relaxed italic border-l-2 border-slate-200 pl-2.5">
+                                        {mapPopupJob.description}
+                                    </p>
                                 )}
+
+                                {/* Actions */}
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => { openJobDetails(mapPopupJob); setMapPopupJob(null); }}
+                                        className="flex-1 bg-vvm-yellow-400 hover:bg-vvm-yellow-500 text-vvm-blue-800 text-xs font-bold py-2 px-3 rounded-lg transition-all duration-200 shadow-sm hover:shadow flex items-center justify-center gap-1.5"
+                                    >
+                                        <ExternalLink className="w-3.5 h-3.5" />
+                                        Részletek
+                                    </button>
+                                    {['open', 'new', 'unassigned', 'waiting'].includes(mapPopupJob.status) && (
+                                        <button
+                                            onClick={() => { setIsEditing(true); openJobDetails(mapPopupJob); setMapPopupJob(null); }}
+                                            className="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-all duration-200 flex items-center justify-center"
+                                        >
+                                            <Edit3 className="w-3.5 h-3.5" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </Popup>
@@ -1311,30 +1363,60 @@ export default function CustomerDashboard() {
                             )}
                         </div>
 
-                        {/* Footer Commands */}
-                        {!isEditing && !(['completed', 'cancelled_by_customer', 'cancelled'].includes(selectedJob.status)) && (
-                            <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3 z-10 backdrop-blur-sm">
-                                <button
-                                    onClick={() => {
-                                        setIsEditing(true);
-                                    }}
-                                    className="flex-1 bg-white hover:bg-slate-50 text-slate-700 font-black py-4 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all border border-slate-200 shadow-sm active:scale-95"
-                                >
-                                    <Edit3 className="w-4 h-4" /> Módosítás
-                                </button>
-                                <button
-                                    onClick={async () => {
-                                        await handleCancelJob(selectedJob.id);
-                                        setSelectedJob(null);
-                                    }}
-                                    disabled={cancellingId === selectedJob.id}
-                                    className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 font-black py-4 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all border border-red-200 disabled:opacity-50 active:scale-95 shadow-sm shadow-red-100"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                    {cancellingId === selectedJob.id ? 'Törlés...' : 'Bejelentés törlése'}
-                                </button>
-                            </div>
-                        )}
+                        {/* Footer Commands — Status-based */}
+                        {!isEditing && (() => {
+                            const hasAcceptedContractor = selectedJob.job_assignments?.some(a => a.status === 'accepted');
+                            const isDeletable = ['waiting', 'open', 'new', 'unassigned'].includes(selectedJob.status) && !hasAcceptedContractor;
+                            const isInProgress = ['assigned', 'in_progress', 'scheduled'].includes(selectedJob.status) || hasAcceptedContractor;
+                            const isFinished = ['completed', 'cancelled_by_customer', 'cancelled'].includes(selectedJob.status);
+
+                            if (isFinished) return null;
+
+                            if (isInProgress) {
+                                return (
+                                    <div className="p-6 border-t border-emerald-100 bg-emerald-50/50 z-10">
+                                        <div className="flex items-center gap-3 mb-4 px-1">
+                                            <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                                            <p className="text-sm font-black text-emerald-700">Folyamatban lévő munka</p>
+                                        </div>
+                                        <button
+                                            onClick={() => handleCompleteJob(selectedJob.id)}
+                                            disabled={completingId === selectedJob.id}
+                                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-200 disabled:opacity-50 active:scale-95"
+                                        >
+                                            <CheckCircle className="w-5 h-5" />
+                                            {completingId === selectedJob.id ? 'Feldolgozás...' : 'Munka kész — Elfogadom'}
+                                        </button>
+                                    </div>
+                                );
+                            }
+
+                            if (isDeletable) {
+                                return (
+                                    <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3 z-10 backdrop-blur-sm">
+                                        <button
+                                            onClick={() => setIsEditing(true)}
+                                            className="flex-1 bg-white hover:bg-slate-50 text-slate-700 font-black py-4 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all border border-slate-200 shadow-sm active:scale-95"
+                                        >
+                                            <Edit3 className="w-4 h-4" /> Módosítás
+                                        </button>
+                                        <button
+                                            onClick={async () => {
+                                                await handleCancelJob(selectedJob.id);
+                                                setSelectedJob(null);
+                                            }}
+                                            disabled={cancellingId === selectedJob.id}
+                                            className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 font-black py-4 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all border border-red-200 disabled:opacity-50 active:scale-95 shadow-sm shadow-red-100"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                            {cancellingId === selectedJob.id ? 'Törlés...' : 'Bejelentés törlése'}
+                                        </button>
+                                    </div>
+                                );
+                            }
+
+                            return null;
+                        })()}
 
                         <div className="p-4 lg:hidden bg-white border-t border-slate-50">
                             <button

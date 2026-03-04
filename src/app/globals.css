@@ -294,9 +294,10 @@ h6 {
 /* Map Popup Card Styles */
 .map-popup-card .mapboxgl-popup-content {
   border-radius: 16px;
-  padding: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
-  border: 1px solid #e2e8f0;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: none;
 }
 
 .map-popup-card .mapboxgl-popup-close-button {
@@ -315,4 +316,35 @@ h6 {
 
 .map-popup-card .mapboxgl-popup-tip {
   border-top-color: white;
+}
+
+/* Dashboard Map Popup Styles (Contractor Dashboard) */
+.dashboard-map-popup .mapboxgl-popup-content {
+  pointer-events: auto !important;
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  background: white !important;
+  color: #1e293b !important;
+  width: 260px !important;
+}
+
+.dashboard-map-popup .mapboxgl-popup-tip {
+  border-top-color: white !important;
+}
+
+.dashboard-map-popup .mapboxgl-popup-close-button {
+  font-size: 24px !important;
+  padding: 4px 8px !important;
+  color: #94a3b8 !important;
+  outline: none !important;
+  right: 4px !important;
+  top: 4px !important;
+  transition: color 0.2s !important;
+}
+
+.dashboard-map-popup .mapboxgl-popup-close-button:hover {
+  background-color: transparent !important;
+  color: #0f172a !important;
 }

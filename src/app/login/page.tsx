@@ -26,6 +26,7 @@ function LoginPageContent() {
   const [loginMode, setLoginMode] = useState<'contractor' | 'customer'>(roleParam === 'customer' ? 'customer' : 'contractor');
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerPassword, setCustomerPassword] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [showCustomerPassword, setShowCustomerPassword] = useState(false);
   const [isCustomerRegister, setIsCustomerRegister] = useState(modeParam === 'register');
   const [registerSuccess, setRegisterSuccess] = useState(false);
@@ -71,6 +72,12 @@ function LoginPageContent() {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
+
+    if (!customerName.trim()) {
+      setError('Kérjük adja meg a teljes nevét.');
+      setIsSubmitting(false);
+      return;
+    }
 
     if (customerPassword.length < 6) {
       setError('A jelszónak legalább 6 karakter hosszúnak kell lennie.');
@@ -135,7 +142,7 @@ function LoginPageContent() {
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: customerEmail,
         password: customerPassword,
-        options: { data: { role: 'customer' } },
+        options: { data: { role: 'customer', full_name: customerName.trim() } },
       });
       if (signUpError) { justRegistered.current = false; throw signUpError; }
       if (!authData.user) { justRegistered.current = false; throw new Error('Nem sikerült létrehozni a fiókot.'); }
@@ -415,6 +422,15 @@ function LoginPageContent() {
             ) : (
               /* ===== EMAIL + PASSWORD form (used for BOTH login and registration step 1) ===== */
               <form onSubmit={isCustomerRegister ? handleRegisterStep1 : handleCustomerLogin} className="space-y-6">
+                {isCustomerRegister && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Teljes név <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input type="text" required autoComplete="name" className="input-field pl-10" placeholder="Vezetéknév Keresztnév" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                    </div>
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">E-mail cím</label>
                   <div className="relative">
@@ -447,7 +463,7 @@ function LoginPageContent() {
                     </div>
                   )}
                 </div>
-                <button type="submit" disabled={isSubmitting || !customerEmail || !customerPassword} className="btn-primary w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed">
+                <button type="submit" disabled={isSubmitting || !customerEmail || !customerPassword || (isCustomerRegister && !customerName.trim())} className="btn-primary w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed">
                   {isSubmitting ? (
                     <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /><span>{isCustomerRegister ? 'Kód küldése...' : 'Bejelentkezés...'}</span></>
                   ) : (

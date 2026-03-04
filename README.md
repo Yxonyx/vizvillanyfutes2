@@ -1,4 +1,4 @@
-# 🔧 VizVillanyFutes.hu — Lead-Generation Marketplace
+# 🔧 VízVillanyFűtés.hu — Lead-Generation Marketplace
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/dbd91aaf-6057-4e44-8df6-147a482d7dca/deploy-status)](https://app.netlify.com/projects/vizvillanyfutes/deploys)
 
@@ -6,11 +6,11 @@
 
 ---
 
-## 🏗️ Rendszer Architektúra
+## 📐 Architekturális Áttekintés
 
 ```mermaid
 graph TB
-    subgraph "Frontend - Next.js"
+    subgraph "Frontend — Next.js 14"
         HP["Homepage<br/>page.tsx"]
         TM["TeaserMap<br/>Mapbox GL"]
         OV["MarketplaceOverlay<br/>Dashboard + Térkép"]
@@ -18,14 +18,11 @@ graph TB
         AUTH["AuthModal<br/>Login/Register"]
         FIOK["Fiók oldal<br/>/fiok"]
         FOG["Foglalás form<br/>/foglalas"]
+        CD["Ügyfél Dashboard"]
+        SD["Szakember Dashboard"]
     end
 
-    subgraph "Supabase Client - Direkt"
-        SC["supabase.from()"]
-        RPC["supabase.rpc()"]
-    end
-
-    subgraph "Next.js API Routes"
+    subgraph "API Layer — Next.js Routes (33 db)"
         A_AUTH["/api/auth/*"]
         A_CONT["/api/contractor/*"]
         A_ADMIN["/api/admin/*"]
@@ -35,9 +32,7 @@ graph TB
         A_EMAIL["/api/send-email"]
     end
 
-    subgraph "Supabase PostgreSQL"
-        T_LEADS["leads"]
-        T_LI["lead_interests"]
+    subgraph "Data Layer — Supabase PostgreSQL"
         T_JOBS["jobs"]
         T_CP["contractor_profiles"]
         T_CUST2["customers"]
@@ -46,133 +41,143 @@ graph TB
         T_CT["credit_transactions"]
         T_UM["user_meta"]
         T_JA["job_assignments"]
-        RPC_ACC["accept_contractor_interest()"]
-        RPC_CJF["create_job_from_form()"]
-        RPC_UJL["unlock_job_lead()"]
-        RPC_REG["register_contractor()"]
+        T_LI["lead_interests"]
+        T_LEADS["leads"]
+        V_OJM["open_jobs_map (VIEW)"]
     end
 
-    subgraph "Külső szolgáltatások"
-        STRIPE["Stripe"]
-        MAPBOX["Mapbox"]
+    subgraph "Külső Szolgáltatások"
+        STRIPE["Stripe Payments"]
+        MAPBOX["Mapbox Maps"]
+        RESEND["Resend Email"]
     end
 
     HP --> TM
     TM --> OV
-    OV --> AM
-    OV --> AUTH
-    HP --> FOG
-
-    TM -->|"leads select"| SC
-    AM -->|"leads insert"| SC
-    OV -->|"lead_interests insert"| SC
-    OV -->|"contractor_profiles select"| SC
-    OV -->|"lead_interests select"| SC
-    OV -->|"accept_contractor_interest()"| RPC
-    FOG -->|"POST"| A_JOBS
-    AUTH -->|"POST"| A_AUTH
-    FIOK -->|"GET/PUT"| A_CONT
-
-    SC --> T_LEADS
-    SC --> T_LI
-    SC --> T_CP
-    RPC --> RPC_ACC
-    RPC_ACC --> T_LI
-    RPC_ACC --> T_CP
-    RPC_ACC --> T_CT
-
-    A_JOBS -->|"RPC"| RPC_CJF
-    A_CONT -->|"RPC"| RPC_UJL
-    A_CONT -->|"RPC"| RPC_REG
+    CD --> A_CUST
+    SD --> A_CONT
+    FOG --> A_JOBS
+    AUTH --> A_AUTH
     A_STRIPE --> STRIPE
-    A_AUTH --> T_UM
-
-    RPC_CJF --> T_CUST2
-    RPC_CJF --> T_ADDR
-    RPC_CJF --> T_JOBS
-    RPC_UJL --> T_LP
-    RPC_UJL --> T_CT
-    RPC_REG --> T_CP
-    RPC_REG --> T_UM
-
+    A_EMAIL --> RESEND
     TM --> MAPBOX
-    OV --> MAPBOX
 
-    style T_LI fill:#10b981,color:#fff
-    style RPC_ACC fill:#10b981,color:#fff
-    style OV fill:#3b82f6,color:#fff
+    A_JOBS --> T_JOBS
+    A_CUST --> T_JOBS
+    A_CONT --> T_JOBS
+    A_ADMIN --> T_JOBS
+
     style STRIPE fill:#635bff,color:#fff
     style MAPBOX fill:#4264fb,color:#fff
+    style RESEND fill:#000,color:#fff
+    style V_OJM fill:#10b981,color:#fff
 ```
 
 ---
 
-## 💡 Üzleti Logika
+## 🏗️ Data Engineering Elvek
 
-### Felhasználói szerepkörök
+### 1. Adatmodell Tervezés
 
-| Szerep | Leírás | Regisztráció |
-|--------|--------|-------------|
-| **Ügyfél** | Hibát jelent, szakembert fogad el | Regisztráció → `user_meta.role = 'customer'` |
-| **Szakember** | Érdeklődik munkák iránt, elvégzi a munkát | Regisztráció → jóváhagyásra vár → admin aktiválja |
-| **Admin** | Szakembereket kezel, krediteket ad, munkákat oszt | Manuális |
-| **Diszpécser** | Munkákat oszt ki (legacy modell) | Manuális |
+Az alkalmazás **normalizált relációs modellt** követ:
 
-### Lead Érdeklődés Flow (Fő üzleti folyamat)
-
-```mermaid
-sequenceDiagram
-    participant S as Szakember UI
-    participant SB as Supabase Client
-    participant LI as lead_interests tábla
-    participant U as Ügyfél UI
-    participant RPC as accept_contractor_interest()
-    participant CP as contractor_profiles
-    participant CT as credit_transactions
-
-    Note over S: Térkép pin kattintás
-    S->>SB: lead_interests.insert(lead_id, contractor_id)
-    SB->>LI: INSERT (status: pending)
-    SB-->>S: Érdeklődés rögzítve
-
-    Note over U: Saját bejelentéseim tab
-    U->>SB: lead_interests.select().in(lead_id, myLeads)
-    SB-->>U: Lista - 2 szakember érdeklődik
-
-    Note over U: Elfogadás gomb
-    U->>RPC: accept_contractor_interest(interest_id)
-    RPC->>LI: UPDATE status = accepted
-    RPC->>CP: credit_balance -= 2000
-    RPC->>CT: INSERT (amount: -2000)
-    RPC-->>U: Szakember neve + telefonszáma
-
-    Note over S: Tárgyalólista frissül
-    S->>SB: lead_interests.select(status: accepted)
-    SB-->>S: Elfogadott lead + ügyfél adatok
+```
+customers (1) ──── (N) addresses
+    │
+    └── (1) ──── (N) jobs
+                       │
+                       ├── (N) job_assignments ──── (1) contractor_profiles
+                       └── (N) lead_interests  ──── (1) contractor_profiles
 ```
 
-> **Kulcs szabály:** A kredit **csak akkor** vonódik le, ha az ügyfél **elfogadja** a szakembert. A szakember soha nem fizet üres leadért.
+**Tervezési elvek:**
+- **3NF normalizáció** — Ügyfél, cím és munka adatok külön táblákban, idegen kulcsokkal
+- **Immutable audit trail** — `credit_transactions` és `lead_purchases` csak INSERT, soha nem UPDATE/DELETE
+- **Soft delete** — Munkák nem törlődnek, státuszt kapnak (`cancelled_by_customer`, `completed`)
+- **Idempotens műveletek** — Stripe webhook handler `upsert` mintát követ
+- **Atomikus tranzakciók** — Kritikus műveletek (kredit levonás + lead elfogadás) egyetlen RPC-ben futnak
 
-### Kredit Rendszer
+### 2. Státusz Gépek (State Machines)
+
+Minden entitás **jól definiált státusz átmenetekkel** rendelkezik:
+
+#### Jobs státusz gép:
+```mermaid
+stateDiagram-v2
+    [*] --> new: Bejelentés
+    new --> open: Admin jóváhagyás
+    new --> waiting: Lead feldolgozás
+    open --> assigned: Szakember kiosztás
+    open --> unlocked: Lead vásárlás
+    assigned --> in_progress: Munka elkezdve
+    assigned --> scheduled: Időpont egyeztetve
+    in_progress --> completed: Munka kész
+    scheduled --> in_progress: Elkezdve
+    scheduled --> completed: Munka kész
+    new --> cancelled_by_customer: Ügyfél törli
+    open --> cancelled_by_customer: Ügyfél törli
+    waiting --> cancelled_by_customer: Ügyfél törli
+```
+
+#### Contractor státusz gép:
+```
+pending_approval → approved → active
+                 → rejected
+                   active → suspended → active (újra)
+```
+
+#### Job Assignment státusz gép:
+```
+pending → accepted → completed
+        → declined
+```
+
+### 3. Adat Integritás Rétegek
+
+Az adatvédelem **három rétegen** valósul meg:
+
+| Réteg | Implementáció | Cél |
+|---|---|---|
+| **1. RLS (Row Level Security)** | PostgreSQL policy-k | Adatbázis szintű hozzáférés-védelem |
+| **2. API Auth** | `supabase.auth.getUser()` | Endpoint szintű autentikáció |
+| **3. Ownership Check** | `customer_id === user.id` | Business logic szintű jogosultság |
+
+```
+┌───────────────────────────────────┐
+│  Kliens kérés (Bearer token)      │
+├───────────────────────────────────┤
+│  API Route: getUser() → 401?      │ ← Auth réteg
+├───────────────────────────────────┤
+│  Ownership: job.customer_id       │ ← Business réteg
+│  === user.id? → 403?              │
+├───────────────────────────────────┤
+│  Supabase RLS policy              │ ← DB réteg
+│  (utolsó védvonal)                │
+└───────────────────────────────────┘
+```
+
+### 4. Kredit Rendszer (Double-Entry Pattern)
+
+A kredit rendszer **double-entry bookkeeping** elvét követi:
 
 ```mermaid
 flowchart LR
     subgraph "Feltöltés"
-        A["Szakember"] -->|POST| B["/api/stripe/create-checkout-session"]
+        A["Szakember"] -->|POST| B["/api/stripe/create-checkout"]
         B --> C["Stripe Checkout"]
         C -->|webhook| D["/api/stripe/webhook"]
         D -->|RPC| E["add_contractor_credits()"]
-        E --> F["credit_balance UP"]
+        E --> F["credit_balance ↑"]
     end
 
     subgraph "Levonás"
         G["Ügyfél elfogad"] -->|RPC| H["accept_contractor_interest()"]
-        H --> I["credit_balance DOWN"]
+        H --> I["credit_balance ↓"]
     end
 
     subgraph "Visszatérítés"
         J["Admin"] -->|RPC| K["refund_lead()"]
-        K --> L["credit_balance UP"]
+        K --> L["credit_balance ↑"]
     end
 
     style F fill:#10b981,color:#fff
@@ -180,37 +185,131 @@ flowchart LR
     style L fill:#f59e0b,color:#fff
 ```
 
+**Minden egyenlegváltozás:**
+1. `contractor_profiles.credit_balance` mező UPDATE
+2. `credit_transactions` tábla INSERT (audit log, soha nem törölhető)
+3. Egyetlen atomikus RPC-ben (konzisztencia garantált)
+
 **Lead ár:** 2 000 Ft / lead (rögzítve a `lead_interests.price_at_interest` mezőben az érdeklődés pillanatában).
 
-### Szakember Regisztráció Flow
+---
 
-```
-1. Szakember kitölti a regisztrációs form-ot → POST /api/contractors/register
-2. register_contractor() RPC: user_meta (role: contractor, status: pending_approval) + contractor_profiles
-3. Admin Dashboard-on jóváhagyja → approve_contractor() → status = approved
-4. Szakember belép → látja a térképet, érdeklődhet munkák iránt
+## 🔒 Biztonság
+
+### API Autentikáció Mátrix
+
+| API Route | Auth | Ownership | Admin Check | Rate Limit |
+|---|:---:|:---:|:---:|:---:|
+| `/api/jobs/create` | — | — | — | ✅ 3/perc/IP |
+| `/api/send-email` | — | — | — | ✅ 5/perc/IP |
+| `/api/customer/jobs/[id]` PATCH | ✅ | ✅ | — | — |
+| `/api/customer/jobs/[id]` DELETE | ✅ | ✅ | — | — |
+| `/api/customer/assignments/[id]/respond` | ✅ | ✅ | — | — |
+| `/api/contractor/jobs/[id]` | ✅ | ✅ | — | — |
+| `/api/contractor/marketplace` | ✅ | — | — | — |
+| `/api/contractor/profile` | ✅ | ✅ | — | — |
+| `/api/admin/*` (minden route) | ✅ | — | ✅ `is_admin_or_dispatcher()` | — |
+| `/api/stripe/create-checkout` | ✅ | ✅ | — | — |
+| `/api/stripe/webhook` | ✅ sig | — | — | — |
+
+### Server-Side Client Elválasztás
+
+```typescript
+// Kliens oldal — Anon Key (RLS aktív)
+createClient(SUPABASE_URL, ANON_KEY)          // supabase/client.ts
+
+// Server — User context (RLS aktív, user token-nel)
+createServerClient(authorizationHeader)       // supabase/server.ts
+
+// Server — Admin (RLS BYPASS, service_role)
+createAdminClient()                           // supabase/server.ts
 ```
 
-### Ügyfél Bejelentés Flow
+> ⚠️ `createAdminClient()` RLS-t bypass-olja — ezért **minden** admin client használat mellett kódban ellenőrizzük az ownership-et.
 
-```
-1. Ügyfél regisztrál/belép → AuthModal (Supabase Auth)
-2. Térképen kattint → AddLeadModal megnyílik
-3. Kitölti: típus, cím, leírás, lokáció → leads táblába INSERT
-4. Pin megjelenik a térképen valós időben
-5. Szakemberek látják és érdeklődhetnek
+### Rate Limiting
+
+In-memory IP-alapú rate limiter (`src/lib/rate-limit.ts`):
+- 5 perc-es időablak, automatikus cleanup
+- IP detektálás: `x-forwarded-for` → `x-real-ip` → fallback
+- Napi 100+ felhasználónál is hatékony
+
+### Row Level Security (RLS)
+
+| Tábla | Policy |
+|---|---|
+| `user_meta` | Saját rekord only |
+| `contractor_profiles` | Saját + admin mindent |
+| `customers` | Saját (`user_id` match) + admin |
+| `jobs` | Customer sajátját (`customer_id`), contractor `open` + purchased, admin mindent |
+| `lead_interests` | Contractor sajátját, lead owner a saját leadjein lévőket |
+| `leads` | Authenticated read + saját insert/delete |
+| `credit_transactions` | Contractor sajátját, admin mindent |
+
+---
+
+## 💡 Üzleti Logika
+
+### Felhasználói Szerepkörök
+
+| Szerep | Leírás | Regisztráció |
+|---|---|---|
+| **Ügyfél** | Hibát jelent, szakembert fogad el, munkát befejez | Regisztráció → `user_meta.role = 'customer'` |
+| **Szakember** | Érdeklődik munkák iránt, elvégzi a munkát | Regisztráció → jóváhagyásra vár → admin aktiválja |
+| **Admin** | Szakembereket kezel, krediteket ad, munkákat oszt | Manuális |
+| **Diszpécser** | Munkákat oszt ki | Manuális |
+
+### Munka Életciklus (Job Lifecycle)
+
+```mermaid
+sequenceDiagram
+    participant Ü as Ügyfél
+    participant API as API Routes
+    participant DB as Supabase
+    participant Sz as Szakember
+
+    Note over Ü: 1. Bejelentés
+    Ü->>API: POST /api/jobs/create
+    API->>DB: create_job_from_form()
+    DB-->>Ü: Job létrehozva (new/waiting)
+
+    Note over Ü: 2. Dashboard — Módosítás/Törlés
+    Ü->>Ü: Csak waiting/open/new státusznál<br/>Módosítás + Bejelentés törlése gombok
+
+    Note over Sz: 3. Érdeklődés
+    Sz->>DB: lead_interests INSERT (pending)
+    DB-->>Ü: Szakember érdeklődik
+
+    Note over Ü: 4. Elfogadás
+    Ü->>DB: accept_contractor_interest(id)
+    DB->>DB: kredit levonás + status=accepted
+    DB-->>Sz: Elfogadva — ügyfél kontakt megjelenik
+
+    Note over Ü: 5. Folyamatban
+    Ü->>Ü: Dashboard: Zöld "Folyamatban lévő munka"<br/>"Munka kész — Elfogadom" gomb
+    Sz->>Sz: Dashboard: "Elvégeztem a munkát" gomb
+
+    Note over Ü,Sz: 6. Befejezés (bármely fél)
+    Ü->>API: PATCH {action: 'complete'}
+    Sz->>API: PUT {new_status: 'completed'}
+    API->>DB: status = 'completed'
 ```
 
-### Foglalási Form Flow (B2C)
+### Ügyfél Dashboard Footer — Státusz Alapú Gombok
 
-```
-1. Ügyfél kitölti a /foglalas oldalt → POST /api/jobs/create
-2. create_job_from_form() RPC: customer upsert + address insert + job insert (atomikus)
-3. Job megjelenik az admin/diszpécser dashboard-on
-4. Admin kiosztja szakembernek → assign_job_to_contractor()
-5. Szakember elfogadja → contractor_respond_to_assignment(action: accept)
-6. Munka elvégzése → contractor_update_job_status(status: completed)
-```
+| Státusz | Gombok |
+|---|---|
+| `waiting`, `open`, `new` (nincs elfogadott szaki) | 📝 Módosítás + 🗑️ Bejelentés törlése |
+| `assigned`, `in_progress`, `scheduled` (elfogadott szaki) | 🟢 "Folyamatban lévő munka" + ✅ "Munka kész — Elfogadom" |
+| `completed`, `cancelled` | Nincs gomb |
+
+### Szakember Dashboard — Aktív Munka Kártya
+
+Elfogadott munkáknál megjelenik:
+- 🎉 "Gratulálunk!" banner
+- Ügyfél kontakt adatok (név, telefon, email)
+- 📍 Waze + Google Maps navigáció
+- ✅ "Elvégeztem a munkát" gomb
 
 ---
 
@@ -218,212 +317,234 @@ flowchart LR
 
 ### Táblák
 
-| Tábla | Oszlopok (kulcs) | Leírás |
-|-------|-----------------|--------|
+| Tábla | Kulcs oszlopok | Leírás |
+|---|---|---|
 | `user_meta` | `user_id`, `role`, `status` | Auth user → szerepkör mapping |
-| `contractor_profiles` | `user_id`, `display_name`, `phone`, `trades[]`, `service_areas[]`, `credit_balance`, `status` | Teljes szakember profil + kredit |
+| `contractor_profiles` | `user_id`, `display_name`, `phone`, `trades[]`, `service_areas[]`, `credit_balance`, `status` | Szakember profil + kredit |
 | `customers` | `full_name`, `phone`, `email`, `type`, `user_id` | Ügyfél adatok |
-| `addresses` | `customer_id`, `city`, `district`, `postal_code`, `street`, `house_number` | Címek |
-| `jobs` | `customer_id`, `address_id`, `trade`, `status`, `priority`, `lead_price`, `latitude`, `longitude` | Munka megrendelések |
-| `job_assignments` | `job_id`, `contractor_id`, `status`, `confirmed_start_time` | Diszpécser → szakember kiosztás |
-| `leads` | `user_id`, `lat`, `lng`, `type`, `title`, `description`, `district`, `status`, `contact_*` | Térképes bejelentések |
-| `lead_interests` | `lead_id`, `contractor_id`, `status`, `contractor_name`, `price_at_interest` | Szakember érdeklődések (halasztott kredit) |
-| `lead_purchases` | `job_id`, `contractor_id`, `price_paid` | Jobs tábla alapú lead vásárlás |
-| `credit_transactions` | `contractor_id`, `amount`, `transaction_type`, `reference_id` | Kredit mozgások napló |
+| `addresses` | `customer_id`, `city`, `district`, `street` | Címek |
+| `jobs` | `customer_id`, `address_id`, `trade`, `status`, `priority`, `latitude`, `longitude` | Munkák |
+| `job_assignments` | `job_id`, `contractor_id`, `status` | Szakember kiosztás |
+| `leads` | `user_id`, `lat`, `lng`, `type`, `title`, `status` | Térképes bejelentések |
+| `lead_interests` | `lead_id`, `contractor_id`, `status`, `price_at_interest` | Érdeklődések (halasztott kredit) |
+| `lead_purchases` | `job_id`, `contractor_id`, `price_paid` | Lead vásárlások |
+| `credit_transactions` | `contractor_id`, `amount`, `transaction_type` | Kredit napló (append-only) |
 
-### Státusz értékek
+### Views
 
-**Jobs:** `new` → `open` → `unlocked` → `completed` / `cancelled_by_customer`
-**Legacy:** `new` → `unassigned` → `assigned` → `scheduled` → `in_progress` → `completed`
-**Lead interests:** `pending` → `accepted` / `rejected` / `withdrawn`
-**Contractor:** `pending_approval` → `approved` / `rejected`
+| View | Leírás |
+|---|---|
+| `open_jobs_map` | Nyitott munkák térkép nézethez (lat, lng, trade, status, district) |
 
 ### RPC Függvények
 
-| Függvény | Paraméterek | Logika |
-|----------|------------|--------|
-| `create_job_from_form()` | ügyfél+cím+munka adatok | Atomikus: customer upsert → address insert → job insert |
-| `register_contractor()` | user_id, profil adatok | user_meta + contractor_profiles insert |
-| `assign_job_to_contractor()` | job_id, contractor_id | Admin jogosultság ellenőrzés → assignment insert → job status: assigned |
-| `contractor_respond_to_assignment()` | assignment_id, action | accept: status=accepted, job=scheduled / decline: status=declined, job=unassigned |
-| `contractor_update_job_status()` | job_id, new_status | Jogosultság + státusz átmenet validálás → update |
-| `approve_contractor()` | contractor_id | Admin: contractor status=approved, user_meta status=active |
-| `reject_contractor()` | contractor_id | Admin: contractor status=rejected, user_meta status=suspended |
-| `unlock_job_lead()` | job_id | Kredit ellenőrzés → levonás → lead_purchase insert → job status: unlocked |
-| `add_contractor_credits()` | contractor_id, amount | Admin: credit_balance += amount + credit_transaction |
-| `refund_lead()` | purchase_id | Admin: credit visszaírás + credit_transaction |
-| `accept_contractor_interest()` | interest_id | **Halasztott modell:** auth.uid() == lead owner → kredit levonás → status: accepted |
+| Függvény | Logika |
+|---|---|
+| `create_job_from_form()` | Atomikus: customer upsert → address → job insert |
+| `register_contractor()` | user_meta + contractor_profiles |
+| `assign_job_to_contractor()` | Admin check → assignment insert → status: assigned |
+| `contractor_respond_to_assignment()` | accept/decline → status update |
+| `accept_contractor_interest()` | Kredit levonás → status: accepted (atomikus) |
+| `unlock_job_lead()` | Kredit check → levonás → lead_purchase |
+| `add_contractor_credits()` | credit_balance += amount + transaction log |
+| `approve_contractor()` / `reject_contractor()` | Admin contractor management |
+| `is_admin_or_dispatcher()` | Jogosultság helper |
+
+### Migrációk
+
+| # | Fájl | Leírás |
+|---|---|---|
+| 001 | `create_tables.sql` | Alap táblák |
+| 002 | `rls_policies.sql` | RLS policy-k + helper funkciók |
+| 003 | `functions.sql` | 7 RPC függvény |
+| 004 | `seed_data.sql` | Teszt adatok |
+| 005 | `marketplace_refactor.sql` | Kredit rendszer: credit_balance, transactions, purchases |
+| 006 | `add_job_timestamps.sql` | Timestamp mezők |
+| 007 | `customer_profiles.sql` | Customer user_id + RLS |
+| 008 | `lead_interests.sql` | lead_interests + accept RPC (halasztott kredit) |
 
 ---
 
-## 🛣️ API Route-ok (28 db)
+## 🛣️ API Route-ok (33 db)
 
-### 🔐 Auth
+### 🔐 Auth (7 route)
 | Route | Method | Funkció |
-|-------|--------|---------|
-| `/api/auth/login` | POST | Email + jelszó bejelentkezés (Supabase Auth) |
+|---|---|---|
+| `/api/auth/login` | POST | Email + jelszó belépés |
 | `/api/auth/logout` | POST | Session törlés |
-| `/api/auth/session` | GET | Aktuális session + user_meta lekérdezés |
-| `/api/auth/forgot-password` | POST | Jelszó-emlékeztető email küldés |
-| `/api/auth/reset-password` | POST | Új jelszó beállítás token-nel |
+| `/api/auth/session` | GET | Aktuális session + user_meta |
+| `/api/auth/forgot-password` | POST | Jelszó-emlékeztető |
+| `/api/auth/reset-password` | POST | Új jelszó beállítás |
+| `/api/auth/send-verification` | POST | Email verifikáció küldés |
+| `/api/auth/verify-code` | POST | Kód ellenőrzés |
 
-### 👷 Contractor
+### 👷 Contractor (9 route)
 | Route | Method | Funkció |
-|-------|--------|---------|
-| `/api/contractor/profile` | GET/PUT | Saját profil lekérdezés és módosítás |
-| `/api/contractor/jobs` | GET | Elérhető munkák listája (szűrve trade + area) |
-| `/api/contractor/jobs/[id]` | GET | Egy munka részletei (ha unlocked: ügyfél adatok is) |
-| `/api/contractor/jobs/[id]/unlock` | POST | Lead megvásárlása → `unlock_job_lead()` RPC |
+|---|---|---|
+| `/api/contractor/profile` | GET/PUT | Profil lekérdezés/módosítás |
+| `/api/contractor/jobs` | GET | Elérhető munkák listája |
+| `/api/contractor/jobs/[id]` | GET/PUT | Munka részletek/státusz update |
+| `/api/contractor/jobs/[id]/unlock` | POST | Lead vásárlás (kredit) |
+| `/api/contractor/jobs/[id]/interest` | POST | Érdeklődés jelzése |
 | `/api/contractor/marketplace` | GET | Nyitott munkák térkép nézethez |
-| `/api/contractor/assignments` | GET | Kiosztott munkák (diszpécser modell) |
-| `/api/contractor/assignments/[id]/respond` | POST | Munka elfogadás/elutasítás |
-| `/api/contractors/register` | POST | Szakember regisztráció form → `register_contractor()` |
+| `/api/contractor/assignments` | GET | Kiosztott munkák |
+| `/api/contractor/assignments/[id]/respond` | POST | Elfogadás/elutasítás |
+| `/api/contractors/register` | POST | Szakember regisztráció |
 
-### 🏢 Admin
+### 🏢 Admin (10 route)
 | Route | Method | Funkció |
-|-------|--------|---------|
-| `/api/admin/contractors` | GET | Összes szakember listája + szűrés |
-| `/api/admin/contractors/[id]` | GET/PUT | Szakember részletek és módosítás |
-| `/api/admin/contractors/[id]/approve` | POST | Jóváhagyás → `approve_contractor()` |
-| `/api/admin/contractors/[id]/reject` | POST | Elutasítás → `reject_contractor()` |
+|---|---|---|
+| `/api/admin/contractors` | GET | Szakember lista |
+| `/api/admin/contractors/[id]` | GET/PUT | Szakember részletek/módosítás |
+| `/api/admin/contractors/[id]/approve` | POST | Jóváhagyás |
+| `/api/admin/contractors/[id]/reject` | POST | Elutasítás |
 | `/api/admin/contractors/[id]/activate` | POST | Újra aktiválás |
 | `/api/admin/contractors/[id]/suspend` | POST | Felfüggesztés |
 | `/api/admin/customers` | GET | Ügyfél lista |
-| `/api/admin/jobs` | GET | Összes munka lista |
+| `/api/admin/jobs` | GET/PUT | Munkák kezelése |
 | `/api/admin/jobs/[id]` | GET/PUT | Munka módosítás |
-| `/api/admin/jobs/assign` | POST | Munka kiosztás → `assign_job_to_contractor()` |
+| `/api/admin/jobs/assign` | POST | Munka kiosztás |
 
-### 👤 Customer & Egyéb
+### 👤 Customer (2 route)
 | Route | Method | Funkció |
-|-------|--------|---------|
-| `/api/customer/jobs/[id]` | GET | Ügyfél saját munkájának részletei |
-| `/api/jobs/create` | POST | Foglalási form → `create_job_from_form()` |
-| `/api/stripe/create-checkout-session` | POST | Stripe fizetési session (kredit feltöltés) |
-| `/api/stripe/webhook` | POST | Stripe webhook → `add_contractor_credits()` |
-| `/api/send-email` | POST | Általános email küldés |
+|---|---|---|
+| `/api/customer/jobs/[id]` | GET/PATCH/DELETE | Saját munka kezelés (cancel/complete) |
+| `/api/customer/assignments/[id]/respond` | POST | Szakember elfogadás/elutasítás |
+
+### 💳 Stripe + Email (5 route)
+| Route | Method | Funkció | Védelem |
+|---|---|---|---|
+| `/api/jobs/create` | POST | Munka létrehozás (publikus) | Rate limit 3/perc/IP |
+| `/api/stripe/create-checkout-session` | POST | Stripe fizetés | Auth |
+| `/api/stripe/webhook` | POST | Stripe webhook | Signature |
+| `/api/send-email` | POST | Email küldés | Rate limit 5/perc/IP |
 
 ---
 
-## 🔒 Row Level Security (RLS)
+## 🖥️ Frontend Oldalak
 
-Minden tábla RLS-sel védett. A policy-k biztosítják, hogy:
-
-| Tábla | Szabály |
-|-------|---------|
-| `user_meta` | Mindenki csak a saját rekordját látja |
-| `contractor_profiles` | Saját profil + admin/diszpécser az összeset |
-| `customers` | Saját profil (`user_id` match) + admin az összeset |
-| `jobs` | Admin mindent lát; contractor `open` + saját purchased; customer sajátját |
-| `lead_purchases` | Contractor a sajátját, admin mindent |
-| `credit_transactions` | Contractor a sajátját, admin mindent |
-| `lead_interests` | Contractor saját érdeklődéseit; lead owner a saját leadjein lévőket |
-| `leads` | Authenticated userek (olvasás + saját insert/delete) |
-
-**Helper funkciók:**
-- `is_admin_or_dispatcher()` — admin/diszpécser jogosultság check
-- `is_contractor()` — szakember jogosultság check
-- `get_contractor_profile_id()` — auth.uid() → contractor_profiles.id mapping
-
----
-
-## 🖥️ Frontend Oldalak (30 route)
-
-### Publikus oldalak
+### Publikus (20+ route)
 | Útvonal | Leírás |
-|---------|--------|
-| `/` | Landing page — hero, térkép, hogyan működik, blog |
-| `/foglalas` | Foglalási form (B2C ügyfelek) |
+|---|---|
+| `/` | Landing — hero, térkép, hogyan működik |
+| `/foglalas` | Foglalási form |
 | `/arak` | Árkalkulátor |
 | `/vizszerelo-budapest` | SEO landing — vízszerelés |
 | `/villanyszerelo-budapest` | SEO landing — villanyszerelés |
 | `/futeskorszerusites` | SEO landing — fűtéskorszerűsítés |
 | `/dugulaselharitas-budapest` | SEO landing — duguláselhárítás |
-| `/szolgaltatasi-teruletek` | Szolgáltatási terület lista |
-| `/csatlakozz-partnerkent` | Szakember toborzó oldal |
-| `/general-kivitelezo-partner` | Generál kivitelező partner oldal |
-| `/blog` / `/blog/[id]` | Blog lista és cikk |
+| `/szolgaltatasi-teruletek` | Terület lista |
+| `/csatlakozz-partnerkent` | Szakember toborzó |
+| `/general-kivitelezo-partner` | Generál kivitelező partner |
+| `/blog`, `/blog/[id]` | Blog |
 | `/gyik` | GYIK |
-| `/rolunk` | Rólunk |
-| `/kapcsolat` | Kapcsolat |
-| `/visszahivas` | Visszahívás kérés |
+| `/rolunk`, `/kapcsolat` | Rólunk, Kapcsolat |
 | `/palyazat-kalkulator` | Pályázat kalkulátor |
-| `/aszf` / `/cookie` / `/impresszum` / `/adatkezeles` | Jogi oldalak |
+| `/aszf`, `/cookie`, `/impresszum`, `/adatkezeles` | Jogi oldalak |
 
-### Autentikált oldalak
+### Autentikált
 | Útvonal | Szerep | Leírás |
-|---------|--------|--------|
+|---|---|---|
 | `/login` | Mindenki | Bejelentkezés |
 | `/forgot-password` / `/reset-password` | Mindenki | Jelszó kezelés |
-| `/fiok` | Mindenki | Saját fiók beállítások |
+| `/fiok` | Mindenki | Fiók beállítások |
 | `/admin` | Admin | Admin dashboard |
-| `/contractor/dashboard` | Szakember | Szakember dashboard |
+| `/contractor/dashboard` | Szakember | Térkép + munkák + aktív megbízások |
 | `/contractor/profile` | Szakember | Profil szerkesztés |
 | `/contractor/topup` | Szakember | Kredit feltöltés (Stripe) |
-| `/ugyfel/dashboard` | Ügyfél | Ügyfél saját munkái |
+| `/ugyfel/dashboard` | Ügyfél | Munkák kezelése (térkép + részletek) |
 
-### Kulcs komponensek
-| Komponens | Funkció |
-|-----------|---------|
-| `TeaserMap` | Interaktív Mapbox térkép a homepage-en, lead pin-ek, overlay indítás |
-| `MarketplaceSimulationOverlay` | Teljes screen dashboard: térkép + sidebar, lead lista, érdeklődés, elfogadás |
-| `AddLeadModal` | Új hiba bejelentés form (típus, lokáció, leírás) |
-| `AuthModal` | Bejelentkezés/regisztráció overlay |
-| `Header` | Navigáció, role-based menü |
-| `HowItWorksAnimation` | Animált "Hogyan működik" szekció |
-| `JobCard` | Munka kártya (admin/szakember nézet) |
-| `ContractorCard` | Szakember kártya (admin nézet) |
-| `ProtectedRoute` | Auth guard wrapper |
-| `CookieConsent` | GDPR cookie consent |
+### Kulcs Komponensek (17 db)
 
----
-
-## 🗂️ Migráció Történet
-
-| # | Fájl | Mit csinál |
-|---|------|------------|
-| 001 | `create_tables.sql` | Alap táblák: user_meta, contractor_profiles, customers, addresses, jobs, job_assignments |
-| 002 | `rls_policies.sql` | RLS policy-k minden táblára + helper funkciók |
-| 003 | `functions.sql` | 7 RPC: create_job_from_form, register_contractor, assign/respond/update job, approve/reject contractor |
-| 004 | `seed_data.sql` | Teszt admin user + minta adatok |
-| 005 | `marketplace_refactor.sql` | Marketplace átállás: credit_balance, lead_purchases, credit_transactions, unlock/refund/add_credits RPC, open_jobs_map view |
-| 006 | `add_job_timestamps.sql` | Job timestamp mezők |
-| 007 | `customer_profiles.sql` | Customer user_id hozzáadás + RLS, create_job_from_form frissítés user_id supporttal |
-| 008 | `lead_interests.sql` | lead_interests tábla + accept_contractor_interest RPC (halasztott kredit modell) |
+| Komponens | Méret | Funkció |
+|---|---|---|
+| `MarketplaceSimulationOverlay` | 63KB | Full-screen marketplace: térkép + sidebar |
+| `TeaserMap` | 32KB | Homepage interaktív térkép, lead pin-ek |
+| `AddLeadModal` | 31KB | Hiba bejelentés form (típus, lokáció, leírás) |
+| `HowItWorksAnimation` | 27KB | Animált "Hogyan működik" szekció |
+| `Header` | 19KB | Navigáció, role-based menü |
+| `JobCard` | 17KB | Munka kártya (admin/szakember) |
+| `UnauthMapLibreMap` | 15KB | MapLibre fallback térkép |
+| `CookieConsent` | 11KB | GDPR cookie consent |
+| `Footer` | 10KB | Footer |
+| `ContractorCard` | 6KB | Szakember kártya (admin) |
+| `ShareButtons` | 5KB | Megosztás gombok |
+| `Breadcrumbs` | 5KB | Navigációs morzsa |
+| `AuthModal` | 4KB | Login/regisztráció overlay |
+| `Toast` | 3KB | Értesítés toast |
+| `ProtectedRoute` | 3KB | Auth guard wrapper |
+| `Logo` | 2KB | Logo |
+| `ConditionalFooter` | 1KB | Feltételes footer |
 
 ---
 
 ## ⚙️ Tech Stack
 
-| Réteg | Technológia |
-|-------|-------------|
-| Frontend | Next.js 14, React, TypeScript, Tailwind CSS |
-| Térkép | Mapbox GL JS (`react-map-gl`) |
-| Backend | Next.js API Routes + Supabase RPC |
-| Adatbázis | PostgreSQL (Supabase) |
-| Auth | Supabase Auth (email/password) |
-| Fizetés | Stripe Checkout + Webhooks |
-| Hosting | Netlify |
-| Email | Supabase Edge / API route |
+| Réteg | Technológia | Verzió |
+|---|---|---|
+| Frontend | Next.js, React, TypeScript | 14.2.0 |
+| Styling | Tailwind CSS | 3.x |
+| Térkép | Mapbox GL JS (`react-map-gl`) | — |
+| Backend | Next.js API Routes + Supabase RPC | — |
+| Adatbázis | PostgreSQL (Supabase) | 15 |
+| Auth | Supabase Auth (email/password) | — |
+| Fizetés | Stripe Checkout + Webhooks | — |
+| Email | Resend | — |
+| Hosting | Netlify | — |
+| Rate Limiting | In-memory (IP-based) | — |
 
 ---
 
 ## 🚀 Fejlesztés
 
+### Telepítés
+
 ```bash
-# Telepítés
 npm install
+```
 
-# Fejlesztői szerver
+### Fejlesztői szerver
+
+```bash
 npm run dev
+# → http://localhost:3000
+```
 
-# Build
+### Build
+
+```bash
 npm run build
+```
 
-# Környezeti változók (.env.local)
+### Környezeti Változók (`.env.local`)
+
+```env
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_xxxxx
 SUPABASE_SERVICE_ROLE_KEY=sb_secret_xxxxx
+
+# Mapbox
 NEXT_PUBLIC_MAPBOX_TOKEN=pk.xxxxx
+
+# Resend Email
+RESEND_API_KEY=re_xxxxx
+EMAIL_TO=info@vizvillanyfutes.hu
+ADMIN_EMAIL=admin@vizvillanyfutes.hu
+DISPATCHER_EMAIL=dispatcher@vizvillanyfutes.hu
+NEXT_PUBLIC_BASE_URL=https://vizvillanyfutes.hu
+
+# Stripe
+STRIPE_SECRET_KEY=sk_live_xxxxx
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+```
+
+### Deploy
+
+```bash
+# Netlify-re deploy (production)
+netlify deploy --prod
 ```
 
 ---
@@ -432,25 +553,48 @@ NEXT_PUBLIC_MAPBOX_TOKEN=pk.xxxxx
 
 ```
 src/
-├── app/                    # Next.js pages (30 route)
-│   ├── api/                # API routes (28 endpoint)
-│   │   ├── auth/           # Login, logout, session, password
-│   │   ├── admin/          # Contractor/job management
-│   │   ├── contractor/     # Profile, jobs, marketplace, assignments
-│   │   ├── customer/       # Customer job details
-│   │   ├── stripe/         # Payment checkout + webhook
-│   │   └── jobs/           # Job creation
-│   ├── contractor/         # Szakember pages
-│   ├── ugyfel/             # Ügyfél pages
-│   └── [seo pages]/        # SEO landing pages
-├── components/             # 16 React komponens
-├── contexts/               # AuthContext (global auth state)
-├── lib/                    # Supabase client, auth helpers, API utils
-└── utils/                  # Phone formatting etc.
+├── app/                        # Next.js pages
+│   ├── api/                    # 33 API route
+│   │   ├── auth/               # Login, logout, session, password, verification
+│   │   ├── admin/              # Contractor/job management (is_admin_or_dispatcher check)
+│   │   ├── contractor/         # Profile, jobs, marketplace, assignments
+│   │   ├── customer/           # Job management (cancel, complete, assignment respond)
+│   │   ├── stripe/             # Payment checkout + webhook
+│   │   ├── jobs/               # Job creation (rate limited)
+│   │   └── send-email/         # Email dispatch (rate limited)
+│   ├── (dashboard)/            # Ügyfél dashboard (grouped route)
+│   ├── contractor/             # Szakember pages (dashboard, profile, topup)
+│   ├── admin/                  # Admin dashboard
+│   └── [seo-pages]/            # 10+ SEO landing page
+├── components/                 # 17 React komponens
+├── contexts/                   # AuthContext (global auth state)
+├── lib/
+│   ├── supabase/               # Client (anon), Server (user), Admin (service_role)
+│   ├── services/               # jobService (create, normalize, notify)
+│   ├── auth.ts                 # Session management (localStorage)
+│   ├── api.ts                  # API helper (GET, POST, PUT, DELETE with auth)
+│   └── rate-limit.ts           # In-memory IP-based rate limiter
+└── utils/                      # Phone formatting etc.
 
 supabase/
-└── migrations/             # 8 SQL migration (001-008)
-
-docs/
-└── ARCHITECTURE.md         # Ez a fájl
+└── migrations/                 # 8 SQL migration (001-008)
 ```
+
+---
+
+## 📊 Méretezés + Teljesítmény
+
+| Metrika | Szint | Megjegyzés |
+|---|---|---|
+| Napi felhasználók | 100-1000 | Supabase Free/Pro bőven elég |
+| API kérések | ~50K/hó | Supabase Free tier limit: 500K |
+| DB méret | <100MB | Supabase Free: 500MB |
+| Rate limiter | In-memory | Serverless cold start-nál resetelődik — ez feature, nem bug |
+| Térkép | Mapbox Free | 50K tile load/hó |
+| Email | Resend Free | 100 email/nap |
+
+**Skálázási szükséglet esetén:**
+- Rate limiter → Redis (Upstash)
+- DB → Supabase Pro
+- Email → Resend Pro
+- Térkép → Mapbox Pay-as-you-go
