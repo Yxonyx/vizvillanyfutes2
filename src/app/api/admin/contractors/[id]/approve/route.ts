@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createServerClient, createAdminClient } from '@/lib/supabase/server';
 
 // POST /api/admin/contractors/[id]/approve - Approve contractor
 export async function POST(
@@ -44,11 +44,16 @@ export async function POST(
       .eq('id', contractorId)
       .single();
 
-    // Get contractor's email
+    // Get contractor's email - must use admin client for auth.admin API
     let contractorEmail: string | null = null;
     if (contractor?.user_id) {
-      const { data: authUser } = await supabase.auth.admin.getUserById(contractor.user_id);
-      contractorEmail = authUser?.user?.email || null;
+      try {
+        const adminClient = createAdminClient();
+        const { data: authUser } = await adminClient.auth.admin.getUserById(contractor.user_id);
+        contractorEmail = authUser?.user?.email || null;
+      } catch (err) {
+        console.warn('Failed to get contractor email via admin API:', err);
+      }
     }
 
     // Send approval notification email

@@ -248,7 +248,7 @@ export default function TeaserMap() {
                     [minLng, minLat],
                     [maxLng, maxLat]
                 ],
-                { padding: window.innerWidth >= 1024 ? { top: 50, bottom: 50, left: window.innerWidth * 0.3 + 50, right: 50 } : 50, duration: 1500, maxZoom: 10 }
+                { padding: window.innerWidth >= 1024 ? { top: 50, bottom: 50, left: window.innerWidth * 0.3 + 50, right: 50 } : 50, duration: 1500, maxZoom: 11.5 }
             );
         }
     }, [displayLeads, selectedLead]);

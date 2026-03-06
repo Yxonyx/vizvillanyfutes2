@@ -42,32 +42,37 @@ export default function Footer() {
   return (
     <footer className="bg-zinc-900 text-white pb-20 lg:pb-0">
       {/* Trust Badges */}
-      <div className="border-b border-slate-800 relative">
-        {/* Subtle top highlight logic if needed */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-12 lg:pt-16 lg:pb-16">
-          <div className="text-center mb-8">
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-3 font-heading tracking-wide">
+      <div className="border-b border-slate-800 relative overflow-hidden">
+        {/* Decorative gradient orb */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-vvm-blue-600/[0.07] rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20 relative z-10">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-black text-white mb-3 tracking-tight">
               Minden, amire a zavartalan otthonhoz szükséged van
             </h2>
-            <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
-              Szakmai felkészültségünk és ügyfélközpontú hozzáállásunk garantálja a magas minőséget és a tartós eredményeket.
+            <p className="text-slate-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+              Szakmai felkészültség és ügyfélközpontú hozzáállás — garantált minőség, tartós eredmények.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {[
-              { icon: <ThumbsUp className="w-7 h-7 md:w-5 md:h-5 text-green-400" />, bg: 'bg-green-500/20', title: 'Ingyenes ajánlatkérés', desc: 'Rejtett költségek nélkül' },
-              { icon: <CheckCircle className="w-7 h-7 md:w-5 md:h-5 text-vvm-blue-400" />, bg: 'bg-vvm-blue-500/20', title: 'Ellenőrzött szakik', desc: 'Minősített mesterek' },
-              { icon: <Star className="w-7 h-7 md:w-5 md:h-5 text-vvm-yellow-400" />, bg: 'bg-vvm-yellow-500/20', title: 'Valós értékelések', desc: 'Ügyfelek véleménye' },
-              { icon: <Users className="w-7 h-7 md:w-5 md:h-5 text-indigo-400" />, bg: 'bg-indigo-500/20', title: 'Versengő ajánlatok', desc: 'Legjobb ár garantált' },
+              { icon: <ThumbsUp className="w-6 h-6" />, color: 'text-emerald-400', glow: 'shadow-emerald-500/10', border: 'border-emerald-500/20', bg: 'bg-emerald-500/10', title: 'Ingyenes ajánlatkérés', desc: 'Rejtett költségek nélkül, kötelezettségmentesen' },
+              { icon: <CheckCircle className="w-6 h-6" />, color: 'text-vvm-blue-400', glow: 'shadow-blue-500/10', border: 'border-blue-500/20', bg: 'bg-vvm-blue-500/10', title: 'Ellenőrzött szakemberek', desc: 'Kézzel válogatott, minősített mesterek' },
+              { icon: <Star className="w-6 h-6" />, color: 'text-amber-400', glow: 'shadow-amber-500/10', border: 'border-amber-500/20', bg: 'bg-amber-500/10', title: 'Valós értékelések', desc: 'Korábbi ügyfelek hiteles véleményei' },
+              { icon: <Users className="w-6 h-6" />, color: 'text-indigo-400', glow: 'shadow-indigo-500/10', border: 'border-indigo-500/20', bg: 'bg-indigo-500/10', title: 'Több szakember', desc: 'A legjobb ajánlatot választhatod ki' },
             ].map((item, i) => (
-              <div key={i} className="flex flex-col items-center text-center gap-2 p-4 rounded-xl bg-white/[0.04] md:bg-transparent md:p-0 md:flex-row md:text-left md:items-center md:gap-3">
-                <div className={`w-12 h-12 md:w-10 md:h-10 ${item.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+              <div
+                key={i}
+                className={`group relative flex flex-col items-center text-center gap-3 p-5 md:p-6 rounded-2xl bg-white/[0.04] backdrop-blur-sm border ${item.border} hover:bg-white/[0.07] transition-all duration-300 shadow-lg ${item.glow}`}
+              >
+                <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center ${item.color} group-hover:scale-110 transition-transform duration-300`}>
                   {item.icon}
                 </div>
                 <div>
-                  <div className="font-semibold text-white text-sm leading-tight">{item.title}</div>
-                  <div className="text-xs text-slate-400 mt-0.5">{item.desc}</div>
+                  <div className="font-bold text-white text-sm md:text-[15px] leading-tight mb-1">{item.title}</div>
+                  <div className="text-xs text-slate-400 leading-snug">{item.desc}</div>
                 </div>
               </div>
             ))}

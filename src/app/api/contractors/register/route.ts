@@ -210,8 +210,24 @@ export async function POST(request: NextRequest) {
         }),
       });
     } catch (emailError) {
-      console.warn('Failed to send notification email:', emailError);
-      // Don't fail the request if email fails
+      console.warn('Failed to send admin notification email:', emailError);
+    }
+
+    // Send welcome email to the partner
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'new_contractor_welcome',
+          data: {
+            display_name: registrationData.display_name,
+            to_email: registrationData.email,
+          },
+        }),
+      });
+    } catch (emailError) {
+      console.warn('Failed to send partner welcome email:', emailError);
     }
 
     return NextResponse.json({

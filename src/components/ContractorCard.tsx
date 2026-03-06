@@ -1,8 +1,9 @@
 'use client';
 
-import { 
+import { useState, useEffect } from 'react';
+import {
   User, Phone, MapPin, Briefcase, CheckCircle, XCircle, Clock,
-  Droplets, Zap, Flame, Ban, Play
+  Droplets, Zap, Flame, Ban, Play, Star
 } from 'lucide-react';
 
 const tradeIcons: Record<string, typeof Droplets> = {
@@ -55,6 +56,17 @@ export default function ContractorCard({
   const status = statusConfig[contractor.status] || statusConfig.pending_approval;
   const StatusIcon = status.icon;
 
+  // Fetch rating for this contractor
+  const [rating, setRating] = useState<{ avg: number; count: number } | null>(null);
+  useEffect(() => {
+    fetch(`/api/customer/ratings?contractor_id=${contractor.id}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.avg !== undefined) setRating({ avg: data.avg, count: data.count });
+      })
+      .catch(() => { });
+  }, [contractor.id]);
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
       {/* Header */}
@@ -71,12 +83,25 @@ export default function ContractorCard({
             </p>
           </div>
         </div>
-        
+
         <span className={`inline-flex items-center gap-1 px-3 py-1 bg-${status.color}-100 text-${status.color}-700 rounded-full text-sm font-medium`}>
           <StatusIcon className="w-4 h-4" />
           {status.label}
         </span>
       </div>
+
+      {/* Rating */}
+      {rating && rating.count > 0 && (
+        <div className="flex items-center gap-2 mb-4 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+          <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map(s => (
+              <Star key={s} className={`w-4 h-4 ${s <= Math.round(rating.avg) ? 'text-amber-400 fill-amber-400' : 'text-gray-200 fill-gray-200'}`} />
+            ))}
+          </div>
+          <span className="text-sm font-bold text-amber-700">{rating.avg.toFixed(1)}</span>
+          <span className="text-xs text-amber-600/70">({rating.count} értékelés)</span>
+        </div>
+      )}
 
       {/* Details */}
       <div className="space-y-2 mb-4">
@@ -86,7 +111,7 @@ export default function ContractorCard({
             {contractor.phone}
           </a>
         </div>
-        
+
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <Briefcase className="w-4 h-4 text-gray-400" />
           <div className="flex flex-wrap gap-1">
@@ -101,7 +126,7 @@ export default function ContractorCard({
             })}
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <MapPin className="w-4 h-4 text-gray-400" />
           <span>{contractor.service_areas.slice(0, 5).join(', ')}{contractor.service_areas.length > 5 ? ` +${contractor.service_areas.length - 5}` : ''}</span>

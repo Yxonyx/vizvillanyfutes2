@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
+import { wrapHtml } from '@/lib/services/leadNotificationService';
 
 export async function POST(request: NextRequest) {
     try {
@@ -60,33 +61,26 @@ export async function POST(request: NextRequest) {
 
         const resend = new Resend(process.env.RESEND_API_KEY);
 
+        const htmlBody = wrapHtml('Megerősítő kód', `
+          <div style="text-align:center;margin-bottom:20px;">
+            <span style="display:inline-block;background:#dbeafe;color:#1e40af;font-size:12px;font-weight:700;padding:6px 16px;border-radius:99px;text-transform:uppercase;letter-spacing:0.5px;">🔑 Fiók megerősítés</span>
+          </div>
+          <h1 style="font-size:22px;font-weight:800;margin:0 0 16px;color:#0f172a;text-align:center;">Megerősítő kódod</h1>
+          <p style="font-size:15px;line-height:1.7;color:#475569;margin:0 0 24px;text-align:center;">Az alábbi kóddal tudod megerősíteni a regisztrációdat:</p>
+          <div style="background:#eff6ff;border:2px dashed #3b82f6;border-radius:16px;padding:24px;margin:0 0 24px;text-align:center;">
+            <span style="font-size:40px;font-weight:800;letter-spacing:10px;color:#1e40af;">${code}</span>
+          </div>
+          <p style="font-size:13px;color:#94a3b8;text-align:center;line-height:1.6;">
+            A kód <strong>15 percig</strong> érvényes.<br>
+            Ha nem te kezdeményezted a regisztrációt, kérjük hagyd figyelmen kívül ezt az emailt.
+          </p>
+        `);
+
         const { error: emailError } = await resend.emails.send({
             from: 'VízVillanyFűtés <info@vizvillanyfutes.hu>',
             to: email,
             subject: '🔑 Megerősítő kód – VízVillanyFűtés regisztráció',
-            html: `
-        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f8fafc; border-radius: 16px;">
-          <div style="text-align: center; margin-bottom: 24px;">
-            <h1 style="color: #1e40af; font-size: 24px; margin: 0;">VízVillanyFűtés</h1>
-            <p style="color: #64748b; font-size: 14px; margin-top: 4px;">Fiók megerősítés</p>
-          </div>
-          <div style="background: white; border-radius: 12px; padding: 32px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            <p style="color: #334155; font-size: 16px; margin-bottom: 24px;">
-              Az Ön megerősítő kódja:
-            </p>
-            <div style="background: #eff6ff; border: 2px dashed #3b82f6; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-              <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #1e40af;">${code}</span>
-            </div>
-            <p style="color: #94a3b8; font-size: 13px;">
-              A kód 15 percig érvényes.<br/>
-              Ha nem Ön kezdeményezte a regisztrációt, kérjük hagyja figyelmen kívül ezt az emailt.
-            </p>
-          </div>
-          <p style="color: #94a3b8; font-size: 11px; text-align: center; margin-top: 16px;">
-            © VízVillanyFűtés.hu – Megbízható szakemberek, egy kattintásra.
-          </p>
-        </div>
-      `,
+            html: htmlBody,
         });
 
         if (emailError) {

@@ -109,6 +109,49 @@ export async function POST(
                         });
                     }
                 }
+
+                // 3) Referral reward: if this contractor was referred and this is their first lead purchase
+                try {
+                    const { data: profile } = await admin
+                        .from('contractor_profiles')
+                        .select('id, referred_by, referral_reward_paid')
+                        .eq('user_id', user.id)
+                        .single();
+
+                    if (profile?.referred_by && !profile.referral_reward_paid) {
+                        // Check if this is their first interest (only 1 entry = this one)
+                        const { count } = await admin
+                            .from('contractor_interests')
+                            .select('id', { count: 'exact', head: true })
+                            .eq('contractor_id', profile.id);
+
+                        if (count !== null && count <= 1) {
+                            // Credit the referrer with 5000 Ft
+                            const { data: referrer } = await admin
+                                .from('contractor_profiles')
+                                .select('credit_balance')
+                                .eq('id', profile.referred_by)
+                                .single();
+
+                            if (referrer) {
+                                await admin
+                                    .from('contractor_profiles')
+                                    .update({ credit_balance: (referrer.credit_balance || 0) + 5000 })
+                                    .eq('id', profile.referred_by);
+                            }
+
+                            // Mark reward as paid (prevent double payout)
+                            await admin
+                                .from('contractor_profiles')
+                                .update({ referral_reward_paid: true })
+                                .eq('id', profile.id);
+
+                            console.log(`Referral reward: +5000 Ft credited to ${profile.referred_by} for referring ${profile.id}`);
+                        }
+                    }
+                } catch (refErr) {
+                    console.warn('Referral reward error (non-blocking):', refErr);
+                }
             } catch (err) {
                 console.error('Error sending interest notifications:', err);
             }

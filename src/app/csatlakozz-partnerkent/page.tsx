@@ -708,57 +708,67 @@ function PartnerOnboardingContent() {
             <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-vvm-yellow-200 blur-3xl rounded-full opacity-50 pointer-events-none"></div>
 
             {isSubmitted ? (
-              <div className="text-center relative z-10 py-8">
-                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-                  <CheckCircle className="w-10 h-10 text-emerald-600" />
-                </div>
-                <h3 className="text-2xl lg:text-3xl font-bold font-heading text-slate-900 mb-3">Sikeres regisztráció!</h3>
-                <p className="text-slate-600 mb-6 text-lg max-w-lg mx-auto">
-                  Fiókod sikeresen létrejött a rendszerben.
-                </p>
-
-                {/* Admin approval warning  */}
-                <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-5 mb-6 max-w-md mx-auto">
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
-                    <span className="text-amber-800 font-bold text-lg">Jóváhagyásra vár!</span>
+              <div className="relative z-10 py-4 sm:py-6">
+                {/* Header - compact */}
+                <div className="text-center mb-5">
+                  <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <CheckCircle className="w-7 h-7 text-emerald-600" />
                   </div>
-                  <p className="text-amber-700 font-medium text-sm leading-relaxed">
-                    A bejelentkezés csak az <strong>adminisztrátori jóváhagyás után</strong> lehetséges.
-                    Amint jóváhagyjuk a regisztrációdat, azonnal be tudsz lépni.
-                  </p>
+                  <h3 className="text-xl sm:text-2xl font-bold font-heading text-slate-900 mb-1">Sikeres regisztráció!</h3>
+                  <p className="text-slate-500 text-sm sm:text-base">Fiókod sikeresen létrejött a rendszerben.</p>
                 </div>
 
-                {/* Email notification info */}
-                <div className="bg-vvm-blue-50 border border-vvm-blue-200 rounded-2xl p-5 mb-8 max-w-md mx-auto">
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    <svg className="w-6 h-6 text-vvm-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-vvm-blue-800 font-bold">E-mail értesítést küldünk!</span>
+                {/* Info cards - side by side on sm+ */}
+                <div className="grid sm:grid-cols-2 gap-3 mb-5">
+                  {/* Admin approval warning */}
+                  <div className="bg-amber-50 border border-amber-300 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                      <span className="text-amber-800 font-bold text-sm">Jóváhagyásra vár!</span>
+                    </div>
+                    <p className="text-amber-700 text-xs sm:text-[13px] leading-relaxed">
+                      A bejelentkezés csak az <strong>adminisztrátori jóváhagyás után</strong> lehetséges. Amint jóváhagyjuk, azonnal be tudsz lépni.
+                    </p>
                   </div>
-                  <p className="text-vvm-blue-700 text-sm leading-relaxed">
-                    A jóváhagyásról <strong>automatikus e-mail értesítést</strong> kapsz a megadott e-mail címedre.
-                    Nem kell folyamatosan ellenőrizned — mi szólunk, ha elkészültünk!
-                  </p>
+
+                  {/* Email notification info */}
+                  <div className="bg-vvm-blue-50 border border-vvm-blue-200 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-5 h-5 text-vvm-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-vvm-blue-800 font-bold text-sm">E-mail értesítést küldünk!</span>
+                    </div>
+                    <p className="text-vvm-blue-700 text-xs sm:text-[13px] leading-relaxed">
+                      A jóváhagyásról <strong>automatikus e-mail értesítést</strong> kapsz. Nem kell folyamatosan ellenőrizned!
+                    </p>
+                  </div>
                 </div>
 
-                <div className="bg-slate-50 rounded-2xl p-5 mb-8 max-w-md mx-auto border border-slate-200">
-                  <p className="text-slate-500 font-semibold mb-4 text-sm tracking-wide uppercase">A következő lépések:</p>
-                  <ul className="text-slate-700 text-left space-y-3 font-medium text-sm">
-                    <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-xs font-bold text-emerald-600">✓</div> Regisztráció befejezve</li>
-                    <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-600">2</div> Adminisztrátori jóváhagyás (max. 24 óra)</li>
-                    <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-100 flex items-center justify-center text-xs font-bold text-vvm-blue-600">3</div> E-mail értesítés a jóváhagyásról</li>
-                    <li className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-vvm-blue-100 flex items-center justify-center text-xs font-bold text-vvm-blue-600">4</div> Bejelentkezés és munkák fogadása</li>
-                  </ul>
+                {/* Steps - horizontal on sm+, compact */}
+                <div className="bg-slate-50 rounded-xl p-4 mb-5 border border-slate-200">
+                  <p className="text-slate-400 font-semibold mb-3 text-xs tracking-wide uppercase">Következő lépések:</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                      { num: '✓', label: 'Regisztráció kész', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+                      { num: '2', label: 'Admin jóváhagyás', bg: 'bg-amber-100', text: 'text-amber-600' },
+                      { num: '3', label: 'E-mail értesítés', bg: 'bg-vvm-blue-100', text: 'text-vvm-blue-600' },
+                      { num: '4', label: 'Munkák fogadása', bg: 'bg-vvm-blue-100', text: 'text-vvm-blue-600' },
+                    ].map((step, i) => (
+                      <div key={i} className="flex flex-col items-center text-center gap-1.5">
+                        <div className={`w-7 h-7 rounded-full ${step.bg} flex items-center justify-center text-xs font-bold ${step.text}`}>{step.num}</div>
+                        <span className="text-slate-600 text-xs font-medium leading-tight">{step.label}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex justify-center gap-4">
-                  <Link href="/" className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold text-lg py-4 px-8 rounded-xl flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg shadow-vvm-blue-600/20">
+                <div className="flex justify-center">
+                  <Link href="/" className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold text-sm sm:text-base py-3 px-6 rounded-xl flex items-center gap-2 transition-all hover:scale-105 shadow-lg shadow-vvm-blue-600/20">
                     Vissza a főoldalra
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>

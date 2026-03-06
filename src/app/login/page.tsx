@@ -48,7 +48,7 @@ function LoginPageContent() {
       } else if (role === 'admin' || role === 'dispatcher') {
         router.push('/admin');
       } else {
-        router.push('/');
+        router.push('/ugyfel/dashboard');
       }
     }
   }, [isAuthenticated, isLoading, role, router, redirect, registerSuccess]);
@@ -156,6 +156,21 @@ function LoginPageContent() {
         console.warn('user_meta insert warning:', metaError);
       }
 
+      // Send welcome email to the customer (fire-and-forget)
+      try {
+        fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'customer_welcome',
+            data: {
+              display_name: customerName.trim(),
+              to_email: customerEmail,
+            },
+          }),
+        }).catch(() => { });
+      } catch { }
+
       await supabase.auth.signOut();
       setRegisterSuccess(true);
     } catch (err: any) {
@@ -208,7 +223,7 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen relative pt-16 sm:pt-20 lg:pt-20 pb-4 sm:pb-6 flex flex-col justify-center">
+    <div className="min-h-screen relative pt-16 sm:pt-20 lg:pt-20 pb-4 sm:pb-6 overflow-y-auto">
       {/* Blurred background image */}
       <div className="fixed inset-0 -z-10 bg-slate-900 leading-none">
         <Image
@@ -221,16 +236,18 @@ function LoginPageContent() {
         />
       </div>
 
-      <div className="max-w-md md:max-w-lg lg:max-w-xl mx-auto px-3 sm:px-4 relative z-10 w-full">
+      <div className="max-w-md md:max-w-lg mx-auto px-3 sm:px-4 relative z-10 w-full">
         <Breadcrumbs className="mb-2 sm:mb-4" />
 
-        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
-          <div className="text-center mb-4 sm:mb-5">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
-              <LogIn className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-5 lg:p-6">
+          <div className="flex items-center justify-center gap-3 mb-4 sm:mb-5">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <LogIn className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
             </div>
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900 font-heading">Bejelentkezés</h1>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1">Válassza ki a fiókja típusát</p>
+            <div>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 font-heading leading-tight">Bejelentkezés</h1>
+              <p className="text-xs text-gray-500">Válassza ki a fiókja típusát</p>
+            </div>
           </div>
 
           <div className="flex bg-gray-50/80 border border-gray-200 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl mb-4 sm:mb-5 w-full">
@@ -259,7 +276,7 @@ function LoginPageContent() {
           {loginMode === 'contractor' && (
             <div className="bg-gray-50 rounded-xl p-3 mb-4">
               <p className="text-sm text-gray-600 text-center">
-                🔧 Ez a felület a regisztrált <strong>vízszerelők, villanyszerelők és fűtésszerelők</strong> számára készült,
+                Ez a felület a regisztrált <strong>vízszerelők, villanyszerelők és fűtésszerelők</strong> számára készült,
                 ahol a munkáikat kezelhetik.
               </p>
             </div>
@@ -270,9 +287,9 @@ function LoginPageContent() {
               <p className="text-sm text-vvm-blue-800 text-center">
                 {isCustomerRegister
                   ? (regStep === 'code'
-                    ? '📧 Ellenőrizze a postaládáját és írja be a 6 számjegyű megerősítő kódot!'
-                    : '👋 Adja meg az email címét és válasszon jelszót – utána megerősítő kódot küldünk!')
-                  : '👋 Üdvözöljük! Jelentkezzen be az email címével és jelszavával.'}
+                    ? 'Ellenőrizze a postaládáját és írja be a 6 számjegyű megerősítő kódot.'
+                    : 'Adja meg az email címét és válasszon jelszót — utána megerősítő kódot küldünk.')
+                  : 'Jelentkezzen be az email címével és jelszavával.'}
               </p>
             </div>
           )}

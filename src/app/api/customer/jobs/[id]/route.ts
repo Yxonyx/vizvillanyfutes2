@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient, createAdminClient } from '@/lib/supabase/server';
+import {
+    notifyCustomerRatingRequest,
+    getEmailByUserId,
+    getContractorEmail,
+} from '@/lib/services/leadNotificationService';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +32,7 @@ export async function PATCH(
         const adminClient = createAdminClient();
         const { data: job, error: jobError } = await adminClient
             .from('jobs')
-            .select('id, status, customer_id')
+            .select('id, status, created_by_user_id')
             .eq('id', jobId)
             .single();
 
@@ -35,8 +40,8 @@ export async function PATCH(
             return NextResponse.json({ success: false, error: 'Job not found' }, { status: 404 });
         }
 
-        // Verify ownership
-        if (job.customer_id !== user.id) {
+        // Verify ownership via auth user id
+        if (job.created_by_user_id !== user.id) {
             return NextResponse.json({ success: false, error: 'Nincs jogosultságod.' }, { status: 403 });
         }
 
@@ -67,6 +72,63 @@ export async function PATCH(
                 .update({ status: 'completed', updated_at: new Date().toISOString() })
                 .eq('id', jobId);
             if (updateError) return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
+
+            // Fire-and-forget: send rating request email
+            (async () => {
+                try {
+                    // Get job title
+                    const { data: fullJob } = await adminClient
+                        .from('jobs')
+                        .select('title, created_by_user_id')
+                        .eq('id', jobId)
+                        .single();
+                    if (!fullJob) return;
+
+                    // Get customer info
+                    const { data: customer } = await adminClient
+                        .from('customers')
+                        .select('full_name')
+                        .eq('user_id', fullJob.created_by_user_id)
+                        .single();
+
+                    const customerEmail = await getEmailByUserId(fullJob.created_by_user_id);
+                    if (!customerEmail) return;
+
+                    // Find the contractor: first try accepted interest, then assignment
+                    let contractorName = 'Szakember';
+                    const { data: acceptedInterest } = await adminClient
+                        .from('job_interests')
+                        .select('contractor_id, contractor_profiles(display_name)')
+                        .eq('job_id', jobId)
+                        .eq('status', 'accepted')
+                        .single();
+
+                    if (acceptedInterest) {
+                        contractorName = (acceptedInterest.contractor_profiles as any)?.display_name || 'Szakember';
+                    } else {
+                        const { data: assignment } = await adminClient
+                            .from('job_assignments')
+                            .select('contractor_profiles(display_name)')
+                            .eq('job_id', jobId)
+                            .eq('status', 'accepted')
+                            .single();
+                        if (assignment) {
+                            contractorName = (assignment.contractor_profiles as any)?.display_name || 'Szakember';
+                        }
+                    }
+
+                    await notifyCustomerRatingRequest({
+                        customerEmail,
+                        customerName: customer?.full_name || 'Ügyfél',
+                        contractorName,
+                        jobTitle: fullJob.title,
+                        jobId,
+                    });
+                } catch (err) {
+                    console.error('Error sending rating request email:', err);
+                }
+            })();
+
             return NextResponse.json({ success: true, message: 'Munka sikeresen befejezve!' });
         }
 

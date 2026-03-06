@@ -93,3 +93,53 @@ export function useAdminContractors(statusFilter: string) {
         mutateContractors: mutate,
     };
 }
+
+interface Lead {
+    id: string;
+    user_id: string;
+    lat: number;
+    lng: number;
+    type: string;
+    title: string;
+    description: string;
+    district: string;
+    status: string;
+    created_at: string;
+    contact_name: string | null;
+    contact_phone: string | null;
+    contact_email: string | null;
+    purchases?: {
+        id: string;
+        price_paid: number;
+        purchased_at: string;
+        contractor?: {
+            id: string;
+            display_name: string;
+            phone: string;
+        };
+    }[];
+}
+
+export function useAdminLeads(statusFilter: string) {
+    const params = new URLSearchParams();
+    if (statusFilter && statusFilter !== 'all') {
+        params.set('status', statusFilter);
+    }
+
+    const { data, error, isLoading, mutate } = useSWR<{ leads: Lead[] }>(
+        `/api/admin/leads?${params}`,
+        swrFetcher,
+        {
+            revalidateOnFocus: true,
+            dedupingInterval: 3000,
+        }
+    );
+
+    return {
+        leads: data?.leads || [],
+        isLoading,
+        error: error ? (error instanceof Error ? error.message : 'Unknown error') : null,
+        refresh: mutate,
+        mutateLeads: mutate,
+    };
+}

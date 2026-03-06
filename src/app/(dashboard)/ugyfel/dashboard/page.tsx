@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { getSession } from '@/lib/auth';
 import { supabase } from '@/lib/supabase/client';
-import { AlertCircle, Clock, MapPin, Search, CheckCircle, Shield, ArrowRight, User, Droplets, Zap, Flame, Briefcase, Trash2, Plus, ArrowLeft, X, Edit3, Loader2, Settings, FileText, Navigation, ExternalLink } from 'lucide-react';
+import { AlertCircle, Clock, MapPin, Search, CheckCircle, Shield, ArrowRight, User, Droplets, Zap, Flame, Briefcase, Trash2, Plus, ArrowLeft, X, Edit3, Loader2, Settings, FileText, Navigation, ExternalLink, Star } from 'lucide-react';
 import Link from 'next/link';
 import Map, { Marker, NavigationControl, GeolocateControl, Popup, MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -80,6 +80,14 @@ export default function CustomerDashboard() {
     const [savingEdit, setSavingEdit] = useState(false);
     const [isAddLeadModalOpen, setIsAddLeadModalOpen] = useState(false);
     const [interestActionLoading, setInterestActionLoading] = useState<string | null>(null);
+
+    // Rating modal state
+    const [ratingModal, setRatingModal] = useState<{ jobId: string; contractorName: string; contractorId: string } | null>(null);
+    const [ratingValue, setRatingValue] = useState(0);
+    const [ratingHover, setRatingHover] = useState(0);
+    const [ratingComment, setRatingComment] = useState('');
+    const [ratingSubmitting, setRatingSubmitting] = useState(false);
+    const [ratingSuccess, setRatingSuccess] = useState(false);
 
     // Mobile bottom sheet state
     const [sheetPosition, setSheetPosition] = useState<SheetPosition>('half');
@@ -212,7 +220,7 @@ export default function CustomerDashboard() {
           contractor_profiles ( display_name, phone )
         ),
         job_interests (
-          id, status, created_at,
+          id, status, created_at, contractor_id,
           contractor_profiles ( display_name, phone )
         )
       `)
@@ -330,6 +338,24 @@ export default function CustomerDashboard() {
                 if (selectedJob?.id === jobId) {
                     setSelectedJob(prev => prev ? { ...prev, status: 'completed' } : null);
                 }
+                // Find the contractor to open rating modal
+                const completedJob = jobs.find(j => j.id === jobId);
+                if (completedJob) {
+                    const acceptedAssignment = completedJob.job_assignments?.find(a => a.status === 'accepted');
+                    const acceptedInterest = completedJob.job_interests?.find(i => i.status === 'accepted');
+                    const contractor = acceptedAssignment?.contractor_profiles || acceptedInterest?.contractor_profiles;
+                    if (contractor) {
+                        setRatingModal({
+                            jobId,
+                            contractorName: contractor.display_name || 'Szakember',
+                            contractorId: (acceptedInterest as any)?.id || 'unknown',
+                        });
+                        setRatingValue(0);
+                        setRatingHover(0);
+                        setRatingComment('');
+                        setRatingSuccess(false);
+                    }
+                }
             } else {
                 alert(data.error || 'Hiba történt.');
             }
@@ -337,6 +363,49 @@ export default function CustomerDashboard() {
             alert('Hiba történt.');
         } finally {
             setCompletingId(null);
+        }
+    };
+
+    const handleSubmitRating = async () => {
+        if (!ratingModal || ratingValue === 0) return;
+        setRatingSubmitting(true);
+        try {
+            const { data: { session: sbSession } } = await supabase.auth.getSession();
+            const storedSession = getSession();
+            const token = sbSession?.access_token || storedSession?.session?.access_token;
+
+            // Find contractor_id properly
+            const completedJob = jobs.find(j => j.id === ratingModal.jobId);
+            const acceptedInterest = completedJob?.job_interests?.find(i => i.status === 'accepted');
+            const contractorId = (acceptedInterest as any)?.contractor_id || ratingModal.contractorId;
+
+            const res = await fetch('/api/customer/ratings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({
+                    job_id: ratingModal.jobId,
+                    contractor_id: contractorId,
+                    rating: ratingValue,
+                    comment: ratingComment.trim() || undefined,
+                }),
+            });
+            const result = await res.json();
+            if (result.success) {
+                setRatingSuccess(true);
+                setTimeout(() => {
+                    setRatingModal(null);
+                    setRatingSuccess(false);
+                }, 2000);
+            } else {
+                alert(result.error || 'Hiba történt az értékelés küldésekor.');
+            }
+        } catch {
+            alert('Hiba történt.');
+        } finally {
+            setRatingSubmitting(false);
         }
     };
 
@@ -484,14 +553,17 @@ export default function CustomerDashboard() {
     };
 
     const getStatusBadge = (status: string, assignments: JobAssignment[], interests?: JobInterest[]) => {
-        // If we have an accepted assignment, the pro is on their way or assigned
+        // If we have an accepted assignment OR accepted interest → contractor assigned
         const acceptedAssignment = assignments?.find(a => a.status === 'accepted');
+        const acceptedInterest = interests?.find(i => i.status === 'accepted');
 
-        if (acceptedAssignment) {
+        if (acceptedAssignment || acceptedInterest) {
+            const contractorName = acceptedAssignment?.contractor_profiles?.display_name
+                || acceptedInterest?.contractor_profiles?.display_name || '';
             return (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                     <CheckCircle className="w-4 h-4" />
-                    Szakember úton
+                    {contractorName ? `${contractorName} hozzárendelve` : 'Szakember kiválasztva'}
                 </span>
             );
         }
@@ -522,9 +594,9 @@ export default function CustomerDashboard() {
             case 'assigned':
             case 'scheduled':
                 return (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                        <Clock className="w-4 h-4" />
-                        Egyeztetés alatt
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">
+                        <CheckCircle className="w-4 h-4" />
+                        Szakember kijelölve
                     </span>
                 );
             case 'completed':
@@ -784,29 +856,36 @@ export default function CustomerDashboard() {
                                         {job.description}
                                     </p>
 
-                                    {contractor ? (
-                                        <div className="mt-5 pt-5 border-t border-slate-100 flex items-center justify-between relative z-10">
-                                            <div className="flex items-center gap-3 min-w-0">
-                                                <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-black flex-shrink-0 shadow-sm">
-                                                    {contractor.display_name.charAt(0)}
+                                    {(() => {
+                                        // Check both assignments and accepted interests
+                                        const assignedContractor = contractor;
+                                        const acceptedInterest = !assignedContractor && job.job_interests?.find(i => i.status === 'accepted');
+                                        const displayContractor = assignedContractor || (acceptedInterest ? acceptedInterest.contractor_profiles : null);
+
+                                        return displayContractor ? (
+                                            <div className="mt-5 pt-5 border-t border-slate-100 flex items-center justify-between relative z-10">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-black flex-shrink-0 shadow-sm">
+                                                        {displayContractor.display_name.charAt(0)}
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <p className="text-sm font-black text-slate-900 truncate">{displayContractor.display_name}</p>
+                                                        <p className="text-sm text-emerald-600 font-bold truncate">{displayContractor.phone}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="min-w-0">
-                                                    <p className="text-sm font-black text-slate-900 truncate">{contractor.display_name}</p>
-                                                    <p className="text-sm text-emerald-600 font-bold truncate">{contractor.phone}</p>
-                                                </div>
+                                                <a href={`tel:${displayContractor.phone}`} className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-colors flex items-center justify-center shadow-sm">
+                                                    <AlertCircle className="w-5 h-5" />
+                                                </a>
                                             </div>
-                                            <a href={`tel:${contractor.phone}`} className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-colors flex items-center justify-center shadow-sm">
-                                                <AlertCircle className="w-5 h-5" />
-                                            </a>
-                                        </div>
-                                    ) : (
-                                        <div className="mt-5 pt-5 border-t border-slate-100 flex items-center gap-3 text-amber-700 bg-amber-50/50 p-3.5 rounded-2xl relative z-10 border border-amber-100/50">
-                                            <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse flex-shrink-0"></div>
-                                            <p className="text-[11px] font-black uppercase tracking-tight">
-                                                Szakemberek értesítve. Kis türelmet...
-                                            </p>
-                                        </div>
-                                    )}
+                                        ) : (
+                                            <div className="mt-5 pt-5 border-t border-slate-100 flex items-center gap-3 text-amber-700 bg-amber-50/50 p-3.5 rounded-2xl relative z-10 border border-amber-100/50">
+                                                <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse flex-shrink-0"></div>
+                                                <p className="text-[11px] font-black uppercase tracking-tight">
+                                                    Szakemberek értesítve. Kis türelmet...
+                                                </p>
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                             );
                         })}
@@ -1309,7 +1388,7 @@ export default function CustomerDashboard() {
                                                     <div className="flex-1">
                                                         <p className="font-black text-slate-900">{interest.contractor_profiles?.display_name || 'Szakember'}</p>
                                                         <p className="text-[11px] text-blue-600 font-black uppercase tracking-wider mt-1">
-                                                            🔔 Érdeklődik a munkád iránt!
+                                                            🔔 Jelentkezett a munkádra!
                                                         </p>
                                                     </div>
                                                 </div>
@@ -1342,50 +1421,80 @@ export default function CustomerDashboard() {
                             )}
 
                             {/* Job Assignments / Specialists */}
-                            {!isEditing && (
-                                <div className="mb-4">
-                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-1">Kapcsolódó szakemberek</h4>
-                                    {selectedJob.job_assignments?.length > 0 ? (
-                                        <div className="space-y-3">
-                                            {selectedJob.job_assignments.map((assignment, idx) => (
-                                                <div key={idx} className={`p-4 rounded-[1.5rem] border flex items-center justify-between transition-all ${assignment.status === 'accepted' ? 'bg-emerald-50 border-emerald-100 ring-1 ring-emerald-200/50' : 'bg-white border-slate-100 shadow-sm'
-                                                    }`}>
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg ${assignment.status === 'accepted' ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400'
-                                                            }`}>
-                                                            {assignment.contractor_profiles?.display_name.charAt(0)}
+                            {!isEditing && (() => {
+                                // Collect all assigned contractors from both assignments AND accepted interests
+                                const assignedFromAssignments = (selectedJob.job_assignments || []).map((a, idx) => ({
+                                    key: `assignment-${idx}`,
+                                    name: a.contractor_profiles?.display_name || 'Szakember',
+                                    phone: a.contractor_profiles?.phone || '',
+                                    isAccepted: a.status === 'accepted',
+                                    label: a.status === 'accepted' ? '✅ Elfogadva' : '⏳ Folyamatban',
+                                }));
+                                const assignedFromInterests = (selectedJob.job_interests || [])
+                                    .filter(i => i.status === 'accepted')
+                                    .map((i, idx) => ({
+                                        key: `interest-${idx}`,
+                                        name: i.contractor_profiles?.display_name || 'Szakember',
+                                        phone: i.contractor_profiles?.phone || '',
+                                        isAccepted: true,
+                                        label: '✅ Elfogadva',
+                                    }));
+                                // Merge both, deduplicate by name
+                                const allAssigned = [...assignedFromAssignments, ...assignedFromInterests];
+                                const seen = new Set<string>();
+                                const uniqueAssigned = allAssigned.filter(a => {
+                                    if (seen.has(a.name)) return false;
+                                    seen.add(a.name);
+                                    return true;
+                                });
+                                const hasPendingInterests = (selectedJob.job_interests || []).some(i => i.status === 'pending');
+
+                                return (
+                                    <div className="mb-4">
+                                        <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-1">Kapcsolódó szakemberek</h4>
+                                        {uniqueAssigned.length > 0 ? (
+                                            <div className="space-y-3">
+                                                {uniqueAssigned.map(contractor => (
+                                                    <div key={contractor.key} className={`p-4 rounded-[1.5rem] border flex items-center justify-between transition-all ${contractor.isAccepted ? 'bg-emerald-50 border-emerald-100 ring-1 ring-emerald-200/50' : 'bg-white border-slate-100 shadow-sm'}`}>
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg ${contractor.isAccepted ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 text-slate-400'}`}>
+                                                                {contractor.name.charAt(0)}
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-black text-slate-900">{contractor.name}</p>
+                                                                {contractor.isAccepted && contractor.phone && (
+                                                                    <p className="text-sm font-bold text-emerald-600 mt-0.5">{contractor.phone}</p>
+                                                                )}
+                                                                <p className="text-[11px] text-slate-500 font-black uppercase tracking-wider mt-1">
+                                                                    {contractor.label}
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <p className="font-black text-slate-900">{assignment.contractor_profiles?.display_name}</p>
-                                                            {assignment.status === 'accepted' && (
-                                                                <p className="text-sm font-bold text-emerald-600 mt-0.5">{assignment.contractor_profiles?.phone}</p>
-                                                            )}
-                                                            <p className="text-[11px] text-slate-500 font-black uppercase tracking-wider mt-1">
-                                                                {assignment.status === 'accepted' ? '✅ Elfogadta' : '⏳ Érdeklődik'}
-                                                            </p>
-                                                        </div>
+                                                        {contractor.isAccepted && contractor.phone && (
+                                                            <a href={`tel:${contractor.phone}`} className="w-10 h-10 bg-white text-emerald-600 rounded-xl shadow-sm border border-emerald-100 flex items-center justify-center hover:bg-emerald-50 transition-colors">
+                                                                <Briefcase className="w-5 h-5" />
+                                                            </a>
+                                                        )}
                                                     </div>
-                                                    {assignment.status === 'accepted' && (
-                                                        <a href={`tel:${assignment.contractor_profiles?.phone}`} className="w-10 h-10 bg-white text-emerald-600 rounded-xl shadow-sm border border-emerald-100 flex items-center justify-center hover:bg-emerald-50 transition-colors">
-                                                            <Briefcase className="w-5 h-5" />
-                                                        </a>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : selectedJob.job_interests?.filter(i => i.status === 'pending').length === 0 ? (
-                                        <div className="text-xs font-black text-amber-700 bg-amber-50/50 p-5 rounded-2xl flex items-center gap-4 border border-amber-100/50">
-                                            <div className="w-3 h-3 rounded-full bg-amber-500 animate-pulse flex-shrink-0"></div>
-                                            Még nincs szakember hozzárendelve. Automatikusan értesítettük a környékbeli mestereket.
-                                        </div>
-                                    ) : null}
-                                </div>
-                            )}
+                                                ))}
+                                            </div>
+                                        ) : !hasPendingInterests ? (
+                                            <div className="text-xs font-black text-amber-700 bg-amber-50/50 p-5 rounded-2xl flex items-center gap-4 border border-amber-100/50">
+                                                <div className="w-3 h-3 rounded-full bg-amber-500 animate-pulse flex-shrink-0"></div>
+                                                {['assigned', 'in_progress', 'scheduled'].includes(selectedJob.status)
+                                                    ? 'A szakember adatai hamarosan megjelennek.'
+                                                    : 'Még nincs jelentkező szakember. Automatikusan értesítettük a környékbeli mestereket.'
+                                                }
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Footer Commands — Status-based */}
                         {!isEditing && (() => {
-                            const hasAcceptedContractor = selectedJob.job_assignments?.some(a => a.status === 'accepted');
+                            const hasAcceptedContractor = selectedJob.job_assignments?.some(a => a.status === 'accepted') || selectedJob.job_interests?.some(i => i.status === 'accepted');
                             const isDeletable = ['waiting', 'open', 'new', 'unassigned'].includes(selectedJob.status) && !hasAcceptedContractor;
                             const isInProgress = ['assigned', 'in_progress', 'scheduled'].includes(selectedJob.status) || hasAcceptedContractor;
                             const isFinished = ['completed', 'cancelled_by_customer', 'cancelled'].includes(selectedJob.status);
@@ -1405,7 +1514,7 @@ export default function CustomerDashboard() {
                                             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-200 disabled:opacity-50 active:scale-95"
                                         >
                                             <CheckCircle className="w-5 h-5" />
-                                            {completingId === selectedJob.id ? 'Feldolgozás...' : 'Munka kész — Elfogadom'}
+                                            {completingId === selectedJob.id ? 'Feldolgozás...' : '✅ Munka befejezve'}
                                         </button>
                                     </div>
                                 );
@@ -1462,6 +1571,108 @@ export default function CustomerDashboard() {
                         fetchJobs(); // Refresh jobs list
                     }}
                 />
+            )}
+
+            {/* Rating Modal */}
+            {ratingModal && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
+                    <div className="bg-white rounded-[2rem] shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-300">
+                        {/* Header — site brand blue */}
+                        <div className="bg-gradient-to-r from-vvm-blue-600 to-vvm-blue-500 p-5 text-center relative">
+                            <button onClick={() => setRatingModal(null)} className="absolute top-3 right-3 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                <X className="w-4 h-4" />
+                            </button>
+                            <Star className="w-8 h-8 text-white mx-auto mb-1 fill-white/30" />
+                            <h2 className="text-lg font-black text-white">Értékeld a szakembert</h2>
+                            <p className="text-white/70 text-sm mt-0.5">{ratingModal.contractorName}</p>
+                        </div>
+
+                        {ratingSuccess ? (
+                            <div className="p-8 text-center">
+                                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <CheckCircle className="w-8 h-8 text-emerald-600" />
+                                </div>
+                                <h3 className="text-lg font-black text-slate-900 mb-1">Köszönjük az értékelést!</h3>
+                                <p className="text-sm text-slate-500">Az értékelésed segíti a többi ügyfelet.</p>
+                            </div>
+                        ) : (
+                            <div className="p-5">
+                                {/* Stars */}
+                                <div className="flex justify-center gap-3 mb-4">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            onClick={() => setRatingValue(star)}
+                                            onMouseEnter={() => setRatingHover(star)}
+                                            onMouseLeave={() => setRatingHover(0)}
+                                            className="transition-all duration-200 hover:scale-110"
+                                        >
+                                            <Star
+                                                className={`w-10 h-10 transition-colors duration-200 ${star <= (ratingHover || ratingValue)
+                                                    ? 'text-amber-400 fill-amber-400'
+                                                    : 'text-slate-200 fill-slate-100'
+                                                    }`}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Rating label — text only, no emojis */}
+                                <div className="text-center mb-4">
+                                    <span className="text-sm font-bold text-slate-500">
+                                        {ratingValue === 0 && 'Válassz csillagot'}
+                                        {ratingValue === 1 && 'Gyenge'}
+                                        {ratingValue === 2 && 'Elfogadható'}
+                                        {ratingValue === 3 && 'Jó'}
+                                        {ratingValue === 4 && 'Nagyon jó'}
+                                        {ratingValue === 5 && 'Kiváló!'}
+                                    </span>
+                                </div>
+
+                                {/* Comment */}
+                                <textarea
+                                    className="w-full border border-slate-200 rounded-xl p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-vvm-blue-400/50 focus:border-vvm-blue-400 transition-all"
+                                    placeholder="Írd le a tapasztalataidat... (opcionális)"
+                                    rows={3}
+                                    value={ratingComment}
+                                    onChange={(e) => setRatingComment(e.target.value)}
+                                />
+
+                                {/* Submit */}
+                                <button
+                                    onClick={handleSubmitRating}
+                                    disabled={ratingValue === 0 || ratingSubmitting}
+                                    className={`w-full mt-3 py-3.5 rounded-xl font-black text-white text-sm transition-all flex items-center justify-center gap-2 ${ratingValue === 0
+                                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                                        : ratingSubmitting
+                                            ? 'bg-vvm-blue-300 cursor-wait'
+                                            : 'bg-vvm-blue-600 hover:bg-vvm-blue-700 active:scale-[0.98] shadow-md'
+                                        }`}
+                                >
+                                    {ratingSubmitting ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            Küldés...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Star className="w-4 h-4 fill-white" />
+                                            {`Értékelés küldése (${ratingValue}/5)`}
+                                        </>
+                                    )}
+                                </button>
+
+                                {/* Skip */}
+                                <button
+                                    onClick={() => setRatingModal(null)}
+                                    className="w-full mt-2 py-2.5 text-sm text-slate-400 hover:text-slate-600 transition-colors font-medium"
+                                >
+                                    Most nem értékelek
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
             )}
         </div>
     );
