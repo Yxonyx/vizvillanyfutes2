@@ -2,10 +2,8 @@
 
 import Link from 'next/link';
 import {
-  Mail, MapPin,
-  Shield, Award, Clock, CheckCircle,
+  Mail, MapPin, CheckCircle,
   Facebook, Linkedin, Instagram, Phone,
-  ThumbsUp, Star, Users
 } from 'lucide-react';
 import Logo from './Logo';
 
@@ -41,39 +39,19 @@ const footerLinks = {
 export default function Footer() {
   return (
     <footer className="bg-zinc-900 text-white pb-20 lg:pb-0">
-      {/* Trust Badges */}
-      <div className="border-b border-slate-800 relative overflow-hidden">
-        {/* Decorative gradient orb */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-vvm-blue-600/[0.07] rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20 relative z-10">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-black text-white mb-3 tracking-tight">
-              Minden, amire a zavartalan otthonhoz szükséged van
-            </h2>
-            <p className="text-slate-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
-              Szakmai felkészültség és ügyfélközpontú hozzáállás — garantált minőség, tartós eredmények.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+      {/* Trust Strip */}
+      <div className="border-b border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
             {[
-              { icon: <ThumbsUp className="w-6 h-6" />, color: 'text-emerald-400', glow: 'shadow-emerald-500/10', border: 'border-emerald-500/20', bg: 'bg-emerald-500/10', title: 'Ingyenes ajánlatkérés', desc: 'Rejtett költségek nélkül, kötelezettségmentesen' },
-              { icon: <CheckCircle className="w-6 h-6" />, color: 'text-vvm-blue-400', glow: 'shadow-blue-500/10', border: 'border-blue-500/20', bg: 'bg-vvm-blue-500/10', title: 'Ellenőrzött szakemberek', desc: 'Kézzel válogatott, minősített mesterek' },
-              { icon: <Star className="w-6 h-6" />, color: 'text-amber-400', glow: 'shadow-amber-500/10', border: 'border-amber-500/20', bg: 'bg-amber-500/10', title: 'Valós értékelések', desc: 'Korábbi ügyfelek hiteles véleményei' },
-              { icon: <Users className="w-6 h-6" />, color: 'text-indigo-400', glow: 'shadow-indigo-500/10', border: 'border-indigo-500/20', bg: 'bg-indigo-500/10', title: 'Több szakember', desc: 'A legjobb ajánlatot választhatod ki' },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className={`group relative flex flex-col items-center text-center gap-3 p-5 md:p-6 rounded-2xl bg-white/[0.04] backdrop-blur-sm border ${item.border} hover:bg-white/[0.07] transition-all duration-300 shadow-lg ${item.glow}`}
-              >
-                <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center ${item.color} group-hover:scale-110 transition-transform duration-300`}>
-                  {item.icon}
-                </div>
-                <div>
-                  <div className="font-bold text-white text-sm md:text-[15px] leading-tight mb-1">{item.title}</div>
-                  <div className="text-xs text-slate-400 leading-snug">{item.desc}</div>
-                </div>
+              'Ingyenes ajánlatkérés',
+              'Ellenőrzött szakemberek',
+              'Garancia a munkára',
+              'Több szakember, legjobb ajánlat',
+            ].map((text, i) => (
+              <div key={i} className="flex items-center gap-2 text-slate-400 text-sm">
+                <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                <span>{text}</span>
               </div>
             ))}
           </div>

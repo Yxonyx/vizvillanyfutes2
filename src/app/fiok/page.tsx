@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
-import { User, Mail, Shield, CreditCard, Bell, LogOut, ArrowLeft, Briefcase, FileText } from 'lucide-react';
+import { Mail, LogOut, ArrowLeft, KeyRound, ChevronRight, User, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
 export default function FiokPage() {
@@ -18,7 +18,7 @@ export default function FiokPage() {
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="animate-spin w-8 h-8 border-4 border-vvm-blue-600 border-t-transparent rounded-full" />
+                <div className="animate-spin w-6 h-6 border-2 border-vvm-blue-600 border-t-transparent rounded-full" />
             </div>
         );
     }
@@ -27,9 +27,9 @@ export default function FiokPage() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="text-center">
-                    <h1 className="text-2xl font-black text-slate-800 mb-2">Bejelentkezés szükséges</h1>
-                    <p className="text-slate-500 mb-4">A fiók adatainak megtekintéséhez be kell jelentkezned.</p>
-                    <Link href="/" className="text-vvm-blue-600 font-bold hover:underline">
+                    <h1 className="text-xl font-bold text-slate-800 mb-2">Bejelentkezés szükséges</h1>
+                    <p className="text-slate-500 text-sm mb-4">A fiók adatainak megtekintéséhez be kell jelentkezned.</p>
+                    <Link href="/" className="text-vvm-blue-600 font-semibold text-sm hover:underline">
                         Vissza a főoldalra
                     </Link>
                 </div>
@@ -50,146 +50,120 @@ export default function FiokPage() {
         }
     };
 
+    const handlePasswordReset = async () => {
+        if (!user.email) return;
+        try {
+            await supabase.auth.resetPasswordForEmail(user.email, {
+                redirectTo: `${window.location.origin}/fiok`,
+            });
+            alert('Jelszócsere e-mail elküldve!');
+        } catch (e) {
+            console.error('Password reset error:', e);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-50">
             {/* Header */}
-            <div className="bg-white border-b border-slate-200 shadow-sm mt-16">
-                <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
-                    <Link href="/" className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500">
-                        <ArrowLeft className="w-5 h-5" />
+            <div className="bg-white border-b border-slate-200 mt-16">
+                <div className="max-w-xl mx-auto px-4 py-4 flex items-center gap-3">
+                    <Link href={isContractor ? '/contractor/dashboard' : '/ugyfel/dashboard'} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-400">
+                        <ArrowLeft className="w-4 h-4" />
                     </Link>
-                    <h1 className="text-xl font-black text-slate-800 tracking-tight">Fiók Adataim</h1>
+                    <h1 className="text-base font-bold text-slate-800">Fiók beállítások</h1>
                 </div>
             </div>
 
+            <div className="max-w-xl mx-auto px-4 py-6 space-y-5">
 
-
-            <div className="max-w-2xl mx-auto px-4 pt-6 pb-8 space-y-6">
-
-                {/* Profile Card */}
-                <div className="bg-slate-800 text-white p-5 sm:p-6 rounded-2xl shadow-lg relative overflow-hidden mb-4 border border-slate-700">
-                    {/* Decorative elements */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-vvm-blue-500/20 rounded-full blur-xl -ml-10 -mb-10 pointer-events-none"></div>
-
-                    <div className="flex items-center gap-4 relative z-10">
-                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center flex-shrink-0 shadow-inner">
-                            <User className="w-7 h-7 sm:w-8 sm:h-8 text-slate-300" />
+                {/* Profile summary */}
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                    <div className="flex items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-full bg-vvm-blue-50 border border-vvm-blue-100 flex items-center justify-center flex-shrink-0">
+                            <User className="w-5 h-5 text-vvm-blue-600" />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <div className="font-bold text-base sm:text-lg truncate mb-1">
-                                {user.email}
-                            </div>
-                            <div className="flex items-center gap-1.5 text-xs text-slate-300 font-medium bg-slate-700/50 w-fit px-2.5 py-1 rounded-md border border-slate-600/50">
-                                {isContractor ? (
-                                    <><Shield className="w-3.5 h-3.5 text-emerald-400" /> Szakember Partner</>
-                                ) : (
-                                    <><User className="w-3.5 h-3.5 text-blue-400" /> Regisztrált Ügyfél</>
-                                )}
+                            <div className="font-bold text-slate-800 text-[15px] truncate">{user.email}</div>
+                            <div className="text-xs text-slate-400 font-medium mt-0.5">
+                                {isContractor ? 'Szakember partner' : 'Regisztrált ügyfél'}
                             </div>
                         </div>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg ${isContractor ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-blue-50 text-vvm-blue-600 border border-blue-100'}`}>
+                            {isContractor ? 'Szakember' : 'Ügyfél'}
+                        </span>
                     </div>
                 </div>
 
-                <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-                    <div>
-                        <label className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
-                            <Mail className="w-3.5 h-3.5" /> Email cím
-                        </label>
-                        <div className="text-slate-800 font-medium text-[15px]">{user.email}</div>
-                    </div>
-
-                    <div className="pt-4 border-t border-slate-100">
-                        <label className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
-                            <Shield className="w-3.5 h-3.5" /> Szerepkör
-                        </label>
-                        <div className="text-slate-800 font-medium text-[15px]">
-                            {isContractor ? 'Regisztrált Szakember' : 'Regisztrált Ügyfél'}
+                {/* Account details */}
+                <div>
+                    <h2 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 px-1">Fiók adatok</h2>
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100 overflow-hidden">
+                        {/* Email */}
+                        <div className="px-4 py-3.5 flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
+                                <Mail className="w-3.5 h-3.5 text-slate-400" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">E-mail cím</div>
+                                <div className="text-sm font-semibold text-slate-700 mt-0.5">{user.email}</div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="pt-4 border-t border-slate-100">
-                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Jelszó módosítása</label>
-                        <button className="text-sm font-bold text-vvm-blue-600 hover:text-vvm-blue-800 transition-colors flex items-center gap-1">
-                            Jelszócsere e-mail küldése <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
+                        {/* Password change */}
+                        <button
+                            onClick={handlePasswordReset}
+                            className="w-full px-4 py-3.5 flex items-center gap-3 hover:bg-slate-50 transition-colors text-left"
+                        >
+                            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
+                                <KeyRound className="w-3.5 h-3.5 text-slate-400" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-sm font-semibold text-slate-700">Jelszó módosítása</div>
+                                <div className="text-[11px] text-slate-400 mt-0.5">Jelszócsere e-mail küldése</div>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-slate-300" />
                         </button>
                     </div>
                 </div>
 
                 {/* Contractor: Credit Balance */}
                 {isContractor && (
-                    <div className="bg-gradient-to-r from-slate-800 to-slate-700 text-white rounded-2xl p-6 shadow-lg">
-                        <div className="flex items-center gap-2 mb-1">
-                            <CreditCard className="w-4 h-4 text-slate-300" />
-                            <span className="text-xs text-slate-300 font-bold uppercase tracking-wider">Kredit egyenleg</span>
-                        </div>
-                        <div className="text-3xl font-black font-mono mt-1">
-                            {contractorProfile ? (contractorProfile.credit_balance || 0).toLocaleString('hu-HU') : 0} Ft
-                        </div>
-                        <Link href="/contractor/topup" className="mt-3 inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm py-2 px-4 rounded-xl transition-colors">
-                            + Kredit feltöltés
-                        </Link>
-                    </div>
-                )}
-
-                {/* Contractor: Stats */}
-                {isContractor && (
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
-                            <Briefcase className="w-6 h-6 text-vvm-blue-600 mx-auto mb-2" />
-                            <div className="text-3xl font-black text-slate-800">0</div>
-                            <div className="text-xs text-slate-500 font-medium mt-1">Elvállalt munka</div>
-                        </div>
-                        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
-                            <FileText className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
-                            <div className="text-3xl font-black text-emerald-600">0</div>
-                            <div className="text-xs text-slate-500 font-medium mt-1">Befejezett munka</div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Customer: Report stats */}
-                {!isContractor && (
-                    <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-2xl p-6 shadow-lg">
-                        <div className="flex items-center gap-2 mb-1">
-                            <FileText className="w-4 h-4 text-emerald-100" />
-                            <span className="text-xs text-emerald-100 font-bold uppercase tracking-wider">Bejelentéseim</span>
-                        </div>
-                        <div className="text-3xl font-black font-mono mt-1">0 db</div>
-                        <div className="text-sm text-emerald-200 mt-1">Aktív probléma bejelentés</div>
-                    </div>
-                )}
-
-                {/* Notifications (contractor) */}
-                {isContractor && (
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-3">
-                            <Bell className="w-4 h-4 text-slate-500" />
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Értesítések</label>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-slate-700">Új SOS munkák pittyegése</span>
-                            <div className="w-11 h-6 bg-emerald-500 rounded-full relative cursor-pointer transition-colors">
-                                <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-transform" />
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-between mt-3">
-                            <span className="text-sm font-medium text-slate-700">Email értesítések</span>
-                            <div className="w-11 h-6 bg-emerald-500 rounded-full relative cursor-pointer transition-colors">
-                                <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-transform" />
+                    <div>
+                        <h2 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 px-1">Egyenleg</h2>
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
+                                        <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Kredit egyenleg</div>
+                                        <div className="text-xl font-bold text-slate-800 font-mono mt-0.5">
+                                            {contractorProfile ? (contractorProfile.credit_balance || 0).toLocaleString('hu-HU') : 0} <span className="text-xs font-semibold text-slate-400">Ft</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Link
+                                    href="/contractor/topup"
+                                    className="bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-semibold text-xs py-2 px-4 rounded-xl transition-colors"
+                                >
+                                    Feltöltés
+                                </Link>
                             </div>
                         </div>
                     </div>
                 )}
 
                 {/* Logout */}
-                <button
-                    onClick={handleLogout}
-                    className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-4 rounded-2xl transition-colors border border-red-200 flex items-center justify-center gap-2"
-                >
-                    <LogOut className="w-5 h-5" />
-                    Kijelentkezés
-                </button>
+                <div className="pt-2">
+                    <button
+                        onClick={handleLogout}
+                        className="w-full bg-white border border-slate-200 hover:border-red-200 hover:bg-red-50 text-slate-500 hover:text-red-600 font-semibold py-3 rounded-2xl transition-all text-sm flex items-center justify-center gap-2 shadow-sm"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        Kijelentkezés
+                    </button>
+                </div>
 
             </div>
         </div>

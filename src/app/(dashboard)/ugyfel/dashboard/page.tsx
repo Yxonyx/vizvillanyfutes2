@@ -213,7 +213,7 @@ export default function CustomerDashboard() {
             const { data: jobsData, error: jobsError } = await supabase
                 .from('jobs')
                 .select(`
-        id, title, description, trade, status, created_at, latitude, longitude,
+        id, title, description, trade, status, created_at, latitude, longitude, photo_urls, lead_id,
         addresses ( city, district, street ),
         job_assignments (
           status,
@@ -229,12 +229,12 @@ export default function CustomerDashboard() {
 
             if (jobsError) throw jobsError;
 
-            // 2. Fetch raw leads (waiting status)
+            // 2. Fetch raw leads (waiting AND converted — so they don't vanish when contractor applies)
             const { data: leadsData, error: leadsError } = await supabase
                 .from('leads')
                 .select('*')
                 .eq('user_id', user.id)
-                .eq('status', 'waiting')
+                .in('status', ['waiting', 'converted'])
                 .order('created_at', { ascending: false });
 
             if (leadsError) throw leadsError;
@@ -246,23 +246,30 @@ export default function CustomerDashboard() {
                 allJobs = [...allJobs, ...(jobsData as unknown as Job[])];
             }
 
-            // Map leads to Job format
+            // Collect lead IDs that already have a corresponding job (to avoid duplicates)
+            const convertedLeadIds = new Set(
+                (jobsData || []).map((j: any) => j.lead_id).filter(Boolean)
+            );
+
+            // Map leads to Job format (skip those already shown as jobs)
             if (leadsData) {
-                const mappedLeads = leadsData.map((l: any): Job => ({
+                const mappedLeads = leadsData
+                    .filter((l: any) => !convertedLeadIds.has(l.id))
+                    .map((l: any): Job => ({
                     id: l.id,
                     title: l.title,
                     description: l.description || '',
                     trade: l.type === 'egyeb' ? 'viz' : (l.type || 'viz'),
-                    status: l.status, // "waiting", which we'll treat as "new" conceptually
+                    status: l.status, // "waiting" or "converted"
                     created_at: l.created_at,
                     latitude: l.lat,
                     longitude: l.lng,
                     addresses: {
-                        city: 'Budapest', // Default or parse from address if needed
+                        city: 'Budapest',
                         district: l.district ? l.district.replace('. kerület', '') : '',
                         street: l.address || ''
                     },
-                    job_assignments: [] // Raw leads have no assignments yet
+                    job_assignments: []
                 }));
                 allJobs = [...allJobs, ...mappedLeads];
             }
@@ -987,17 +994,14 @@ export default function CustomerDashboard() {
                                         <span>Saját bejelentéseim</span>
                                         <ArrowRight className="w-4 h-4 ml-auto text-slate-300" />
                                     </button>
-                                    <button
-                                        onClick={() => setDesktopTab('account')}
-                                        className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors ${desktopTab === 'account'
-                                            ? 'text-vvm-blue-600 bg-vvm-blue-600/5 border-l-2 border-vvm-blue-600'
-                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                                            }`}
+                                    <Link
+                                        href="/fiok"
+                                        className="w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                                     >
                                         <Settings className="w-4 h-4 flex-shrink-0" />
                                         <span>Saját fiókom</span>
                                         <ArrowRight className="w-4 h-4 ml-auto text-slate-300" />
-                                    </button>
+                                    </Link>
                                 </nav>
 
                                 {/* Section Content */}
@@ -1086,25 +1090,7 @@ export default function CustomerDashboard() {
                                     </div>
                                 )}
 
-                                {desktopTab === 'account' && (
-                                    <div className="px-4 py-4 border-t border-slate-100">
-                                        <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-3 px-1">
-                                            Fiók kezelése
-                                        </h2>
-                                        <Link
-                                            href="/fiok"
-                                            className="bg-slate-50 hover:bg-slate-100 rounded-xl p-3 flex items-center justify-between transition-colors border border-slate-100"
-                                        >
-                                            <div className="flex items-center gap-2.5">
-                                                <div className="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center text-slate-500">
-                                                    <Settings className="w-4 h-4" />
-                                                </div>
-                                                <span className="text-sm font-semibold text-slate-700">Fiók beállítások</span>
-                                            </div>
-                                            <ArrowRight className="w-4 h-4 text-slate-400" />
-                                        </Link>
-                                    </div>
-                                )}
+
                             </div>
                         </div>
 
@@ -1209,16 +1195,13 @@ export default function CustomerDashboard() {
                                     <FileText className="w-3.5 h-3.5" />
                                     <span>Bejelentéseim</span>
                                 </button>
-                                <button
-                                    onClick={() => setMobileTab('account')}
-                                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all ${mobileTab === 'account'
-                                        ? 'bg-white text-slate-900 shadow-sm'
-                                        : 'text-slate-500 hover:text-slate-700'
-                                        }`}
+                                <Link
+                                    href="/fiok"
+                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-700"
                                 >
                                     <Settings className="w-3.5 h-3.5" />
                                     <span>Fiókom</span>
-                                </button>
+                                </Link>
                             </div>
                         </div>
 
@@ -1259,25 +1242,7 @@ export default function CustomerDashboard() {
                                 </div>
                             )}
 
-                            {mobileTab === 'account' && (
-                                <div className="space-y-4 pt-2">
-                                    <Link
-                                        href="/fiok"
-                                        className="w-full bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500">
-                                                <Settings className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-slate-900 text-sm">Fiók beállítások</p>
-                                                <p className="text-xs text-slate-500">Email, jelszó, értesítések</p>
-                                            </div>
-                                        </div>
-                                        <ArrowRight className="w-5 h-5 text-slate-400" />
-                                    </Link>
-                                </div>
-                            )}
+
                         </div>
                     </div>
                 </div>
@@ -1514,7 +1479,7 @@ export default function CustomerDashboard() {
                                             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-200 disabled:opacity-50 active:scale-95"
                                         >
                                             <CheckCircle className="w-5 h-5" />
-                                            {completingId === selectedJob.id ? 'Feldolgozás...' : '✅ Munka befejezve'}
+                                            {completingId === selectedJob.id ? 'Feldolgozás...' : 'Munka befejezve'}
                                         </button>
                                     </div>
                                 );

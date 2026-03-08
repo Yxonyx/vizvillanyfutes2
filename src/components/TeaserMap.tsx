@@ -32,6 +32,8 @@ interface Lead {
     district: string;
     status: string;
     created_at: string;
+    has_pending?: boolean;
+    has_accepted?: boolean;
 }
 
 // Fake active leads for unauthenticated users, carefully spread out across Budapest to prevent overlapping
@@ -120,40 +122,54 @@ export default function TeaserMap() {
                         }));
                     }
                 } else if (role === 'customer') {
-                    // Fetch customer's own jobs
+                    // Fetch customer's own jobs (use created_by_user_id)
                     const { data: jobsData, error: jobsError } = await supabase
                         .from('jobs')
-                        .select('id, title, description, trade, status, created_at, latitude, longitude, district_or_city')
-                        .eq('customer_id', user.id)
+                        .select('id, title, description, trade, status, created_at, latitude, longitude, district_or_city, lead_id, job_interests(id, status)')
+                        .eq('created_by_user_id', user.id)
                         .order('created_at', { ascending: false });
 
-                    // Also fetch customer's raw waiting leads
+                    // Also fetch customer's leads (waiting AND converted)
                     const { data: leadsData, error: leadsError } = await supabase
                         .from('leads')
                         .select('*')
                         .eq('user_id', user.id)
-                        .eq('status', 'waiting')
+                        .in('status', ['waiting', 'converted'])
                         .order('created_at', { ascending: false });
 
                     let combinedLeads: Lead[] = [];
 
+                    // Collect lead IDs from jobs to deduplicate
+                    const jobLeadIds = new Set(
+                        (jobsData || []).map((j: any) => j.lead_id).filter(Boolean)
+                    );
+
                     if (jobsData && !jobsError) {
-                        combinedLeads = [...combinedLeads, ...jobsData.map((j: any) => ({
-                            id: j.id,
-                            user_id: user.id, // Mark as own lead
-                            lat: j.latitude,
-                            lng: j.longitude,
-                            type: j.trade === 'egyeb' ? 'viz' : (j.trade || 'viz'),
-                            title: j.title,
-                            description: j.description || '',
-                            district: j.district_or_city || null,
-                            status: j.status,
-                            created_at: j.created_at
-                        }))];
+                        combinedLeads = [...combinedLeads, ...jobsData.map((j: any) => {
+                            const interests = j.job_interests || [];
+                            const hasPending = interests.some((i: any) => i.status === 'pending');
+                            const hasAccepted = interests.some((i: any) => i.status === 'accepted');
+                            return {
+                                id: j.id,
+                                user_id: user.id,
+                                lat: j.latitude,
+                                lng: j.longitude,
+                                type: j.trade === 'egyeb' ? 'viz' : (j.trade || 'viz'),
+                                title: j.title,
+                                description: j.description || '',
+                                district: j.district_or_city || null,
+                                status: j.status,
+                                created_at: j.created_at,
+                                has_pending: hasPending,
+                                has_accepted: hasAccepted,
+                            };
+                        })];
                     }
 
                     if (leadsData && !leadsError) {
-                        combinedLeads = [...combinedLeads, ...leadsData.map((l: any) => ({
+                        // Only add leads that DON'T have a corresponding job
+                        const filteredLeads = leadsData.filter((l: any) => !jobLeadIds.has(l.id));
+                        combinedLeads = [...combinedLeads, ...filteredLeads.map((l: any) => ({
                             id: l.id,
                             user_id: user.id,
                             lat: l.lat,
@@ -457,26 +473,73 @@ export default function TeaserMap() {
                         >
                             <div className={`relative group cursor-pointer transition-transform duration-300 ${selectedLead?.id === lead.id ? 'scale-125 z-30' : 'hover:scale-110 z-10'} ${isOwnLead ? 'opacity-100' : 'opacity-90'}`}>
                                 {/* Outer pulsing ring */}
-                                <div className="absolute -inset-2 lg:-inset-3 bg-slate-500/20 rounded-full animate-ping"></div>
+                                <div className={`absolute -inset-2 lg:-inset-3 rounded-full animate-ping ${(lead as any).has_accepted ? 'bg-vvm-blue-400/30' : (lead as any).has_pending ? 'bg-emerald-400/30' : 'bg-slate-500/20'}`}></div>
                                 {/* Inner pin */}
                                 <div className={`relative w-10 h-10 lg:w-14 lg:h-14 rounded-full ${getColor(lead.type)} shadow-xl flex items-center justify-center border-2 ${isOwnLead ? 'border-amber-300' : 'border-white/20'} ${selectedLead?.id === lead.id ? 'ring-4 lg:ring-6 ring-white/40' : ''}`}>
                                     {getIcon(lead.type)}
                                 </div>
 
-                                {/* Own lead indicator star */}
-                                {isOwnLead && (
-                                    <div className="absolute -top-1 -right-1 bg-amber-400 rounded-full w-3.5 h-3.5 border-2 border-slate-800 shadow-sm"></div>
+                                {/* Always-visible status pill — thought bubble top-right (hidden when popup open) */}
+                                {isOwnLead && selectedLead?.id !== lead.id && (
+                                    <div className="absolute -top-7 left-full -ml-3 whitespace-nowrap">
+                                        {(lead as any).has_accepted ? (
+                                            <div className="relative px-2.5 py-1 bg-vvm-blue-600 text-white text-[8px] lg:text-[9px] font-black uppercase tracking-wide rounded-full shadow-lg border border-vvm-blue-500">
+                                                Folyamatban
+                                                <div className="absolute -bottom-1 left-3 w-2 h-2 bg-vvm-blue-600 border-r border-b border-vvm-blue-500 rotate-45"></div>
+                                            </div>
+                                        ) : (lead as any).has_pending ? (
+                                            <div className="relative px-2.5 py-1 bg-emerald-500 text-white text-[8px] lg:text-[9px] font-black uppercase tracking-wide rounded-full shadow-lg border border-emerald-400 animate-pulse">
+                                                Szakember jelentkezett
+                                                <div className="absolute -bottom-1 left-3 w-2 h-2 bg-emerald-500 border-r border-b border-emerald-400 rotate-45"></div>
+                                            </div>
+                                        ) : lead.status === 'in_progress' ? (
+                                            <div className="relative px-2.5 py-1 bg-vvm-blue-600 text-white text-[8px] lg:text-[9px] font-black uppercase tracking-wide rounded-full shadow-lg border border-vvm-blue-500">
+                                                Folyamatban
+                                                <div className="absolute -bottom-1 left-3 w-2 h-2 bg-vvm-blue-600 border-r border-b border-vvm-blue-500 rotate-45"></div>
+                                            </div>
+                                        ) : (
+                                            <div className="relative px-2.5 py-1 bg-slate-700 text-slate-200 text-[8px] lg:text-[9px] font-bold uppercase tracking-wide rounded-full shadow-lg border border-slate-600">
+                                                Keresés...
+                                                <div className="absolute -bottom-1 left-3 w-2 h-2 bg-slate-700 border-r border-b border-slate-600 rotate-45"></div>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
 
-                                {/* Simple Label (hidden when popup is open) */}
-                                {selectedLead?.id !== lead.id && (
-                                    <div className="absolute top-1/2 -translate-y-1/2 left-full ml-3 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity bg-white px-3 py-1.5 rounded-lg shadow-xl w-max pointer-events-none border border-gray-200 z-50">
+                                {/* Hover tooltip (desktop only, non-own leads — own leads have the pill) */}
+                                {selectedLead?.id !== lead.id && !isOwnLead && (
+                                    <div className="absolute top-1/2 -translate-y-1/2 left-full ml-3 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 backdrop-blur-sm px-3 py-2 rounded-xl shadow-2xl w-max pointer-events-none border border-slate-200/80 z-50">
                                         <div className="font-bold text-slate-900 text-sm whitespace-nowrap">{lead.title}</div>
-                                        <div className="flex items-center gap-1.5 mt-0.5">
-                                            <div className="text-[10px] text-red-500 font-semibold uppercase tracking-wider">Sürgős (SOS)</div>
-                                            {isOwnLead && <div className="text-[10px] text-amber-600 font-bold ml-1">(Saját bejelentés)</div>}
+                                        <div className="flex items-center gap-1.5 mt-1">
+                                            {(lead as any).has_accepted ? (
+                                                <>
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-vvm-blue-500"></div>
+                                                    <span className="text-[10px] text-vvm-blue-600 font-bold tracking-wide">Folyamatban</span>
+                                                </>
+                                            ) : (lead as any).has_pending ? (
+                                                <>
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                                    <span className="text-[10px] text-emerald-600 font-bold tracking-wide">Szakember jelentkezett</span>
+                                                </>
+                                            ) : lead.status === 'in_progress' ? (
+                                                <>
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-vvm-blue-500"></div>
+                                                    <span className="text-[10px] text-vvm-blue-600 font-bold tracking-wide">Folyamatban</span>
+                                                </>
+                                            ) : lead.status === 'completed' ? (
+                                                <>
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                                                    <span className="text-[10px] text-emerald-600 font-bold tracking-wide">Befejezve</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+                                                    <span className="text-[10px] text-slate-500 font-medium tracking-wide">Szakembert keresünk</span>
+                                                </>
+                                            )}
+                                            {isOwnLead && <span className="text-[9px] text-amber-500 font-bold ml-1">• Saját</span>}
                                         </div>
-                                        <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-white border-l border-b border-gray-200 rotate-45 transform"></div>
+                                        <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-white/95 border-l border-b border-slate-200/80 rotate-45 transform"></div>
                                     </div>
                                 )}
                             </div>
@@ -498,62 +561,72 @@ export default function TeaserMap() {
                         className="z-50 min-w-[300px]"
                         maxWidth="340px"
                     >
-                        <div className="p-0.5">
-                            <div className="flex items-center gap-2 mb-2 border-b border-slate-100 pb-2">
-                                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${getColor(selectedLead.type)} flex flex-shrink-0 items-center justify-center text-white shadow-md *:w-4 *:h-4 sm:*:w-5 sm:*:h-5`}>
+                        <div className="p-0">
+                            {/* Compact header — matching dashboard style */}
+                            <div className="flex items-center gap-2.5 mb-2.5">
+                                <div className={`w-9 h-9 rounded-xl ${getColor(selectedLead.type)} flex flex-shrink-0 items-center justify-center text-white shadow-md *:w-4 *:h-4`}>
                                     {getIcon(selectedLead.type)}
                                 </div>
-                                <div className="flex-1 pr-1">
-                                    <h3 className="font-bold text-slate-800 text-[13px] sm:text-base leading-tight mb-0.5">{selectedLead.title}</h3>
-                                    <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-500 font-medium">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
-                                        {selectedLead.district}
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="font-bold text-slate-800 text-sm leading-tight truncate">{selectedLead.title}</h3>
+                                    <div className="flex items-center gap-1 text-[10px] text-slate-400 font-medium mt-0.5">
+                                        <MapPin className="w-2.5 h-2.5 flex-shrink-0" />
+                                        <span className="truncate">Budapest, {selectedLead.district}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-slate-50 text-slate-600 rounded-lg p-2 sm:p-3 mb-2 sm:mb-4 text-[11px] sm:text-sm border border-slate-200 leading-snug italic shadow-inner">
-                                &quot;{selectedLead.description}&quot;
-                            </div>
-
-                            <div className="flex items-center justify-between mb-2 sm:mb-4 px-0.5">
-                                <div className="flex items-center gap-1 sm:gap-1.5 text-red-600 font-bold bg-red-50/80 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-red-100 text-[10px] sm:text-xs">
-                                    <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-500" />
-                                    Azonnali SOS
-                                </div>
-                                <div className="flex items-center gap-1 sm:gap-1.5 text-blue-600 font-bold bg-blue-50/80 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-blue-100 text-[10px] sm:text-xs">
-                                    <Search className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-500" />
-                                    Szakit keres
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-1.5 sm:gap-2">
-                                {role === 'contractor' ? (
-                                    <Link
-                                        href="/contractor/dashboard"
-                                        className="w-full bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-1.5 sm:py-2.5 rounded-xl text-[11px] sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all shadow-md"
-                                    >
-                                        <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
-                                        Megtekintés az Irányítópulton
-                                    </Link>
+                            {/* Status badge — compact inline pill */}
+                            <div className="mb-2">
+                                {(selectedLead as any).has_accepted ? (
+                                    <div className="inline-flex items-center gap-1.5 bg-blue-50 text-vvm-blue-600 font-bold text-[11px] px-2.5 py-1 rounded-lg border border-blue-100">
+                                        <Clock className="w-3 h-3" />
+                                        Folyamatban
+                                    </div>
+                                ) : (selectedLead as any).has_pending ? (
+                                    <div className="inline-flex items-center gap-1.5 bg-blue-50 text-vvm-blue-600 font-bold text-[11px] px-2.5 py-1 rounded-lg border border-blue-100">
+                                        <Search className="w-3 h-3" />
+                                        Szakember jelentkezett!
+                                    </div>
+                                ) : selectedLead.status === 'in_progress' ? (
+                                    <div className="inline-flex items-center gap-1.5 bg-blue-50 text-vvm-blue-600 font-bold text-[11px] px-2.5 py-1 rounded-lg border border-blue-100">
+                                        <Clock className="w-3 h-3" />
+                                        Folyamatban
+                                    </div>
+                                ) : selectedLead.status === 'completed' ? (
+                                    <div className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-600 font-bold text-[11px] px-2.5 py-1 rounded-lg border border-emerald-100">
+                                        <Shield className="w-3 h-3" />
+                                        Befejezve
+                                    </div>
                                 ) : (
-                                    <Link
-                                        href={user ? '/ugyfel/dashboard' : '/login'}
-                                        onClick={() => setSelectedLead(null)}
-                                        className="w-full bg-vvm-yellow-500 hover:bg-vvm-yellow-400 text-slate-900 font-bold py-1.5 sm:py-2.5 rounded-xl text-[11px] sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all shadow-md"
-                                    >
-                                        <Maximize2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                                        Megtekintés az Irányítópulton
-                                    </Link>
+                                    <div className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 font-bold text-[11px] px-2.5 py-1 rounded-lg border border-amber-100">
+                                        <Search className="w-3 h-3" />
+                                        Szakembert keresünk
+                                    </div>
                                 )}
+                            </div>
 
+                            {/* Description — clean */}
+                            <div className="text-slate-500 text-[11px] sm:text-xs leading-relaxed mb-3 pl-0.5">
+                                {selectedLead.description}
+                            </div>
+
+                            {/* Action row — matching dashboard */}
+                            <div className="flex items-center gap-2">
+                                <Link
+                                    href={role === 'contractor' ? '/contractor/dashboard' : (user ? '/ugyfel/dashboard' : '/login')}
+                                    onClick={() => setSelectedLead(null)}
+                                    className="flex-1 bg-vvm-blue-600 hover:bg-vvm-blue-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                                >
+                                    <FileCheck className="w-3.5 h-3.5" />
+                                    Részletek
+                                </Link>
                                 {user && user.id === selectedLead.user_id && (
                                     <button
                                         onClick={(e) => handleDelete(selectedLead.id, e)}
-                                        className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-2 border border-red-200 transition-colors"
+                                        className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all"
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
-                                        Saját bejelentés törlése
                                     </button>
                                 )}
                             </div>
