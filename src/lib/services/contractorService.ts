@@ -72,6 +72,7 @@ export async function getMarketplaceData(
         created_at: lead.created_at,
         lead_price: 2000,
         source: 'lead',
+        photo_urls: lead.photo_urls || null,
     }));
 
     // Merge: leads first, then traditional jobs
@@ -87,7 +88,7 @@ export async function getMarketplaceData(
       job:jobs(
         id, title, description, trade, category, status, priority,
         preferred_time_from, preferred_time_to, created_at, updated_at,
-        lead_price, latitude, longitude, district_or_city,
+        lead_price, latitude, longitude, district_or_city, photo_urls,
         customer:customers(full_name, phone, email),
         address:addresses(city, district, street, house_number)
       )
@@ -264,6 +265,7 @@ export async function resolveLeadToJobId(leadId: string): Promise<string> {
             lead_price: 2000,
             created_by_user_id: lead.user_id || null,
             lead_id: lead.id,
+            photo_urls: lead.photo_urls || null,
         })
         .select('id')
         .single();

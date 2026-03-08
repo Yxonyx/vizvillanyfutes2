@@ -3,7 +3,7 @@
 import {
   Droplets, Zap, Flame, MapPin, Phone, Clock,
   CheckCircle, XCircle, Play, AlertTriangle, User,
-  Calendar
+  Calendar, Camera
 } from 'lucide-react';
 
 // Trade icons and colors
@@ -69,6 +69,7 @@ interface JobCardProps {
     };
     district_or_city?: string;
     lead_price?: number;
+    photo_urls?: string[] | null;
     // For admin view - assignments with contractor info
     assignments?: {
       id: string;
@@ -196,6 +197,29 @@ export default function JobCard({
       {/* Description */}
       {!compact && job.description && (
         <p className="text-gray-600 text-sm mb-4 line-clamp-2">{job.description}</p>
+      )}
+
+      {/* Photo thumbnails */}
+      {job.photo_urls && job.photo_urls.length > 0 && (
+        <div className="mb-4">
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mb-2">
+            <Camera className="w-3.5 h-3.5" />
+            <span>{job.photo_urls.length} fotó</span>
+          </div>
+          <div className="flex gap-2">
+            {job.photo_urls.map((url, idx) => (
+              <a
+                key={idx}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-16 h-16 rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all"
+              >
+                <img src={url} alt={`Fotó ${idx + 1}`} className="w-full h-full object-cover" />
+              </a>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Details */}

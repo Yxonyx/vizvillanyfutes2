@@ -191,6 +191,7 @@ export interface Database {
           currency: string;
           dispatcher_notes: string | null;
           created_by_user_id: string | null;
+          photo_urls: string[] | null;
           created_at: string;
           updated_at: string;
         };
@@ -212,6 +213,7 @@ export interface Database {
           currency?: string;
           dispatcher_notes?: string | null;
           created_by_user_id?: string | null;
+          photo_urls?: string[] | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -233,6 +235,7 @@ export interface Database {
           currency?: string;
           dispatcher_notes?: string | null;
           created_by_user_id?: string | null;
+          photo_urls?: string[] | null;
           created_at?: string;
           updated_at?: string;
         };

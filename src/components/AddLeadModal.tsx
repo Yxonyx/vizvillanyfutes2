@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
-import { X, MapPin, Loader2, AlertCircle, CheckCircle2, Search, Droplets, Zap, Flame, Wrench, Building2, Home } from 'lucide-react';
+import { X, MapPin, Loader2, AlertCircle, CheckCircle2, Search, Droplets, Zap, Flame, Wrench, Building2, Home, Camera, Trash2 } from 'lucide-react';
+import { validateImageFile, compressImage, type CompressedImage } from '@/lib/imageUtils';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
@@ -99,6 +100,9 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
     const [street, setStreet] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [selectedPhotos, setSelectedPhotos] = useState<CompressedImage[]>([]);
+    const [photoError, setPhotoError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [contactPhone, setContactPhone] = useState('');
     const [contactEmail, setContactEmail] = useState('');
 
@@ -238,7 +242,7 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
 
         try {
             const fullDistrict = street ? `${districtLabel}, ${street}` : districtLabel;
-            const { error: insertError } = await supabase.from('leads').insert({
+            const { data: insertedLead, error: insertError } = await supabase.from('leads').insert({
                 user_id: userId,
                 lat: finalCoords.lat,
                 lng: finalCoords.lng,
@@ -249,9 +253,38 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
                 status: 'waiting',
                 contact_phone: contactPhone,
                 contact_email: contactEmail
-            });
+            }).select('id').single();
 
             if (insertError) throw insertError;
+
+            // Upload photos if any
+            if (selectedPhotos.length > 0 && insertedLead?.id) {
+                const photoUrls: string[] = [];
+                for (const photo of selectedPhotos) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', photo.file);
+                        formData.append('jobId', insertedLead.id);
+
+                        const uploadRes = await fetch('/api/jobs/upload-photo', {
+                            method: 'POST',
+                            body: formData,
+                        });
+                        const uploadData = await uploadRes.json();
+                        if (uploadData.success && uploadData.url) {
+                            photoUrls.push(uploadData.url);
+                        }
+                    } catch (uploadErr) {
+                        console.warn('Photo upload failed:', uploadErr);
+                    }
+                }
+                // Save photo URLs to lead
+                if (photoUrls.length > 0) {
+                    await supabase.from('leads')
+                        .update({ photo_urls: photoUrls })
+                        .eq('id', insertedLead.id);
+                }
+            }
 
             // Fire-and-forget: notify customer via email that their lead was created
             fetch('/api/customer/lead-created-notification', {
@@ -499,6 +532,86 @@ export default function AddLeadModal({ lat, lng, userId, onClose, onSuccess }: A
                                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 outline-none transition-all placeholder:text-slate-400 resize-none text-sm"
                                 placeholder="Mióta áll fenn a probléma? Próbáltad már javítani?"
                                 maxLength={300}
+                            />
+                        </div>
+
+                        {/* Photo Upload Zone */}
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                                Fotók <span className="text-slate-400 font-medium">(max. 3 db)</span>
+                            </label>
+                            
+                            {photoError && (
+                                <div className="mb-2 text-xs text-red-600 font-medium flex items-center gap-1">
+                                    <AlertCircle className="w-3 h-3" />
+                                    {photoError}
+                                </div>
+                            )}
+
+                            {/* Preview thumbnails */}
+                            {selectedPhotos.length > 0 && (
+                                <div className="flex gap-2 mb-3">
+                                    {selectedPhotos.map((photo, idx) => (
+                                        <div key={idx} className="relative group w-20 h-20 rounded-xl overflow-hidden border-2 border-slate-200">
+                                            <img src={photo.preview} alt={`Fotó ${idx + 1}`} className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => setSelectedPhotos(prev => prev.filter((_, i) => i !== idx))}
+                                                className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {selectedPhotos.length < 3 && (
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-full py-4 border-2 border-dashed border-slate-200 rounded-xl hover:border-slate-400 hover:bg-slate-50 transition-all flex flex-col items-center gap-1.5 text-slate-400 hover:text-slate-600"
+                                >
+                                    <Camera className="w-6 h-6" />
+                                    <span className="text-xs font-bold">Fotó hozzáadása</span>
+                                    <span className="text-[10px]">JPEG, PNG, WebP • max 5MB</span>
+                                </button>
+                            )}
+
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                multiple
+                                className="hidden"
+                                onChange={async (e) => {
+                                    const files = Array.from(e.target.files || []);
+                                    setPhotoError(null);
+                                    
+                                    const remaining = 3 - selectedPhotos.length;
+                                    const toProcess = files.slice(0, remaining);
+                                    
+                                    for (const file of toProcess) {
+                                        const validationError = validateImageFile(file);
+                                        if (validationError) {
+                                            setPhotoError(validationError);
+                                            continue;
+                                        }
+                                        try {
+                                            const compressed = await compressImage(file);
+                                            setSelectedPhotos(prev => [...prev, compressed]);
+                                        } catch {
+                                            setPhotoError('Hiba a kép feldolgozása során.');
+                                        }
+                                    }
+                                    
+                                    if (files.length > remaining) {
+                                        setPhotoError(`Maximum 3 fotó tölthető fel.`);
+                                    }
+                                    
+                                    // Reset input
+                                    e.target.value = '';
+                                }}
                             />
                         </div>
 
