@@ -25,7 +25,7 @@ const faqs = [
     id: 2,
     category: 'platform',
     question: 'Hogyan működik a rendszer?',
-    answer: 'Egyszerű: bejelented a problémádat (pl. csőtörés, villanyszerelés), a közeledben lévő szakemberek azonnal értesítést kapnak, majd versengő ajánlatokat küldenek neked. Te kiválasztod a számodra legjobb ajánlatot – ár, értékelés és elérhetőség alapján.'
+    answer: 'Egyszerű: bejelented a problémádat (pl. csőtörés, villanyszerelés), a közeledben lévő szakemberek azonnal értesítést kapnak, majd ajánlatokat küldenek neked. Te kiválasztod a számodra legjobb ajánlatot – ár, értékelés és elérhetőség alapján.'
   },
   {
     id: 3,
@@ -63,7 +63,7 @@ const faqs = [
     id: 8,
     category: 'ugyfelek',
     question: 'Mi van, ha sürgős a probléma (pl. csőtörés)?',
-    answer: 'SOS hibabejelentésnél a rendszer kiemelt, azonnali értesítést küld a közeledben elérhető szakembereknek. Ilyen esetben a szakemberek jellemzően perceken belül válaszolnak, és akár azonnal a helyszínre érhetnek.'
+    answer: 'Sürgős hibabejelentésnél a rendszer kiemelt, azonnali értesítést küld a közeledben elérhető szakembereknek. Ilyen esetben a szakemberek jellemzően perceken belül válaszolnak, és akár azonnal a helyszínre érhetnek.'
   },
   {
     id: 9,
@@ -103,7 +103,7 @@ const faqs = [
     id: 14,
     category: 'arak',
     question: 'Mennyibe kerül egy szerelő?',
-    answer: 'Az árakat közvetlenül a szakemberek adják meg ajánlatukban. A VízVillanyFűtés nem szab meg fix árakat – a szakemberek versenyeznek egymással, így Te mindig versenyképes, átlátható árat kapsz. Az Árak oldalon tájékoztató, piaci átlagárakat találsz.'
+    answer: 'Az árakat közvetlenül a szakemberek adják meg ajánlatukban. A VízVillanyFűtés nem szab meg fix árakat – több szakember is jelentkezik a munkádra, így Te mindig átlátható, kedvező árat kapsz. Az Árak oldalon tájékoztató, piaci átlagárakat találsz.'
   },
   {
     id: 15,

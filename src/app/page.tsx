@@ -33,7 +33,7 @@ const services = [
     description: 'Csőtörés, duguláselhárítás, bojler javítás. Magasra értékelt helyi szakemberek várják a hívásod.',
     color: 'bg-sky-500',
     link: '/vizszerelo-budapest',
-    features: ['Átlag 15 perces elfogadás', 'Azonnali SOS kiállás', 'Többszáz ellenőrzött szaki'],
+    features: ['Átlag 15 perces elfogadás', 'Azonnali hibaelhárítás', 'Többszáz ellenőrzött szaki'],
   },
   {
     icon: Zap,
@@ -41,24 +41,17 @@ const services = [
     description: 'Áramkimaradás, zárlat, okosotthon kiépítés. Csak érvényes engedéllyel rendelkező mesterek.',
     color: 'bg-amber-500',
     link: '/villanyszerelo-budapest',
-    features: ['Hibaelhárítás azonnal', 'Fi-relé bekötés', 'Kizárólag regisztrált szerelők'],
+    features: ['Hibaelhárítás azonnal', 'Villamosbiztonsági felülvizsgálat', 'Kizárólag regisztrált szerelők'],
   },
   {
     icon: Flame,
-    title: 'Fűtésszerelők',
-    description: 'Radiátor csere, kazán javítás, hőszivattyúk. Megbízható fűtésszerelők egy kattintásra.',
+    title: 'Fűtés- és Klímaszerelők',
+    description: 'Radiátor csere, kazán javítás, klíma beszerelés és karbantartás. Megbízható szakemberek egy kattintásra.',
     color: 'bg-orange-500',
     link: '/futeskorszerusites',
-    features: ['Kazán és bojler javítás', 'Padlófűtés', 'Gyors segítség télen is'],
+    features: ['Klíma telepítés és javítás', 'Kazán és bojler javítás', 'Padlófűtés szerelés'],
   },
-  {
-    icon: AlertTriangle,
-    title: 'SOS Szolgáltatások (0-24)',
-    description: 'Balesetveszély, ömlő víz vagy áramkimaradás? Kérj azonnali sürgősségi kiszállást.',
-    color: 'bg-red-500',
-    link: '/dugulaselharitas-budapest',
-    features: ['Legközelebbi szaki riasztása', '0-24 ügyelet tartás', 'Akár 1 órán belüli kiállás'],
-  },
+
 ];
 
 // Testimonials
@@ -626,17 +619,20 @@ export default function HomePage() {
       </section >
 
       {/* Final CTA */}
-      < section className="py-16 md:py-24 bg-gradient-to-br from-vvm-blue-600 to-vvm-blue-800 text-white relative overflow-hidden" >
+      < section className="py-16 md:py-24 bg-gradient-to-br from-vvm-blue-800 via-vvm-blue-700 to-vvm-blue-900 text-white relative overflow-hidden" >
         <div className="absolute inset-0 bg-hero-pattern opacity-20"></div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 leading-tight">
-            Többé nem kell hetekig <br />
-            <span className="text-vvm-yellow-400">könyörögni egy szerelőnek!</span>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] leading-[1.05] font-bold font-heading tracking-tight text-white mb-3 lg:mb-4 px-2">
+            Többé nem kell hetekig <br className="sm:hidden" />
+            könyörögni egy szerelőnek!
           </h2>
+          <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-vvm-yellow-500 tracking-tight mb-8">
+            Mi hozzuk a szakembert.
+          </p>
 
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Dobd fel a problémádat a platformra 1 perc alatt teljesen ingyenesen, és dőlj hátra: az elérhető ügyeskezű szomszéd szerelők fognak versengeni a munkádért.
+          <p className="text-base lg:text-lg text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed font-light">
+            Dobd fel a problémádat a platformra 1 perc alatt teljesen ingyenesen, és dőlj hátra: az elérhető ügyeskezű szomszéd szerelők azonnal jelentkeznek a munkádra.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0 mt-10">
@@ -657,7 +653,7 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
-              <span>Versengő szakemberek</span>
+              <span>Több jelentkező szakember</span>
             </div>
             <div className="flex items-center gap-2">
               <Star className="w-4 h-4" />

@@ -119,8 +119,8 @@ export default function HowItWorksAnimation() {
                             </div>
                         </div>
                         <span className="inline-block text-[10px] font-extrabold text-red-500 uppercase tracking-[0.15em] mb-2 bg-red-50 px-3 py-1 rounded-full border border-red-100/80">Katasztrófa</span>
-                        <h4 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight">Váratlan hiba</h4>
-                        <p className="text-sm text-slate-500 leading-relaxed">Írd le 3 kattintással, mi a gond (pl. csöpög a csap, nincs áram), akár fényképpel.</p>
+                        <h4 className="text-2xl font-extrabold text-slate-900 mb-2 tracking-tight">Váratlan hiba</h4>
+                        <p className="text-base text-slate-500 leading-relaxed">Írd le 3 kattintással, mi a gond (pl. csöpög a csap, nincs áram), akár fényképpel.</p>
                     </div>
 
                     {/* Arrow 1→2 */}
@@ -144,8 +144,8 @@ export default function HowItWorksAnimation() {
                             </div>
                         </div>
                         <span className="inline-block text-[10px] font-extrabold text-blue-500 uppercase tracking-[0.15em] mb-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-100/80">Rendszer</span>
-                        <h4 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight">Okos Kiosztás</h4>
-                        <p className="text-sm text-slate-500 leading-relaxed">Rendszerünk másodperceken belül kiküldi a kérésedet a közeledben lévő szakembereknek.</p>
+                        <h4 className="text-2xl font-extrabold text-slate-900 mb-2 tracking-tight">Okos Kiosztás</h4>
+                        <p className="text-base text-slate-500 leading-relaxed">Rendszerünk másodperceken belül kiküldi a kérésedet a közeledben lévő szakembereknek.</p>
                     </div>
 
                     {/* Arrow 2→3 */}
@@ -167,8 +167,8 @@ export default function HowItWorksAnimation() {
                             </div>
                         </div>
                         <span className="inline-block text-[10px] font-extrabold text-emerald-500 uppercase tracking-[0.15em] mb-2 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100/80">Megoldás</span>
-                        <h4 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight">Mester Úton!</h4>
-                        <p className="text-sm text-slate-500 leading-relaxed">A munkát egy minősített szerelő vállalja el, és azonnal indul hozzád.</p>
+                        <h4 className="text-2xl font-extrabold text-slate-900 mb-2 tracking-tight">Mester Úton!</h4>
+                        <p className="text-base text-slate-500 leading-relaxed">A munkát egy minősített szerelő vállalja el, és azonnal indul hozzád.</p>
                     </div>
                 </div>
             </div>

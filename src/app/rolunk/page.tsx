@@ -37,7 +37,7 @@ const values = [
   {
     icon: Target,
     title: 'Átláthatóság',
-    description: 'A szakemberek versengő ajánlatokat adnak, Te döntesz az ár, az értékelés és az elérhetőség alapján. Nincs rejtett költség.'
+    description: 'A szakemberek ajánlatokat adnak, Te döntesz az ár, az értékelés és az elérhetőség alapján. Nincs rejtett költség.'
   },
 ];
 
@@ -57,7 +57,7 @@ const inspirations = [
   },
   {
     name: 'Wolt / Foodora',
-    desc: 'Versengő ajánlatok, gyors kiszolgálás, átlátható értékelések és árak.',
+    desc: 'Több ajánlat egyszerre, gyors kiszolgálás, átlátható értékelések.',
   },
   {
     name: 'Booking.com',
@@ -91,7 +91,7 @@ export default function RolunkPage() {
               <p className="text-lg md:text-xl text-blue-100 mb-8 leading-relaxed font-light">
                 A VízVillanyFűtés egy modern magyar platform, ami valós időben
                 összeköt téged a közeledben lévő, ellenőrzött víz-, villany- és
-                fűtésszerelőkkel. A szakemberek versenyeznek a munkádért.
+                fűtésszerelőkkel. A szakemberek jelentkeznek a munkádra.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/login?role=customer" className="btn-primary py-4 px-8 justify-center shadow-xl shadow-vvm-blue-900/20">
@@ -148,7 +148,7 @@ export default function RolunkPage() {
             Ismerősök, Facebook-csoportok, elavult telefonkönyv... A hagyományos szakemberkeresés lassú,
             bizonytalan és tele van rejtett kockázatokkal. Mi ezt gondoltuk újra egy modern,
             adatvezérelt platformmal, ahol a feladást percek alatt megoldod, és a szakemberek
-            versenyeznek a munkádért.
+            jelentkeznek a munkádra.
           </p>
         </div>
       </section>
@@ -272,7 +272,7 @@ export default function RolunkPage() {
                   'Ellenőrzött, számlaképes mesterek',
                   'Kizárólag valós ügyfélértékelések',
                   'Ingyenes profil az ügyfeleknek',
-                  'SOS bejelentés perceken belüli válasszal',
+                  'Gyors válasz sürgős esetben is',
                   'Hitelesített, megbízható partnerhálózat',
                 ].map((item, index) => (
                   <div key={index} className="flex items-center gap-3 lg:gap-4 bg-white/60 p-3 rounded-xl border border-white/80 shadow-sm hover:shadow-md transition-shadow">
