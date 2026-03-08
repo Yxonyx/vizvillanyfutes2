@@ -363,7 +363,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-5xl mx-auto">
             {services.map((service, index) => (
               <Link
                 key={index}
@@ -623,7 +623,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-hero-pattern opacity-20"></div>
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] leading-[1.05] font-bold font-heading tracking-tight text-white mb-3 lg:mb-4 px-2">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl leading-[1.1] font-bold font-heading tracking-tight text-white mb-3 lg:mb-4 px-2">
             Többé nem kell hetekig <br className="sm:hidden" />
             könyörögni egy szerelőnek!
           </h2>
