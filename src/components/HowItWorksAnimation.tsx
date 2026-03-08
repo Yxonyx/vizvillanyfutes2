@@ -6,14 +6,12 @@ export default function HowItWorksAnimation() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // Only mount animations on client to avoid hydration mismatch
         setMounted(true);
     }, []);
 
     if (!mounted) {
         return (
-            <div className="w-full text-center relative pointer-events-none min-h-[400px] flex items-center justify-center">
-                {/* Placeholder while mounting */}
+            <div className="w-full text-center relative pointer-events-none min-h-[300px] flex items-center justify-center">
                 <div className="w-8 h-8 border-4 border-vvm-blue-500 border-t-vvm-blue-200 rounded-full animate-spin mx-auto"></div>
             </div>
         );
@@ -23,137 +21,14 @@ export default function HowItWorksAnimation() {
         <div className="w-full text-center relative pointer-events-none mb-12">
             <style dangerouslySetInnerHTML={{
                 __html: `
-        /* Entry Animations */
         .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; }
-        .stagger-1 { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s forwards; opacity: 0; transform: scale(0.8); }
-        .stagger-2 { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 3s forwards; opacity: 0; transform: scale(0.8); }
-        .stagger-3 { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 5.5s forwards; opacity: 0; transform: scale(0.8); }
-
+        .stagger-1 { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards; opacity: 0; transform: scale(0.8); }
+        .stagger-2 { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s forwards; opacity: 0; transform: scale(0.8); }
+        .stagger-3 { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.5s forwards; opacity: 0; transform: scale(0.8); }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-
-        /* Problem House Animations */
-        .house-shake { animation: shake 4s ease-in-out infinite alternate 1s; }
-        @keyframes shake {
-            0%, 90% { transform: translateX(0); }
-            92%, 96% { transform: translateX(-2px); }
-            94%, 98% { transform: translateX(2px); }
-        }
-        .spark { opacity: 0; animation: flash 0.2s linear infinite alternate 1.5s; transform-origin: center; color: #f59e0b; }
-        @keyframes flash {
-            0% { opacity: 0; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1.2); }
-        }
-
-        /* Wavy Arrow Connections (Full draw with pathLength 100) */
-        .path-draw-1, .path-draw-2 { 
-            stroke-dasharray: 100; 
-            stroke-dashoffset: 100; 
-        }
-        .path-draw-1 { animation: drawLine 1.5s cubic-bezier(0.4, 0, 0.2, 1) 1.5s forwards; }
-        .path-draw-2 { animation: drawLine 1.5s cubic-bezier(0.4, 0, 0.2, 1) 4s forwards; }
-        
-        @keyframes drawLine { to { stroke-dashoffset: 0; } }
-
-        .arrow-head-1 { opacity: 0; animation: fadeIn 0.3s ease-out 2.8s forwards; }
-        .arrow-head-2 { opacity: 0; animation: fadeIn 0.3s ease-out 5.3s forwards; }
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        /* Lead Packets sliding along the exact waves */
-        .packet-1 { offset-path: path('M 10 50 C 50 0, 90 100, 130 50'); animation: movePacket 1.5s cubic-bezier(0.4, 0, 0.2, 1) 1.5s forwards; opacity: 0; }
-        .packet-2 { offset-path: path('M 10 50 C 50 100, 90 0, 130 50'); animation: movePacket 1.5s cubic-bezier(0.4, 0, 0.2, 1) 4s forwards; opacity: 0; }
-        @keyframes movePacket {
-            0% { offset-distance: 0%; opacity: 0; transform: scale(0.5); }
-            10% { opacity: 1; transform: scale(1.5); }
-            90% { opacity: 1; transform: scale(1.5); }
-            100% { offset-distance: 100%; opacity: 0; transform: scale(0.5); }
-        }
-
-        /* Platform Animations */
-        .radar-sweep { transform-origin: center; animation: spin 2s linear infinite 3.5s; opacity: 0; animation-fill-mode: forwards; }
-        @keyframes spin { 0% { transform: rotate(0deg); opacity: 0.6;} 100% { transform: rotate(360deg); opacity: 0.6;} }
-
-        .lead-drop { opacity: 0; transform: translateY(-30px); animation: dropIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 3.2s forwards; }
-        @keyframes dropIn { to { opacity: 1; transform: translateY(0); } }
-
-        .ping-circle { opacity: 0; animation: sonarPing 1.5s ease-out infinite 3.5s; }
-        @keyframes sonarPing { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
-
-        /* Pro Animations */
-        .pro-badge { opacity: 0; transform: scale(0); animation: popBadge 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 6s forwards; }
-        @keyframes popBadge { to { opacity: 1; transform: scale(1); } }
-        
-        /* Layout Grid */
-        .anim-grid {
-            display: grid;
-            grid-template-columns: 200px 1fr 200px 1fr 200px;
-            align-items: center;
-            width: 100%;
-            max-width: 850px;
-            margin: 0 auto;
-        }
-
-        @media (max-width: 1024px) {
-            .anim-grid {
-                display: flex;
-                flex-direction: column;
-                gap: 0;
-            }
-            .desktop-arrow-container {
-                display: none;
-            }
-            /* Zigzag step rows */
-            .zigzag-step {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 0.75rem;
-                align-items: center;
-                padding: 0.75rem 0;
-            }
-            .zigzag-step .step-visual { order: 1; display: flex; justify-content: center; }
-            .zigzag-step .step-text { order: 2; text-align: left; }
-            .zigzag-step .step-text .step-title { font-size: 1.125rem; }
-            .zigzag-step .step-text .step-desc { font-size: 0.875rem; }
-            .zigzag-step.reverse .step-visual { order: 2; }
-            .zigzag-step.reverse .step-text { order: 1; text-align: right; }
-            .mobile-arrow-container {
-                display: flex;
-                justify-content: center;
-                height: 50px;
-                width: 100%;
-                margin: -4px 0;
-                z-index: 0;
-            }
-        }
-        @media (min-width: 1025px) {
-            .mobile-arrow-container {
-                display: none;
-            }
-            .zigzag-step {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            .zigzag-step .step-text {
-                text-align: center;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-        
-        /* Mobile Straight Arrows - COMPACT */
-        .path-draw-mobile-1, .path-draw-mobile-2 {
-            stroke-dasharray: 60;
-            stroke-dashoffset: 60;
-        }
-        .path-draw-mobile-1 { animation: drawLineMobile 1.5s cubic-bezier(0.4, 0, 0.2, 1) 1.5s forwards; }
-        .path-draw-mobile-2 { animation: drawLineMobile 1.5s cubic-bezier(0.4, 0, 0.2, 1) 4s forwards; }
-        
-        @keyframes drawLineMobile { to { stroke-dashoffset: 0; } }
-        
-        .packet-mobile-1 { offset-path: path('M 50 5 L 50 55'); animation: movePacket 1.5s cubic-bezier(0.4, 0, 0.2, 1) 1.5s forwards; opacity: 0; }
-        .packet-mobile-2 { offset-path: path('M 50 5 L 50 55'); animation: movePacket 1.5s cubic-bezier(0.4, 0, 0.2, 1) 4s forwards; opacity: 0; }
+        @keyframes subtlePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.15); } 50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } }
+        .icon-pulse-red { animation: subtlePulse 3s ease-in-out infinite; }
       `}} />
 
             <div className="text-center mb-10 fade-in-up">
@@ -163,240 +38,137 @@ export default function HowItWorksAnimation() {
                 </p>
             </div>
 
-            <div className="anim-grid relative">
-                <div className="absolute inset-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[300px] bg-gradient-to-r from-blue-100/30 via-emerald-100/30 to-teal-100/30 blur-3xl -z-10 rounded-full opacity-50"></div>
+            <div className="max-w-4xl mx-auto overflow-hidden">
 
-                {/* ==============================================
-             1. THE PROBLEM (Left on mobile, zigzag normal)
-             ============================================== */}
-                <div className="stagger-1 zigzag-step">
-                    {/* Visual */}
-                    <div className="step-visual">
-                        {/* House Card */}
-                        <div className="house-shake bg-white w-32 h-36 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.05)] border border-slate-100 flex flex-col items-center justify-center relative">
+                {/* ===== MOBILE: Vertical Premium Timeline ===== */}
+                <div className="lg:hidden bg-gradient-to-b from-white via-white to-slate-50/80 py-8 px-5 sm:px-8 rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.06)] border border-slate-100/80 max-w-[400px] mx-auto">
+                    <div className="relative pl-8">
+                        {/* Dotted Flowing Line */}
+                        <div className="absolute left-[29px] top-8 bottom-6 w-px border-l-2 border-dashed border-slate-200/60"></div>
 
-                            {/* Windows with issues */}
-                            <div className="flex gap-4 mb-2">
-                                {/* Water leak */}
-                                <div className="w-8 h-10 border-2 border-slate-200 rounded-md bg-blue-50 relative overflow-hidden">
-                                    <div className="absolute inset-x-0 bottom-0 bg-blue-300 w-full animate-pulse" style={{ height: '40%' }}></div>
-                                    <div className="absolute top-0 left-1/2 w-1 h-full bg-blue-400 -translate-x-1/2"></div>
-                                </div>
-                                {/* Electricity */}
-                                <div className="w-8 h-10 border-2 border-amber-300 rounded-md bg-amber-50 relative flex items-center justify-center">
-                                    <svg className="w-5 h-5 spark" viewBox="0 0 24 24" fill="currentColor">
-                                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        {/* Step 1 */}
+                        <div className="relative z-10 flex gap-5 mb-10 stagger-1">
+                            <div className="relative shrink-0 -ml-1">
+                                {/* Step Number Badge */}
+                                <div className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center z-20 shadow-sm ring-2 ring-white">1</div>
+                                {/* Icon Circle */}
+                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-50 to-red-100/50 border border-red-200/60 flex items-center justify-center text-red-500 shadow-[0_4px_12px_-2px_rgba(239,68,68,0.12)] icon-pulse-red">
+                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
                                     </svg>
                                 </div>
                             </div>
-
-                            {/* Angry User in Door */}
-                            <div className="w-10 h-14 border-t-2 border-x-2 border-slate-200 rounded-t-lg mt-auto flex flex-col items-center justify-end pb-1 bg-slate-50">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round">
-                                    <circle cx="12" cy="8" r="4" fill="#fee2e2"></circle>
-                                    <path d="M20 21a8 8 0 0 0-16 0"></path>
-                                    <path d="M9 7L11 9 M15 7L13 9" stroke="#b91c1c" strokeWidth="2"></path>
-                                </svg>
+                            <div className="text-left pt-1.5">
+                                <span className="inline-block text-[9px] font-extrabold text-red-500 uppercase tracking-[0.15em] mb-1 bg-red-50 px-2 py-0.5 rounded-full border border-red-100/80">Katasztrófa</span>
+                                <h4 className="text-[18px] font-extrabold text-slate-900 mb-1 leading-tight tracking-tight">Váratlan hiba</h4>
+                                <p className="text-[13px] text-slate-500 leading-relaxed">Írd le 3 kattintással a gondot, szükség esetén fotóval.</p>
                             </div>
-
-                            {/* Dark broken roof */}
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-36 h-8 bg-slate-700 rounded-t-lg -z-10 skew-x-[-10deg]"></div>
                         </div>
-                    </div>
 
-                    {/* Text */}
-                    <div className="step-text">
-                        <div className="mt-5 lg:mt-5 bg-red-50 text-red-600 text-[10px] sm:text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-red-100 mb-2 shadow-sm inline-block">
-                            Katasztrófa
-                        </div>
-                        <div className="step-title text-base md:text-lg font-extrabold text-slate-900 mb-1.5">Váratlan Hiba</div>
-                        <p className="step-desc text-xs sm:text-sm text-slate-600 max-w-[260px] leading-relaxed font-medium">
-                            Írd le 3 kattintással, mi a gond (pl. csöpög a csap, nincs áram), akár fényképpel.
-                        </p>
-                    </div>
-                </div>
-
-                {/* ==============================================
-             ARROW 1 (Desktop: Curved RIGHT | Mobile: Straight DOWN)
-             ============================================== */}
-                <div className="relative w-full h-[100px] flex items-center justify-center -mx-4 z-0 desktop-arrow-container">
-                    <svg width="140" height="100" viewBox="0 0 140 100" className="overflow-visible">
-                        <path d="M 10 50 C 50 0, 90 100, 130 50" fill="none" stroke="#e2e8f0" strokeWidth="4" strokeLinecap="round" />
-                        <path d="M 10 50 C 50 0, 90 100, 130 50" fill="none" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" className="path-draw-1" pathLength="100" />
-                        <path d="M 119 54 L 130 50 L 128 61" fill="none" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="arrow-head-1" />
-                        <circle cx="0" cy="0" r="5" fill="#3b82f6" className="packet-1 drop-shadow-[0_0_5px_rgba(59,130,246,0.6)]" />
-                    </svg>
-                </div>
-
-                <div className="relative mobile-arrow-container">
-                    <svg width="100" height="60" viewBox="0 0 100 60" className="overflow-visible">
-                        <path d="M 50 5 L 50 55" fill="none" stroke="#e2e8f0" strokeWidth="4" strokeLinecap="round" />
-                        <path d="M 50 5 L 50 55" fill="none" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" className="path-draw-mobile-1" pathLength="60" />
-                        <path d="M 45 45 L 50 55 L 55 45" fill="none" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="arrow-head-1" />
-                        <circle cx="0" cy="0" r="5" fill="#3b82f6" className="packet-mobile-1 drop-shadow-[0_0_5px_rgba(59,130,246,0.6)]" />
-                    </svg>
-                </div>
-
-                {/* ==============================================
-             2. THE PLATFORM (Middle - reversed on mobile: SVG right, text left)
-             ============================================== */}
-                <div className="stagger-2 zigzag-step reverse">
-                    {/* Visual */}
-                    <div className="step-visual">
-                        {/* App Interface Card */}
-                        <div className="bg-slate-900 w-40 h-40 rounded-3xl shadow-[0_20px_50px_rgba(15,23,42,0.2)] border-2 border-slate-800 overflow-hidden relative">
-                            {/* Top Bar */}
-                            <div className="h-6 bg-slate-800 flex items-center px-3 gap-1.5 border-b border-slate-700/50 z-20 relative">
-                                <div className="w-2 h-2 rounded-full bg-slate-600"></div>
-                                <div className="w-2 h-2 rounded-full bg-slate-600"></div>
-                                <div className="w-2 h-2 rounded-full bg-slate-600"></div>
-                            </div>
-
-                            {/* Radar Map */}
-                            <div className="absolute inset-x-0 bottom-0 top-6 flex items-center justify-center overflow-hidden bg-slate-800">
-                                {/* Abstract Map Background */}
-                                <svg className="absolute inset-0 w-full h-full opacity-25 filter blur-[0.5px]" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-                                    <path d="M-10,30 Q30,40 50,20 T110,30" fill="none" stroke="#94a3b8" strokeWidth="2" />
-                                    <path d="M20,-10 Q30,40 20,110" fill="none" stroke="#94a3b8" strokeWidth="1.5" />
-                                    <path d="M60,-10 L50,50 L80,110" fill="none" stroke="#94a3b8" strokeWidth="1.5" />
-                                    <path d="M-10,70 Q40,60 110,80" fill="none" stroke="#94a3b8" strokeWidth="2" />
-
-                                    <rect x="15" y="15" width="8" height="6" fill="#64748b" rx="1" />
-                                    <rect x="35" y="25" width="10" height="8" fill="#64748b" rx="1" />
-                                    <rect x="60" y="30" width="12" height="12" fill="#64748b" rx="1.5" />
-                                    <rect x="75" y="15" width="6" height="10" fill="#64748b" rx="1" />
-                                    <rect x="25" y="75" width="14" height="10" fill="#64748b" rx="1" />
-                                    <rect x="65" y="65" width="8" height="8" fill="#64748b" rx="1" />
-                                </svg>
-
-                                {/* Subtle Grid Overlay */}
-                                <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
-
-                                {/* Radar Circles */}
-                                <svg className="absolute w-full h-full" viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="35" fill="none" stroke="#0ea5e9" strokeWidth="1.5" opacity="0.4" />
-                                    <circle cx="50" cy="50" r="18" fill="none" stroke="#0ea5e9" strokeWidth="1" opacity="0.2" />
-                                    <circle cx="50" cy="50" r="35" fill="none" stroke="#0ea5e9" strokeWidth="2" className="ping-circle" />
-                                </svg>
-
-                                {/* Spinning Radar sweep */}
-                                <svg className="absolute w-[90%] h-[90%] radar-sweep" viewBox="0 0 100 100">
-                                    <path d="M50 50 L50 0 A50 50 0 0 1 100 50 Z" fill="url(#radar-scan)" />
-                                    <defs>
-                                        <linearGradient id="radar-scan" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.8" />
-                                            <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" />
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-
-                                {/* Incoming Lead Marker */}
-                                <div className="absolute top-[30%] left-[30%] text-sky-400 lead-drop z-10">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="white" strokeWidth="2" className="drop-shadow-md">
-                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                        <circle cx="12" cy="10" r="3" fill="white"></circle>
+                        {/* Step 2 */}
+                        <div className="relative z-10 flex gap-5 mb-10 stagger-2">
+                            <div className="relative shrink-0 -ml-1">
+                                <div className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center z-20 shadow-sm ring-2 ring-white">2</div>
+                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200/60 flex items-center justify-center text-blue-500 shadow-[0_4px_12px_-2px_rgba(59,130,246,0.12)]">
+                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                        <line x1="11" y1="8" x2="11" y2="14" />
+                                        <line x1="8" y1="11" x2="14" y2="11" />
                                     </svg>
-                                    <div className="absolute top-[8px] left-[8px] w-[8px] h-[8px] bg-sky-300 rounded-full animate-ping opacity-50"></div>
                                 </div>
                             </div>
+                            <div className="text-left pt-1.5">
+                                <span className="inline-block text-[9px] font-extrabold text-blue-500 uppercase tracking-[0.15em] mb-1 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100/80">Rendszer</span>
+                                <h4 className="text-[18px] font-extrabold text-slate-900 mb-1 leading-tight tracking-tight">Okos Kiosztás</h4>
+                                <p className="text-[13px] text-slate-500 leading-relaxed">Rendszerünk másodperceken belül keresi a közelben lévő szakembereket.</p>
+                            </div>
+                        </div>
 
-                            {/* Notification Label */}
-                            <div className="absolute -top-3 -right-6 bg-slate-800 text-white font-bold text-[10px] px-3 py-1.5 rounded-full shadow-lg border border-slate-700 flex items-center gap-1 z-30">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                                </svg>
-                                Új Lead
+                        {/* Step 3 */}
+                        <div className="relative z-10 flex gap-5 stagger-3">
+                            <div className="relative shrink-0 -ml-1">
+                                <div className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex items-center justify-center z-20 shadow-sm ring-2 ring-white">3</div>
+                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200/60 flex items-center justify-center text-emerald-500 shadow-[0_4px_12px_-2px_rgba(16,185,129,0.12)]">
+                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                        <polyline points="22 4 12 14.01 9 11.01" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className="text-left pt-1.5">
+                                <span className="inline-block text-[9px] font-extrabold text-emerald-500 uppercase tracking-[0.15em] mb-1 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100/80">Megoldás</span>
+                                <h4 className="text-[18px] font-extrabold text-slate-900 mb-1 leading-tight tracking-tight">Mester Úton!</h4>
+                                <p className="text-[13px] text-slate-500 leading-relaxed">A munkát a mester elvállalta, azonnal indul hozzád.</p>
                             </div>
                         </div>
                     </div>
-
-                    {/* Text */}
-                    <div className="step-text">
-                        <div className="mt-5 lg:mt-5 bg-blue-50 text-blue-600 text-[10px] sm:text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-blue-100 mb-2 shadow-sm inline-block">
-                            Rendszer
-                        </div>
-                        <div className="step-title text-base md:text-lg font-extrabold text-slate-900 mb-1.5">Okos Kiosztás</div>
-                        <p className="step-desc text-xs sm:text-sm text-slate-600 max-w-[260px] leading-relaxed font-medium">
-                            A rendszerünk másodperceken belül kiküldi a kérésedet a közeledben lévő szakembereknek.
-                        </p>
-                    </div>
                 </div>
 
-                {/* ==============================================
-             ARROW 2 (Desktop: Curved RIGHT | Mobile: Straight DOWN)
-             ============================================== */}
-                <div className="relative w-full h-[100px] flex items-center justify-center -mx-4 z-0 desktop-arrow-container">
-                    <svg width="140" height="100" viewBox="0 0 140 100" className="overflow-visible">
-                        <path d="M 10 50 C 50 100, 90 0, 130 50" fill="none" stroke="#e2e8f0" strokeWidth="4" strokeLinecap="round" />
-                        <path d="M 10 50 C 50 100, 90 0, 130 50" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" className="path-draw-2" pathLength="100" />
-                        <path d="M 119 46 L 130 50 L 128 39" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="arrow-head-2" />
-                        <circle cx="0" cy="0" r="5" fill="#10b981" className="packet-2 drop-shadow-[0_0_5px_rgba(16,185,129,0.6)]" />
-                    </svg>
-                </div>
+                {/* ===== DESKTOP: Card-based horizontal layout ===== */}
+                <div className="hidden lg:flex items-stretch justify-center gap-0 relative max-w-6xl mx-auto">
 
-                <div className="relative mobile-arrow-container">
-                    <svg width="100" height="60" viewBox="0 0 100 60" className="overflow-visible">
-                        <path d="M 50 5 L 50 55" fill="none" stroke="#e2e8f0" strokeWidth="4" strokeLinecap="round" />
-                        <path d="M 50 5 L 50 55" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" className="path-draw-mobile-2" pathLength="60" />
-                        <path d="M 45 45 L 50 55 L 55 45" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="arrow-head-2" />
-                        <circle cx="0" cy="0" r="5" fill="#10b981" className="packet-mobile-2 drop-shadow-[0_0_5px_rgba(16,185,129,0.6)]" />
-                    </svg>
-                </div>
-
-                {/* ==============================================
-             3. THE PROFESSIONAL (Right - normal zigzag on mobile: SVG left, text right)
-             ============================================== */}
-                <div className="stagger-3 zigzag-step">
-                    {/* Visual */}
-                    <div className="step-visual">
-                        {/* Pro Shield Avatar */}
-                        <div className="relative w-32 h-32">
-                            {/* Glowing aura */}
-                            <div className="absolute inset-0 bg-emerald-400 rounded-3xl blur-xl opacity-30"></div>
-
-                            {/* Solid Green Shape */}
-                            <div className="relative w-full h-full bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-3xl shadow-xl border-[3px] border-white flex items-center justify-center overflow-hidden z-10">
-                                {/* Internal shine */}
-                                <div className="absolute top-0 left-0 w-full h-1/2 bg-white/20 -skew-y-12"></div>
-
-                                {/* Wrench Tool */}
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-md z-10" style={{ animation: 'dropIn 0.5s ease-out 5.8s backwards' }}>
-                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                                </svg>
-
-                                {/* Sparkle Star */}
-                                <svg className="absolute top-4 right-4 w-5 h-5" style={{ animation: 'scaleIn 0.3s ease-out 6.5s backwards' }} viewBox="0 0 24 24" fill="#fbbf24">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                </svg>
-                            </div>
-
-                            {/* Success Checkmark */}
-                            <div className="absolute -bottom-2 -right-2 bg-emerald-500 rounded-full p-1.5 border-[3px] border-white shadow-lg pro-badge z-20">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                            </div>
-
-                            {/* 5.0 Rating */}
-                            <div className="absolute -top-3 -left-4 bg-white rounded-full px-2.5 py-1 shadow-md border border-slate-100 pro-badge z-20 flex items-center gap-1" style={{ animationDelay: '6.2s' }}>
-                                <span className="text-slate-800 font-bold text-xs">5.0</span>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24" stroke="none">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    {/* Step 1 Card */}
+                    <div className="flex-1 flex flex-col items-center text-center stagger-1 bg-white rounded-2xl p-10 pb-8 border border-slate-100 shadow-[0_2px_16px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.08)] transition-shadow">
+                        <div className="relative mb-6">
+                            <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center z-20 shadow-sm ring-2 ring-white">1</div>
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-50 to-red-100/50 border border-red-200/60 flex items-center justify-center text-red-500">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
                                 </svg>
                             </div>
                         </div>
+                        <span className="inline-block text-[10px] font-extrabold text-red-500 uppercase tracking-[0.15em] mb-2 bg-red-50 px-3 py-1 rounded-full border border-red-100/80">Katasztrófa</span>
+                        <h4 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight">Váratlan hiba</h4>
+                        <p className="text-sm text-slate-500 leading-relaxed">Írd le 3 kattintással, mi a gond (pl. csöpög a csap, nincs áram), akár fényképpel.</p>
                     </div>
 
-                    {/* Text */}
-                    <div className="step-text">
-                        <div className="mt-5 lg:mt-5 bg-emerald-50 text-emerald-600 text-[10px] sm:text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-100 mb-2 shadow-sm inline-block">
-                            Megoldás
+                    {/* Arrow 1→2 */}
+                    <div className="flex items-center px-5 shrink-0 text-slate-300 self-center">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                    </div>
+
+                    {/* Step 2 Card */}
+                    <div className="flex-1 flex flex-col items-center text-center stagger-2 bg-white rounded-2xl p-10 pb-8 border border-slate-100 shadow-[0_2px_16px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.08)] transition-shadow">
+                        <div className="relative mb-6">
+                            <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center z-20 shadow-sm ring-2 ring-white">2</div>
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200/60 flex items-center justify-center text-blue-500">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    <line x1="11" y1="8" x2="11" y2="14" />
+                                    <line x1="8" y1="11" x2="14" y2="11" />
+                                </svg>
+                            </div>
                         </div>
-                        <div className="step-title text-base md:text-lg font-extrabold text-slate-900 mb-1.5">Mester Úton!</div>
-                        <p className="step-desc text-xs sm:text-sm text-slate-600 max-w-[260px] leading-relaxed font-medium">
-                            A munkát egy minősített szerelő vállalja el, és azonnal indul hozzád!
-                        </p>
+                        <span className="inline-block text-[10px] font-extrabold text-blue-500 uppercase tracking-[0.15em] mb-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-100/80">Rendszer</span>
+                        <h4 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight">Okos Kiosztás</h4>
+                        <p className="text-sm text-slate-500 leading-relaxed">Rendszerünk másodperceken belül kiküldi a kérésedet a közeledben lévő szakembereknek.</p>
+                    </div>
+
+                    {/* Arrow 2→3 */}
+                    <div className="flex items-center px-5 shrink-0 text-slate-300 self-center">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                    </div>
+
+                    {/* Step 3 Card */}
+                    <div className="flex-1 flex flex-col items-center text-center stagger-3 bg-white rounded-2xl p-10 pb-8 border border-slate-100 shadow-[0_2px_16px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.08)] transition-shadow">
+                        <div className="relative mb-6">
+                            <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center z-20 shadow-sm ring-2 ring-white">3</div>
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200/60 flex items-center justify-center text-emerald-500">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                    <polyline points="22 4 12 14.01 9 11.01" />
+                                </svg>
+                            </div>
+                        </div>
+                        <span className="inline-block text-[10px] font-extrabold text-emerald-500 uppercase tracking-[0.15em] mb-2 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100/80">Megoldás</span>
+                        <h4 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight">Mester Úton!</h4>
+                        <p className="text-sm text-slate-500 leading-relaxed">A munkát egy minősített szerelő vállalja el, és azonnal indul hozzád.</p>
                     </div>
                 </div>
             </div>
