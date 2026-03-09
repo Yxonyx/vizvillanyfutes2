@@ -12,10 +12,10 @@ import { AuthProvider } from '@/contexts/AuthContext';
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.vizvillanyfutes.hu'),
   title: {
-    default: 'VízVillanyFűtés - Vízszerelő és Villanyszerelő Budapest | SOS 0-24',
+    default: 'VízVillanyFűtés - Szakembert Keresünk Budapest',
     template: '%s | VízVillanyFűtés',
   },
-  description: 'Professzionális vízszerelő, villanyszerelő és fűtésszerelő Budapest és Pest megye területén. ✓ Gyors kiszállás ✓ Megbízható mesterek ✓ Fix árak ✓ Online ajánlatkérés. Kérjen ajánlatot most!',
+  description: 'Azonnal szakembert keresünk Budapesten! Vízszerelő, villanyszerelő, fűtésszerelő — ellenőrzött mesterek, gyors kiszállás, fix árak. Kérjen ingyenes ajánlatot!',
   keywords: [
     'vízszerelő budapest',
     'villanyszerelő budapest',
@@ -76,8 +76,13 @@ export const metadata: Metadata = {
   },
   category: 'business',
   icons: {
-    icon: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
   },
   other: {
     'geo.region': 'HU-BU',
@@ -303,22 +308,24 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              (function(d, t) {
-                var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-                v.onload = function() {
-                  window.voiceflow.chat.load({
-                    verify: { projectID: '69a34d17a52e1c0fcc16f23e' },
-                    url: 'https://general-runtime.voiceflow.com',
-                    versionID: 'production',
-                    voice: {
-                      url: "https://runtime-api.voiceflow.com"
-                    }
-                  });
-                }
-                v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";
-                v.type = "text/javascript";
-                s.parentNode.insertBefore(v, s);
-              })(document, 'script');
+              window.addEventListener('load', function() {
+                setTimeout(function() {
+                  var v = document.createElement('script');
+                  v.onload = function() {
+                    window.voiceflow.chat.load({
+                      verify: { projectID: '69a34d17a52e1c0fcc16f23e' },
+                      url: 'https://general-runtime.voiceflow.com',
+                      versionID: 'production',
+                      voice: {
+                        url: "https://runtime-api.voiceflow.com"
+                      }
+                    });
+                  }
+                  v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";
+                  v.type = "text/javascript";
+                  document.body.appendChild(v);
+                }, 2000);
+              });
             `,
           }}
         />

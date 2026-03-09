@@ -355,7 +355,7 @@ function PartnerOnboardingContent() {
         className="relative w-full min-h-[auto] lg:min-h-[85vh] overflow-hidden flex flex-col justify-center pt-24 pb-16 lg:pt-28 lg:pb-24 border-b border-[#001f3f]"
         style={{
           backgroundColor: '#002f5d',
-          backgroundImage: 'url(/partner-hero-bg-dark.png)',
+          backgroundImage: 'url(/partner-hero-bg-dark.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

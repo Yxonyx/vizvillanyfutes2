@@ -113,7 +113,7 @@ export default function HomePage() {
 
         {/* LEFT/BOTTOM - Floating Bottom Sheet (Mobile) & Landing Text (Desktop) */}
         <div className="relative z-20 flex-1 flex flex-col justify-end lg:justify-center w-full max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pointer-events-none h-full">
-          <div className="bg-vvm-blue-950/95 backdrop-blur-2xl lg:bg-transparent lg:backdrop-blur-none rounded-t-[2.5rem] lg:rounded-none px-4 pt-3 pb-4 sm:p-8 lg:p-0 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] lg:shadow-none border-t border-white/15 lg:border-0 pointer-events-auto w-full lg:w-[60%] xl:w-[55%] flex flex-col lg:justify-center">
+          <div className="bg-vvm-blue-950/95 backdrop-blur-2xl lg:bg-transparent lg:backdrop-blur-none rounded-t-[2.5rem] lg:rounded-none px-4 pt-3 pb-4 sm:p-8 lg:p-0 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] lg:shadow-none border-t border-white/15 lg:border-0 pointer-events-auto w-full lg:w-[60%] xl:w-[55%] flex flex-col lg:justify-center min-h-[220px] lg:min-h-0">
 
             {/* Mobile drag handle indicator */}
             <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-3 lg:hidden opacity-80"></div>
@@ -403,8 +403,8 @@ export default function HomePage() {
           {/* Container = the "window" you see through. Image is zoomed inside it. */}
           <div className="absolute right-0 top-10 w-[60%] h-[30%] overflow-hidden rounded-bl-3xl">
             <img
-              src="/partner-hero-bg-new.png"
-              alt=""
+              src="/partner-hero-bg-new.webp"
+              alt="Szakember munkavégzés közben Budapesten"
               className="w-full h-full object-cover object-top scale-[1.55] origin-top opacity-40 sm:opacity-55"
             />
           </div>
@@ -486,7 +486,7 @@ export default function HomePage() {
                 {/* Subtle glow behind card */}
                 <div className="absolute -inset-6 bg-gradient-to-br from-blue-500/25 to-indigo-500/25 blur-3xl rounded-[3rem] -z-10"></div>
                 <img
-                  src="/partner-hero-bg-new.png"
+                  src="/partner-hero-bg-new.webp"
                   alt="Szakemberünk munka közben"
                   className="w-full h-full object-cover scale-110" style={{ objectPosition: '50% 2%' }}
                 />
