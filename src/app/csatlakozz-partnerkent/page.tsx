@@ -65,8 +65,6 @@ const benefits = [
 
 // Requirements
 const coreRequirements = [
-  'Érvényes egyéni vállalkozói vagy cég státusz (EV, Kkt, Bt, Kft stb.)',
-  'Számlaképesség (KATA, átalányadó, stb.)',
   'Saját szerszámkészlet az alapvető munkákhoz',
   'Szakmai gyakorlat és önálló munkavégzés',
   'Megbízhatóság, pontos megjelenés az egyeztetett időpontban',
@@ -163,7 +161,6 @@ const vallalkozoiFormaOptions = [
   'Kft.',
   'Bt.',
   'Kkt.',
-  'Még nincs vállalkozásom, de tervezem',
 ];
 
 const tapasztalatOptions = [
@@ -214,8 +211,8 @@ const mapMunkateruletToServiceAreas = (munkateruletek: string[]): string[] => {
 };
 
 const mapVallalkozoiFormaToType = (forma: string): 'individual' | 'company' => {
-  if (forma === 'Egyéni vállalkozó') return 'individual';
-  return 'company';
+  if (!forma || forma === 'Folyamatban') return 'individual';
+  return 'company'; // Any specific company form (EV, Kft, Bt, Kkt) = company type = gets badge
 };
 
 const mapTapasztalatToYears = (tapasztalat: string): number => {
@@ -341,7 +338,7 @@ function PartnerOnboardingContent() {
     isPhoneValid &&
     formData.szakma &&
     formData.munkaterulet.length > 0 &&
-    formData.vallalkozoiForma &&
+
     formData.biztositas &&
     formData.tapasztalat &&
     formData.bemutatkozas &&
@@ -939,19 +936,44 @@ function PartnerOnboardingContent() {
                   <div className="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
                       <label className="block text-sm font-bold text-slate-700 mb-2">
-                        Vállalkozói forma <span className="text-red-500">*</span>
+                        Vállalkozási forma <span className="text-slate-400 font-normal">(opcionális)</span>
                       </label>
-                      <select
-                        required
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-vvm-blue-500 focus:ring-1 focus:ring-vvm-blue-500 transition-colors shadow-sm"
-                        value={formData.vallalkozoiForma}
-                        onChange={(e) => setFormData(prev => ({ ...prev, vallalkozoiForma: e.target.value }))}
-                      >
-                        <option value="" disabled>Válassz...</option>
-                        {vallalkozoiFormaOptions.map(opt => (
-                          <option key={opt} value={opt}>{opt}</option>
-                        ))}
-                      </select>
+                      <div className="flex gap-2">
+                        <select
+                          className={`flex-1 px-4 py-3 bg-white border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-vvm-blue-500 focus:ring-1 focus:ring-vvm-blue-500 transition-colors shadow-sm ${
+                            formData.vallalkozoiForma && formData.vallalkozoiForma !== 'Folyamatban' ? 'border-emerald-400' : 'border-slate-300'
+                          }`}
+                          value={formData.vallalkozoiForma === 'Folyamatban' ? '' : formData.vallalkozoiForma}
+                          onChange={(e) => setFormData(prev => ({ ...prev, vallalkozoiForma: e.target.value }))}
+                        >
+                          <option value="" disabled>Válassz formát...</option>
+                          {vallalkozoiFormaOptions.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, vallalkozoiForma: 'Folyamatban' }))}
+                          className={`px-4 py-3 rounded-xl text-sm font-bold transition-all whitespace-nowrap border-2 ${
+                            formData.vallalkozoiForma === 'Folyamatban'
+                              ? 'bg-amber-50 border-amber-400 text-amber-700'
+                              : 'bg-white border-slate-200 text-slate-500 hover:border-amber-300 hover:bg-amber-50'
+                          }`}
+                        >
+                          Folyamatban
+                        </button>
+                      </div>
+                      {formData.vallalkozoiForma && formData.vallalkozoiForma !== 'Folyamatban' && (
+                        <p className="mt-2 text-xs text-emerald-600 flex items-center gap-1 font-medium bg-emerald-50 p-2 rounded-lg border border-emerald-100">
+                          <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                          Ellenőrzött badge-et kapsz a profilodon!
+                        </p>
+                      )}
+                      {formData.vallalkozoiForma === 'Folyamatban' && (
+                        <p className="mt-2 text-xs text-amber-600 flex items-center gap-1">
+                          Később bármikor megadhatod a fiókodbam.
+                        </p>
+                      )}
                     </div>
 
                     <div>

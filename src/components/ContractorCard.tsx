@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import {
   User, Phone, MapPin, Briefcase, CheckCircle, XCircle, Clock,
-  Droplets, Zap, Flame, Ban, Play, Star
+  Droplets, Zap, Flame, Ban, Play, Star, FileCheck
 } from 'lucide-react';
 
 const tradeIcons: Record<string, typeof Droplets> = {
@@ -76,7 +76,15 @@ export default function ContractorCard({
             <User className="w-6 h-6 text-vvm-blue-600" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">{contractor.display_name}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-gray-900">{contractor.display_name}</h3>
+              {contractor.type === 'company' && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
+                  <FileCheck className="w-3 h-3" />
+                  Ellenőrzött
+                </span>
+              )}
+            </div>
             <p className="text-sm text-gray-500">
               {contractor.type === 'company' ? 'Cég' : 'Egyéni vállalkozó'}
               {contractor.years_experience && ` • ${contractor.years_experience} év tapasztalat`}

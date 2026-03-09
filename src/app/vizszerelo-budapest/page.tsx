@@ -125,8 +125,8 @@ export default function VizszereloPage() {
                     <Droplets className="w-8 h-8 text-sky-600" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-white">Ellenőrzött</div>
-                    <div className="text-sky-200">Budapesti szakemberek</div>
+                    <div className="text-2xl font-bold text-white">4.9★</div>
+                    <div className="text-sky-200">Google értékelés</div>
                   </div>
                 </div>
 

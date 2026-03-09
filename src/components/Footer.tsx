@@ -6,6 +6,7 @@ import {
   Facebook, Linkedin, Instagram, Phone,
 } from 'lucide-react';
 import Logo from './Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 const footerLinks = {
   szolgaltatasok: [
@@ -37,18 +38,24 @@ const footerLinks = {
 
 
 export default function Footer() {
+  const { role } = useAuth();
   return (
     <footer className="bg-zinc-900 text-white pb-20 lg:pb-0">
       {/* Trust Strip */}
       <div className="border-b border-slate-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-            {[
+            {(role === 'contractor' ? [
+              '0% jutalék',
+              'Napi friss leadek',
+              'Rugalmas időbeosztás',
+              'Azonnali értesítés',
+            ] : [
               'Ingyenes ajánlatkérés',
               'Ellenőrzött szakemberek',
               'Garancia a munkára',
               'Több szakember, legjobb ajánlat',
-            ].map((text, i) => (
+            ]).map((text, i) => (
               <div key={i} className="flex items-center gap-2 text-slate-400 text-sm">
                 <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                 <span>{text}</span>

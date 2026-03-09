@@ -96,7 +96,8 @@ export default function Header() {
     window.dispatchEvent(new CustomEvent('openPortal', { detail: { mode, autoAdd, initialTab } }));
   };
 
-  const allNavItems = [...mainNav, ...secondaryNav];
+  const displayMainNav = role === 'contractor' ? [] : mainNav;
+  const allNavItems = [...displayMainNav, ...secondaryNav];
 
   const isPartnerPage = pathname === '/csatlakozz-partnerkent';
 
@@ -211,8 +212,8 @@ export default function Header() {
             <nav className="hidden lg:flex items-center justify-between flex-1">
               {/* Left Nav Items */}
               <div className="flex items-center gap-1">
-                {mainNav.map((item) => renderNavItem(item))}
-                <div className="h-5 w-px bg-gray-200 mx-2"></div>
+                {displayMainNav.map((item) => renderNavItem(item))}
+                {displayMainNav.length > 0 && <div className="h-5 w-px bg-gray-200 mx-2"></div>}
                 {secondaryNav.map((item) => renderNavItem(item))}
               </div>
 

@@ -145,8 +145,8 @@ export default function VillanyszerelPage() {
                     <Zap className="w-8 h-8 text-amber-600" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-white">Ellenőrzött</div>
-                    <div className="text-amber-200">Budapesti szakemberek</div>
+                    <div className="text-2xl font-bold text-white">4.9★</div>
+                    <div className="text-amber-200">Google értékelés</div>
                   </div>
                 </div>
 

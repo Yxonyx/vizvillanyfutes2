@@ -126,6 +126,26 @@ export default function FiokPage() {
                     </div>
                 </div>
 
+                {/* Contractor: Profile Edit Shortcut */}
+                {isContractor && (
+                    <div>
+                        <h2 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 px-1">Szakmai profil</h2>
+                        <Link
+                            href="/contractor/profile"
+                            className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center gap-3 hover:bg-slate-50 transition-colors w-full"
+                        >
+                            <div className="w-8 h-8 rounded-lg bg-vvm-blue-50 flex items-center justify-center flex-shrink-0">
+                                <User className="w-3.5 h-3.5 text-vvm-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-sm font-semibold text-slate-700">Profil szerkesztése</div>
+                                <div className="text-[11px] text-slate-400 mt-0.5">Név, szakterület, céges adatok, szolgáltatási terület</div>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-slate-300" />
+                        </Link>
+                    </div>
+                )}
+
                 {/* Contractor: Credit Balance */}
                 {isContractor && (
                     <div>

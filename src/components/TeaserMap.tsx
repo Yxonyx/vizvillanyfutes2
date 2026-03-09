@@ -275,6 +275,12 @@ export default function TeaserMap() {
 
         setSelectedLead(null);
 
+        // Contractors should not be adding leads — redirect to dashboard
+        if (role === 'contractor') {
+            window.location.href = '/contractor/dashboard';
+            return;
+        }
+
         if (user) {
             setInteractionLocation({ lat: e.lngLat.lat, lng: e.lngLat.lng });
             setAddModalOpen(true);
@@ -365,20 +371,25 @@ export default function TeaserMap() {
             {/* Instruction Badge - Full width bottom bar */}
             <div className="absolute bottom-0 left-0 w-full z-20">
                 <button
-                    onClick={(e) => {
-                        e.stopPropagation();
+                    onClick={() => {
+                        if (role === 'contractor') return; // No action for contractors
                         if (!user) setAuthModalOpen(true);
                     }}
-                    className={`w-full bg-white/90 backdrop-blur-md px-4 py-2 border-t border-white/50 flex flex-row items-center justify-center gap-3 transition-colors ${!user
-                        ? 'cursor-pointer hover:bg-white active:bg-slate-50'
-                        : 'pointer-events-none'
-                        }`}
+                    className={`w-full bg-white/90 backdrop-blur-md px-4 py-2 border-t border-white/50 flex flex-row items-center justify-center gap-3 transition-colors ${
+                        role === 'contractor' 
+                            ? 'pointer-events-none'
+                            : !user
+                            ? 'cursor-pointer hover:bg-white active:bg-slate-50'
+                            : 'pointer-events-none'
+                    }`}
                 >
-                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${user ? 'bg-vvm-blue-500/80' : 'bg-slate-600/90'}`}>
-                        {user ? <MapPin className="w-3 h-3 text-white" /> : <LogIn className="w-3 h-3 text-white" />}
+                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                        role === 'contractor' ? 'bg-vvm-yellow-500/80' : user ? 'bg-vvm-blue-500/80' : 'bg-slate-600/90'
+                    }`}>
+                        {role === 'contractor' ? <Search className="w-3 h-3 text-white" /> : user ? <MapPin className="w-3 h-3 text-white" /> : <LogIn className="w-3 h-3 text-white" />}
                     </div>
                     <span className="text-[11px] sm:text-[13px] font-bold text-slate-700">
-                        {user ? 'Kattints a térképre egy új hiba bejelentéséhez' : 'Jelentkezz be, hogy hibát jelenthess'}
+                        {role === 'contractor' ? 'Elérhető munkák a környékeden' : user ? 'Kattints a térképre egy új hiba bejelentéséhez' : 'Jelentkezz be, hogy hibát jelenthess'}
                     </span>
                 </button>
             </div>

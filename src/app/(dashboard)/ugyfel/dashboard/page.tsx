@@ -25,6 +25,9 @@ type JobAssignment = {
     contractor_profiles: {
         display_name: string;
         phone: string;
+        email?: string;
+        company_name?: string;
+        type?: string;
     };
 };
 
@@ -35,6 +38,9 @@ type JobInterest = {
     contractor_profiles: {
         display_name: string;
         phone: string;
+        email?: string;
+        company_name?: string;
+        type?: string;
     };
 };
 
@@ -217,11 +223,11 @@ export default function CustomerDashboard() {
         addresses ( city, district, street ),
         job_assignments (
           status,
-          contractor_profiles ( display_name, phone )
+          contractor_profiles ( display_name, phone, email, company_name, type )
         ),
         job_interests (
           id, status, created_at, contractor_id,
-          contractor_profiles ( display_name, phone )
+          contractor_profiles ( display_name, phone, email, company_name, type )
         )
       `)
                 .eq('created_by_user_id', user.id)
@@ -876,7 +882,18 @@ export default function CustomerDashboard() {
                                                         {displayContractor.display_name.charAt(0)}
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <p className="text-sm font-black text-slate-900 truncate">{displayContractor.display_name}</p>
+                                                        <div className="flex items-center gap-1.5">
+                                                            <p className="text-sm font-black text-slate-900 truncate">{displayContractor.display_name}</p>
+                                                            {displayContractor.type === 'company' && (
+                                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold flex-shrink-0">
+                                                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                                                                    Ellenőrzött
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {displayContractor.company_name && (
+                                                            <p className="text-xs text-slate-500 truncate">{displayContractor.company_name}</p>
+                                                        )}
                                                         <p className="text-sm text-emerald-600 font-bold truncate">{displayContractor.phone}</p>
                                                     </div>
                                                 </div>
