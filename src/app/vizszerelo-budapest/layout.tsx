@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Vízszerelő Budapest - SOS Csőtörés, Duguláselhárítás | 2 Órán Belül',
+  title: 'Vízszerelő Budapest - Csőtörés, Duguláselhárítás | Gyors Kiszállás',
   description: 'Megbízható vízszerelő Budapest területén. ✓ SOS csőtörés elhárítás ✓ Duguláselhárítás ✓ Csaptelep csere ✓ Bojler szerelés ✓ Számlaképes mesterek ✓ Fix árak. Kérjen ajánlatot most!',
   keywords: [
     'vízszerelő budapest',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     canonical: 'https://www.vizvillanyfutes.hu/vizszerelo-budapest',
   },
   openGraph: {
-    title: 'Vízszerelő Budapest - SOS 2 Órán Belül | VízVillanyFűtés',
+    title: 'Vízszerelő Budapest - Gyors Kiszállás | VízVillanyFűtés',
     description: 'Professzionális vízszerelés Budapesten. Csőtörés, dugulás, csaptelep - gyors megoldás, fix árak.',
     url: 'https://www.vizvillanyfutes.hu/vizszerelo-budapest',
   },

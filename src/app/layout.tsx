@@ -202,13 +202,6 @@ const jsonLd = {
           },
         ],
       },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: '4.9',
-        reviewCount: '500',
-        bestRating: '5',
-        worstRating: '1',
-      },
       sameAs: [
         'https://www.facebook.com/vizvillanyfutes',
       ],

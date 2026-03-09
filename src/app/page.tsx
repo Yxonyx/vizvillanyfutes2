@@ -81,10 +81,10 @@ const testimonials = [
 
 // Stats
 const stats = [
-  { value: '500+', label: 'Regisztrált Szakember' },
-  { value: '15 perc', label: 'Átlagos Elfogadási Idő' },
-  { value: '4.9', label: 'Átlagos Értékelés', suffix: '★' },
-  { value: '100%', label: 'Minőség és Megbízhatóság' },
+  { value: 'Budapest', label: 'és Pest megye lefedettség' },
+  { value: '15 perc', label: 'Átlagos Válaszidő' },
+  { value: 'Ingyenes', label: 'Ajánlatkérés' },
+  { value: '100%', label: 'Ellenőrzött Szakemberek' },
 ];
 
 
@@ -260,26 +260,18 @@ export default function HomePage() {
               <div className="pt-8 w-full mt-auto">
                 <div className="flex items-center gap-3 mb-6 flex-wrap sm:flex-nowrap">
                   <div className="flex items-center gap-2">
-                    <div className="text-[2rem] font-black text-white leading-none whitespace-nowrap">4.9 / 5</div>
-                    <div className="w-px h-8 bg-white/20 mx-2 hidden sm:block"></div>
-                    <div className="flex text-vvm-yellow-400">
-                      <Star className="w-5 h-5 fill-current" />
-                      <Star className="w-5 h-5 fill-current" />
-                      <Star className="w-5 h-5 fill-current" />
-                      <Star className="w-5 h-5 fill-current" />
-                      <Star className="w-5 h-5 fill-current" />
+                    <div className="flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-full border border-emerald-500/30">
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-sm font-semibold">Ellenőrzött mesterek</span>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-white/90 font-medium whitespace-nowrap">
-                    <div className="bg-white p-0.5 rounded-full flex items-center justify-center shrink-0">
-                      <svg viewBox="0 0 24 24" className="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                      </svg>
+                    <div className="flex items-center gap-1.5 bg-vvm-blue-500/20 text-vvm-blue-300 px-3 py-1.5 rounded-full border border-vvm-blue-500/30">
+                      <Zap className="w-4 h-4" />
+                      <span className="text-sm font-semibold">Gyors kiajánlás</span>
                     </div>
-                    Google értékelés
+                    <div className="flex items-center gap-1.5 bg-vvm-yellow-500/20 text-vvm-yellow-400 px-3 py-1.5 rounded-full border border-vvm-yellow-500/30">
+                      <Shield className="w-4 h-4" />
+                      <span className="text-sm font-semibold">Garanciális munkavégzés</span>
+                    </div>
                   </div>
                 </div>
 
@@ -600,18 +592,17 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Google Reviews Badge */}
+          {/* Trust Badge */}
           <div className="mt-12 flex justify-center">
             <div className="bg-white rounded-xl shadow-lg px-8 py-4 flex items-center gap-6">
               <div className="flex items-center gap-3">
-                <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" className="w-8 h-8" />
-                <div className="font-extrabold text-gray-800 text-xl">4.9 / 5</div>
-              </div>
-              <div className="h-8 w-px bg-gray-200"></div>
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-6 h-6 text-amber-400 fill-amber-400" />
-                ))}
+                <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-emerald-600" />
+                </div>
+                <div>
+                  <div className="font-extrabold text-gray-800 text-lg">Személyes minőségellenőrzés</div>
+                  <div className="text-sm text-gray-500">Minden szakembert mi ellenőrzünk</div>
+                </div>
               </div>
             </div>
           </div>
