@@ -15,6 +15,11 @@ const nextConfig = {
       ],
     },
   ],
+  // Redirect old/dead pages that Google still has indexed
+  redirects: async () => [
+    { source: '/foglalas', destination: '/', permanent: true },
+    { source: '/foglalas/:path*', destination: '/', permanent: true },
+  ],
 }
 
 module.exports = nextConfig

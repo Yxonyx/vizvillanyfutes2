@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'VízVillanyFűtés - Vízszerelő, Villanyszerelő, Fűtésszerelő Budapest',
     description: 'Megbízható szakemberek Budapesten és Pest megyében. Gyors SOS kiszállás, gyors és okos kiajánlás, fix árak. Foglaljon online!',
-    url: 'https://www.vizvillanyfutes.hu',
+    url: 'https://www.vizvillanyfutes.hu/',
     siteName: 'VízVillanyFűtés',
     locale: 'hu_HU',
     type: 'website',
@@ -72,8 +72,9 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://www.vizvillanyfutes.hu',
+    canonical: 'https://www.vizvillanyfutes.hu/',
   },
+
   category: 'business',
   icons: {
     icon: [
