@@ -122,9 +122,9 @@ export default function HomePage() {
             <div className="text-white space-y-2 text-center flex flex-col items-center lg:hidden">
               {role === 'contractor' ? (
                 <>
-                  <h1 className="text-3xl leading-[1.1] sm:text-4xl font-black font-heading tracking-tight text-center">
+                  <h2 className="text-3xl leading-[1.1] sm:text-4xl font-black font-heading tracking-tight text-center">
                     Új <span className="text-vvm-yellow-400">munkák</span> várnak rád!
-                  </h1>
+                  </h2>
                   <p className="text-xs sm:text-base text-blue-50/90 max-w-lg leading-relaxed font-light mx-auto">
                     <strong className="text-white font-semibold">Böngészd a friss megrendeléseket!</strong> Válaszd ki a számodra megfelelő munkákat és építsd az ügyfélköröd.
                   </p>
@@ -132,7 +132,7 @@ export default function HomePage() {
               ) : (
                 <>
                   <h1 className="text-3xl leading-[1.1] sm:text-4xl font-black font-heading tracking-tight text-center">
-                    Kérj <span className="text-vvm-yellow-400">segítséget</span> azonnal!
+                    Szakembert keresel? <span className="text-vvm-yellow-400">Segítség</span> azonnal!
                   </h1>
                   <p className="text-xs sm:text-base text-blue-50/90 max-w-lg leading-relaxed font-light mx-auto">
                     <strong className="text-white font-semibold">Rendelj szakit, mint egy taxit!</strong> A platform, ami azonnal összeköt az ellenőrzött szerelőkkel.
@@ -215,10 +215,10 @@ export default function HomePage() {
             <div className="hidden lg:flex flex-col items-start space-y-6 text-left pr-8 w-full max-w-[700px]">
               {role === 'contractor' ? (
                 <>
-                  <h1 className="text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] font-bold font-heading tracking-tight leading-[1.1] text-white">
+                  <h2 className="text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] font-bold font-heading tracking-tight leading-[1.1] text-white">
                     Új <span className="text-vvm-yellow-400">munkák</span><br />
                     várnak rád!
-                  </h1>
+                  </h2>
                   <p className="text-lg text-blue-100/90 max-w-lg leading-relaxed font-light">
                     <strong className="text-white font-semibold tracking-wide">Böngészd a friss megrendeléseket!</strong><br />
                     Válaszd ki a számodra megfelelő munkákat,
@@ -227,11 +227,11 @@ export default function HomePage() {
                 </>
               ) : (
                 <>
-                  <h1 className="text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] font-bold font-heading tracking-tight leading-[1.1] text-white">
+                  <h2 className="text-[2.75rem] lg:text-[3.5rem] xl:text-[4rem] font-bold font-heading tracking-tight leading-[1.1] text-white">
                     Találd meg a <br />
                     tökéletes <span className="text-vvm-yellow-400">szakembert</span><br />
                     percek alatt!
-                  </h1>
+                  </h2>
                   <p className="text-lg text-blue-100/90 max-w-lg leading-relaxed font-light">
                     <strong className="text-white font-semibold tracking-wide">Rendelj szakit, mint egy taxit!</strong><br />
                     A VízVillanyFűtés az új generációs platform, ami azonnal

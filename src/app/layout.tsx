@@ -12,7 +12,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.vizvillanyfutes.hu'),
   title: {
-    default: 'VízVillanyFűtés - Szakembert Keresünk Budapest',
+    default: 'VízVillanyFűtés - Szakembert Keresel? Vízszerelő, Villanyszerelő Budapest',
     template: '%s | VízVillanyFűtés',
   },
   description: 'Azonnal szakembert keresünk Budapesten! Vízszerelő, villanyszerelő, fűtésszerelő — ellenőrzött mesterek, gyors kiszállás, fix árak. Kérjen ingyenes ajánlatot!',

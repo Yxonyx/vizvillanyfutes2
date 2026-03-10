@@ -13,5 +13,14 @@
     Netlify-CDN-Cache-Control = "no-store"
     Surrogate-Control = "no-store"
 
+# Remove X-Powered-By and add security headers for all pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Powered-By = ""
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
 [functions]
   node_bundler = "esbuild"
